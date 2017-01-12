@@ -9,7 +9,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/spring1843/chat-server/chat"
-	"github.com/spring1843/chat-server/config"
+	"github.com/spring1843/chat-server/integration"
 )
 
 var chatServer *chat.Server
@@ -43,8 +43,8 @@ func serveWebSocket(w http.ResponseWriter, r *http.Request) {
 }
 
 // Start starts chat server
-func Start(chatServer *chat.Server, config config.Config) error {
-	chatServer = chatServer
+func Start(chatServerParam *chat.Server, config integration.Config) error {
+	chatServer = chatServerParam
 	http.HandleFunc("/client", serveClient)
 	http.HandleFunc("/ws", serveWebSocket)
 
@@ -55,7 +55,7 @@ func Start(chatServer *chat.Server, config config.Config) error {
 		}
 
 	}()
-	chatServer.LogPrintf("info \t Websocket server listening=%s:%d\nBrowse http://%s:%d/client/ for Websocket client", config.IP, config.WebsocketPort, config.IP, config.WebsocketPort)
+	chatServerParam.LogPrintf("info \t Websocket server listening=%s:%d\nBrowse http://%s:%d/client/ for Websocket client", config.IP, config.WebsocketPort, config.IP, config.WebsocketPort)
 
 	return nil
 }

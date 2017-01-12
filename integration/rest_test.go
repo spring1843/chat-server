@@ -1,4 +1,4 @@
-package rest_test
+package integration_test
 
 import (
 	"io/ioutil"
@@ -8,12 +8,12 @@ import (
 	"testing"
 
 	"github.com/spring1843/chat-server/chat"
-	"github.com/spring1843/chat-server/config"
+	"github.com/spring1843/chat-server/integration"
 	"github.com/spring1843/chat-server/rest"
 )
 
 func TestCanStartAndGetStatus(t *testing.T) {
-	config := config.Config{
+	config := integration.Config{
 		IP:       `0.0.0.0`,
 		RestPort: 4001,
 		LogFile:  `/dev/null`,

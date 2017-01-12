@@ -10,7 +10,7 @@ import (
 	"errors"
 
 	"github.com/spring1843/chat-server/chat"
-	"github.com/spring1843/chat-server/config"
+	"github.com/spring1843/chat-server/integration"
 	"github.com/spring1843/chat-server/rest"
 	"github.com/spring1843/chat-server/telnet"
 	"github.com/spring1843/chat-server/websocket"
@@ -35,7 +35,7 @@ func main() {
 }
 
 // configureNewChatServer configures a new chat server
-func configureNewChatServer(config config.Config) *chat.Server {
+func configureNewChatServer(config integration.Config) *chat.Server {
 	chatServer := chat.NewServer()
 	chatServer.Listen()
 	setLogFile(config.LogFile, chatServer)
@@ -43,7 +43,7 @@ func configureNewChatServer(config config.Config) *chat.Server {
 }
 
 // startTelnet starts the telnet server
-func startTelnet(config config.Config, chatServer *chat.Server) {
+func startTelnet(config integration.Config, chatServer *chat.Server) {
 	err := telnet.Start(chatServer, config)
 	if err != nil {
 		fmt.Printf("Could not start telnet server please check the logs for more info\n")
@@ -52,12 +52,12 @@ func startTelnet(config config.Config, chatServer *chat.Server) {
 }
 
 // startRest starts the rest server
-func startRest(config config.Config, chatServer *chat.Server) {
+func startRest(config integration.Config, chatServer *chat.Server) {
 	rest.Start(chatServer, config)
 }
 
 // startWebSocket starts the Websocket server
-func startWebSocket(config config.Config, chatServer *chat.Server) {
+func startWebSocket(config integration.Config, chatServer *chat.Server) {
 	err := websocket.Start(chatServer, config)
 	if err != nil {
 		fmt.Printf("Could not start websocket server please check the logs for more info\n")
@@ -90,14 +90,14 @@ func setLogFile(logFile string, chatServer *chat.Server) {
 }
 
 // getConfig parses configurations from a json string
-func getConfig(configFile string) config.Config {
+func getConfig(configFile string) integration.Config {
 	fileContents, err := ioutil.ReadFile(configFile)
 	if err != nil {
 		fmt.Printf("Error reading config file: %v\n", err)
 		panic(err)
 	}
 
-	config := new(config.Config)
+	config := new(integration.Config)
 	err = json.Unmarshal([]byte(fileContents), &config)
 	if err != nil {
 		fmt.Printf("Error parsing JSON config file: %v\n", err)

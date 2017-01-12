@@ -9,7 +9,7 @@ import (
 	"github.com/emicklei/go-restful"
 )
 
-// Register registers the message REST endpoints
+// Register the message REST endpoints
 func (r messageEndpoint) Register(container *restful.Container) {
 	ws := new(restful.WebService)
 	ws.Path("/v1/api").
@@ -120,7 +120,6 @@ func (r *messageEndpoint) searchLogForMessages(request *restful.Request, respons
 	var occurrences []string
 	regex := regexp.MustCompile(pattern)
 	for scanner.Scan() {
-
 		if len(occurrences) == 100 {
 			messageResponse.AddError(errTooManyResults)
 			break
@@ -134,7 +133,6 @@ func (r *messageEndpoint) searchLogForMessages(request *restful.Request, respons
 		if entry := regex.FindString(token); entry != `` {
 			occurrences = append(occurrences, entry)
 		}
-
 	}
 
 	messageResponse.Occurrences = occurrences

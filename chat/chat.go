@@ -77,13 +77,13 @@ func (s *Server) LogPrintf(format string, v ...interface{}) {
 	s.Logger.Printf(now.Format(time.UnixDate)+"\t"+format, v...)
 }
 
-// AddUser adds a user to this server
+// AddUser to this server
 func (s *Server) AddUser(user *User) {
 	user.SetServer(s)
 	s.Users = append(s.Users, user)
 }
 
-// RemoveUser removes a user from this server
+// RemoveUser from this server
 func (s *Server) RemoveUser(user *User) error {
 	i := -1
 	for _, user := range s.Users {

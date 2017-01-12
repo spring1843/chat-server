@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	// Command  commands are executed by a user on a server
+	// Command is executed by a user on a server
 	Command struct {
 		Name           string
 		Syntax         string

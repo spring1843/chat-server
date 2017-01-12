@@ -4,7 +4,7 @@ import (
 	"github.com/emicklei/go-restful"
 )
 
-// Register registers the status endpoint
+// Register the status endpoint
 func (g statusEndpoint) Register(container *restful.Container) {
 	ws := new(restful.WebService)
 	ws.Path("/status").

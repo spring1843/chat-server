@@ -8,11 +8,11 @@ import (
 	"strconv"
 
 	"github.com/spring1843/chat-server/chat"
-	"github.com/spring1843/chat-server/config"
+	"github.com/spring1843/chat-server/integration"
 )
 
 // Start starts the telnet server and configures it
-func Start(chatServer *chat.Server, config config.Config) error {
+func Start(chatServer *chat.Server, config integration.Config) error {
 	listener, err := net.Listen("tcp", config.IP+`:`+strconv.Itoa(config.TelnetPort))
 
 	if err != nil {

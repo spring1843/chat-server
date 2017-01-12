@@ -7,19 +7,18 @@ import (
 	"github.com/emicklei/go-restful"
 	"github.com/emicklei/go-restful/swagger"
 	"github.com/spring1843/chat-server/chat"
-	"github.com/spring1843/chat-server/config"
+	"github.com/spring1843/chat-server/integration"
 )
 
-// messageEndpoint holds an instance of the chat.Server
+// messageEndpoint an instance of the chat.Server
 type messageEndpoint struct {
 	ChatServer *chat.Server
 }
 
-// LogFilePath is the path to API log file
+// LogFilePath path to API log file
 var LogFilePath string
 
-// Register all rest routes
-func registerRoutes(chatServer *chat.Server, container *restful.Container) {
+func registerAllEndpoints(chatServer *chat.Server, container *restful.Container) {
 	messageResource := new(messageEndpoint)
 	messageResource.ChatServer = chatServer
 	messageResource.Register(container)
@@ -28,7 +27,6 @@ func registerRoutes(chatServer *chat.Server, container *restful.Container) {
 	statusResource.Register(container)
 }
 
-// Configure swagger
 func configureSwagger(wsContainer *restful.Container) swagger.Config {
 	return swagger.Config{
 		WebServices:     wsContainer.RegisteredWebServices(),
@@ -40,12 +38,11 @@ func configureSwagger(wsContainer *restful.Container) swagger.Config {
 }
 
 // Start the rest server and configures it
-func Start(chatServer *chat.Server, config config.Config) {
-
+func Start(chatServer *chat.Server, config integration.Config) {
 	LogFilePath = config.LogFile
 
 	wsContainer := restful.NewContainer()
-	registerRoutes(chatServer, wsContainer)
+	registerAllEndpoints(chatServer, wsContainer)
 	swagger.RegisterSwaggerService(configureSwagger(wsContainer), wsContainer)
 
 	chatServer.LogPrintf("info \t Rest server listening=%s:%d\nBrowse http://%s:%d/docs/ for RESTful endpoint docs", config.IP, config.RestPort, config.IP, config.RestPort)

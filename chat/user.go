@@ -36,7 +36,7 @@ func NewUser(connection Connection) *User {
 	return User
 }
 
-// Write writes to the user's connection and remembers the last message that was sent out
+// Write to the user's connection and remembers the last message that was sent out
 func (u *User) Write() {
 	for message := range u.Outgoing {
 		u.Connection.Write([]byte(message + "\n"))
@@ -44,7 +44,7 @@ func (u *User) Write() {
 	}
 }
 
-// Read reads and interprets a message from a user
+// Read and interprets a message from a user
 func (u *User) Read() {
 	for {
 		message := make([]byte, 256)
@@ -81,7 +81,7 @@ func (u *User) Listen() {
 	go u.Write()
 }
 
-// Ignore ignores a user
+// Ignore a user
 func (u *User) Ignore(user User) {
 	u.IgnoreList = append(u.IgnoreList, user)
 }
@@ -96,13 +96,13 @@ func (u *User) HasIgnored(user User) bool {
 	return false
 }
 
-// Disconnect disconnects a user from this server
+// Disconnect a user from this server
 func (u *User) Disconnect() {
 	u.Server.LogPrintf("connection \t disconnecting=@%s", u.NickName)
 	u.Connection.Close()
 }
 
-// handleNewInput Checks to see if a new input from user is a command
+// Checks to see if a new input from user is a command
 // If it is a command then it tries executing func
 // If it's not a command then it will output to the channel
 func (u *User) handleNewInput(input string) bool {

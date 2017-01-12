@@ -20,7 +20,7 @@ func NewChatConnection() *ChatConnection {
 	return newChatConnection
 }
 
-// Write writes to a ChatConnection
+// Write to a ChatConnection
 func (c *ChatConnection) Write(p []byte) (int, error) {
 	err := handleOutgoing(1, c, p)
 	if err != nil {
@@ -29,7 +29,7 @@ func (c *ChatConnection) Write(p []byte) (int, error) {
 	return len(p) - 1, nil
 }
 
-// Close closes a ChatConnection
+// Close a ChatConnection
 func (c *ChatConnection) Close() error {
 	err := c.Connection.Close()
 	if err != nil {
@@ -43,7 +43,7 @@ func (c *ChatConnection) RemoteAddr() net.Addr {
 	return c.Connection.RemoteAddr()
 }
 
-// Read reads from a ChatConnection
+// Read from a ChatConnection
 // P is a buffered, write only from the start and maintain the size
 func (c *ChatConnection) Read(p []byte) (int, error) {
 	i := 0

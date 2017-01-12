@@ -1,4 +1,4 @@
-package config
+package integration
 
 // Config holds the values ChatServer needs in order to run
 type Config struct {
