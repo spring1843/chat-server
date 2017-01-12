@@ -10,19 +10,21 @@ import (
 	"github.com/spring1843/chat-server/config"
 )
 
-type RestMessageResource struct {
+// messageEndpoint holds an instance of the chat.Server
+type messageEndpoint struct {
 	ChatServer *chat.Server
 }
 
+// LogFilePath is the path to API log file
 var LogFilePath string
 
 // Register all rest routes
 func registerRoutes(chatServer *chat.Server, container *restful.Container) {
-	messageResource := new(RestMessageResource)
+	messageResource := new(messageEndpoint)
 	messageResource.ChatServer = chatServer
 	messageResource.Register(container)
 
-	statusResource := new(StatusResource)
+	statusResource := new(statusEndpoint)
 	statusResource.Register(container)
 }
 
@@ -37,7 +39,7 @@ func configureSwagger(wsContainer *restful.Container) swagger.Config {
 	}
 }
 
-// Starts the rest server and configures it
+// Start the rest server and configures it
 func Start(chatServer *chat.Server, config config.Config) {
 
 	LogFilePath = config.LogFile

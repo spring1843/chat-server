@@ -1,6 +1,5 @@
 // Package telnet provides a driver for a chat-server
 // When started connections can be made to a tcp port by a telnet like application
-
 package telnet
 
 import (
@@ -12,7 +11,7 @@ import (
 	"github.com/spring1843/chat-server/config"
 )
 
-// Starts the telnet server and configures it
+// Start starts the telnet server and configures it
 func Start(chatServer *chat.Server, config config.Config) error {
 	listener, err := net.Listen("tcp", config.IP+`:`+strconv.Itoa(config.TelnetPort))
 

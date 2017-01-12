@@ -9,7 +9,7 @@ format:
 	@gofmt -l -s -w .
 
 lint:
-	@golint .
+	@golint ./...
 
 optimize_imports:
 	@goimports -l -w .

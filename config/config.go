@@ -1,5 +1,6 @@
 package config
 
+// Config holds the values ChatServer needs in order to run
 type Config struct {
 	TelnetPort    int    `json:"telnet_port"`
 	RestPort      int    `json:"rest_port"`

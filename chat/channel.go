@@ -5,12 +5,13 @@ import (
 	"time"
 )
 
-// Users can be in a channel and chat with each other
+// Channel users can be in a channel and chat with each other
 type Channel struct {
 	Name  string
 	Users []*User
 }
 
+// NewChannel returns a channel
 func NewChannel() *Channel {
 	channel := &Channel{
 		Users: make([]*User, 0),
@@ -19,15 +20,15 @@ func NewChannel() *Channel {
 	return channel
 }
 
-// Adds a user to this channel
+// AddUser adds a user to this channel
 func (c *Channel) AddUser(user *User) {
 	c.Users = append(c.Users, user)
 }
 
-// Removes a user from this server
-func (s *Channel) RemoveUser(user *User) error {
+// RemoveUser removes a user from this server
+func (c *Channel) RemoveUser(user *User) error {
 	i := -1
-	for _, user := range s.Users {
+	for _, user := range c.Users {
 		i++
 		if user.NickName == user.NickName {
 			break
@@ -36,14 +37,14 @@ func (s *Channel) RemoveUser(user *User) error {
 	if i == -1 {
 		return errors.New(`Did not find user to remove`)
 	}
-	copyUsers := s.Users
+	copyUsers := c.Users
 	copyUsers = append(copyUsers[:i], copyUsers[i+1:]...)
-	s.Users = copyUsers
+	c.Users = copyUsers
 
 	return nil
 }
 
-// Sends a message to every user in the chat room
+// Broadcast sends a message to every user in the chat room
 func (c *Channel) Broadcast(message string) {
 
 	now := time.Now()

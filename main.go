@@ -25,7 +25,7 @@ func main() {
 	chatServer := configureNewChatServer(config)
 	startTelnet(config, chatServer)
 	fmt.Printf("Info - Telnet Server Started\n")
-	startWebsocket(config, chatServer)
+	startWebSocket(config, chatServer)
 	fmt.Printf("Info - Websocket Server Started\n")
 	startRest(config, chatServer)
 	fmt.Printf("Info - Web Server Started\n")
@@ -34,7 +34,7 @@ func main() {
 	neverEnd()
 }
 
-// Configures a new chat server
+// configureNewChatServer configures a new chat server
 func configureNewChatServer(config config.Config) *chat.Server {
 	chatServer := chat.NewServer()
 	chatServer.Listen()
@@ -42,7 +42,7 @@ func configureNewChatServer(config config.Config) *chat.Server {
 	return chatServer
 }
 
-// Starts the telnet server
+// startTelnet starts the telnet server
 func startTelnet(config config.Config, chatServer *chat.Server) {
 	err := telnet.Start(chatServer, config)
 	if err != nil {
@@ -51,13 +51,13 @@ func startTelnet(config config.Config, chatServer *chat.Server) {
 	}
 }
 
-// Starts the rest server
+// startRest starts the rest server
 func startRest(config config.Config, chatServer *chat.Server) {
 	rest.Start(chatServer, config)
 }
 
-// Starts the Websocket server
-func startWebsocket(config config.Config, chatServer *chat.Server) {
+// startWebSocket starts the Websocket server
+func startWebSocket(config config.Config, chatServer *chat.Server) {
 	err := websocket.Start(chatServer, config)
 	if err != nil {
 		fmt.Printf("Could not start websocket server please check the logs for more info\n")
@@ -65,7 +65,7 @@ func startWebsocket(config config.Config, chatServer *chat.Server) {
 	}
 }
 
-// Validates command line arguments
+// validateCommandArguments validates command line arguments
 func validateCommandArguments(args []string) bool {
 	if len(args) < 3 || args[1] != `-c` || args[2] == `` {
 		fmt.Printf("Error - No config file specified. Usage %s -c config.json\n", os.Args[0])
@@ -74,7 +74,7 @@ func validateCommandArguments(args []string) bool {
 	return true
 }
 
-// Creates a log file to be given to a server
+// setLogFile creates a log file to be given to a server
 func setLogFile(logFile string, chatServer *chat.Server) {
 	if logFile == `` {
 		return
@@ -89,7 +89,7 @@ func setLogFile(logFile string, chatServer *chat.Server) {
 	fmt.Printf("Info - Log files written to %s\n", logFile)
 }
 
-// Parses configurations from a json string
+// getConfig parses configurations from a json string
 func getConfig(configFile string) config.Config {
 	fileContents, err := ioutil.ReadFile(configFile)
 	if err != nil {
@@ -107,7 +107,7 @@ func getConfig(configFile string) config.Config {
 	return *config
 }
 
-// Never end execution, avoids termination while the server is concurrently running
+// neverEnd never end execution, avoids termination while the server is concurrently running
 func neverEnd() {
 	for {
 		time.Sleep(1000 * time.Second)

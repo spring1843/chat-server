@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// All the params that are supported by chat commands, a chat command may use some or all of these params
+// CommandParams is all the params that are supported by chat commands, a chat command may use some or all of these params
 type CommandParams struct {
 	user1    *User
 	user2    *User
@@ -14,8 +14,8 @@ type CommandParams struct {
 	rawInput string
 }
 
-// Parses a nickname starting with @ from string
-func (c *ChatCommand) ParseNickNameFomInput(input string) (string, error) {
+// ParseNickNameFomInput parses a nickname starting with @ from string
+func (c *Command) ParseNickNameFomInput(input string) (string, error) {
 	subStrings := Filter(input, func(x string) bool {
 		return strings.Index(x, "@") >= 0
 	})
@@ -28,8 +28,8 @@ func (c *ChatCommand) ParseNickNameFomInput(input string) (string, error) {
 	return result[1:], nil
 }
 
-// Parses a channel name starting with # from string
-func (c *ChatCommand) ParseChannelFromInput(input string) (string, error) {
+// ParseChannelFromInput parses a channel name starting with # from string
+func (c *Command) ParseChannelFromInput(input string) (string, error) {
 	subStrings := Filter(input, func(x string) bool {
 		return strings.Index(x, "#") >= 0
 	})
@@ -42,8 +42,8 @@ func (c *ChatCommand) ParseChannelFromInput(input string) (string, error) {
 	return result[1:], nil
 }
 
-// Parses a command starting with / from string
-func (c *ChatCommand) ParseCommandFromInput(input string) (string, error) {
+// ParseCommandFromInput parses a command starting with / from string
+func (c *Command) ParseCommandFromInput(input string) (string, error) {
 	subStrings := Filter(input, func(x string) bool {
 		return strings.Index(x, "/") >= 0
 	})
@@ -56,8 +56,8 @@ func (c *ChatCommand) ParseCommandFromInput(input string) (string, error) {
 	return result[1:], nil
 }
 
-// Parses a message from command, messages do not start with # or / or @
-func (c *ChatCommand) ParseMessageFromInput(input string) (string, error) {
+// ParseMessageFromInput parses a message from command, messages do not start with # or / or @
+func (c *Command) ParseMessageFromInput(input string) (string, error) {
 	subStrings := Filter(input, func(x string) bool {
 		return strings.Index(x, "#") != 0 &&
 			strings.Index(x, "@") != 0 &&
@@ -71,9 +71,9 @@ func (c *ChatCommand) ParseMessageFromInput(input string) (string, error) {
 	return result, nil
 }
 
-// Filter input based on the given requirements defined by f function
+// Filter filters input based on the given requirements defined by f function
 func Filter(input string, function func(string) bool) []string {
-	vsf := make([]string, 0)
+	var vsf []string
 	for _, v := range strings.Split(input, " ") {
 		if function(v) {
 			vsf = append(vsf, v)
@@ -82,8 +82,8 @@ func Filter(input string, function func(string) bool) []string {
 	return vsf
 }
 
-// Checks to see if a command requires the given parameter
-func (c *ChatCommand) DoesCommandRequireParam(param string) bool {
+// DoesCommandRequireParam checks to see if a command requires the given parameter
+func (c *Command) DoesCommandRequireParam(param string) bool {
 	params := c.getChatCommand().RequiredParams
 	for _, p := range params {
 		if p == param {

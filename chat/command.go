@@ -6,70 +6,96 @@ import (
 	"time"
 )
 
-// Chat commands are executed by a user on a server
-type ChatCommand struct {
-	Name           string
-	Syntax         string
-	Description    string
-	RequiredParams []string
-}
+type (
+	// Command  commands are executed by a user on a server
+	Command struct {
+		Name           string
+		Syntax         string
+		Description    string
+		RequiredParams []string
+	}
+	// HelpCommand Shows list of available commands
+	HelpCommand struct {
+		Command
+	}
+	// ListCommand list available users in a channel
+	ListCommand struct {
+		Command
+	}
+	// IgnoreCommand allows a user to ignore another user
+	IgnoreCommand struct {
+		Command
+	}
+	// JoinCommand allows user to join a channel
+	JoinCommand struct {
+		Command
+	}
+	// PrivateMessageCommand allows a channel to privately message a user
+	PrivateMessageCommand struct {
+		Command
+	}
+	// QuitCommand allows a user to disconnect from the server
+	QuitCommand struct {
+		Command
+	}
+)
 
-func (c *ChatCommand) getChatCommand() ChatCommand {
+func (c *Command) getChatCommand() Command {
 	return *c
 }
 
-// Every command must be executable
+// Executable every command must be executable
 type Executable interface {
 	Execute(params CommandParams) error
-	getChatCommand() ChatCommand
+	getChatCommand() Command
 	ParseNickNameFomInput(input string) (string, error)
 	ParseChannelFromInput(input string) (string, error)
 	ParseMessageFromInput(input string) (string, error)
 	ParseCommandFromInput(input string) (string, error)
 }
 
-// Variable containing all valid chat commands supported by this server
+// AllChatCommands all valid chat commands supported by this server
 var AllChatCommands []Executable
 
 func init() {
 	AllChatCommands = []Executable{
 		&HelpCommand{
-			ChatCommand{
+			Command{
 				Name:           `help`,
 				Syntax:         `/help`,
 				Description:    `Shows the list of all available commands`,
 				RequiredParams: []string{`user1`},
 			}},
 		&ListCommand{
-			ChatCommand{
+			Command{
 				Name:           `list`,
 				Syntax:         `/list`,
 				Description:    `Lists user nicknames in the current channel`,
 				RequiredParams: []string{`user1`},
 			}},
 		&IgnoreCommand{
-			ChatCommand{
+			Command{
 				Name:           `ignore`,
 				Syntax:         `/ignore @nickname`,
 				Description:    `Ignore a user, followed by user nickname. An ignored user can not send you private messages`,
 				RequiredParams: []string{`user1`, `user2`},
 			}},
 		&JoinCommand{
-			ChatCommand{
+			Command{
 				Name:           `join`,
 				Syntax:         `/join #channel`,
 				Description:    `Join a channel`,
 				RequiredParams: []string{`user1`, `channel`},
 			}},
 		&PrivateMessageCommand{
-			ChatCommand{
+			Command{
 				Name:           `msg`,
 				Syntax:         `/msg @nickname message`,
 				Description:    `Send a private message to a user in the same channel`,
 				RequiredParams: []string{`user1`, `user2`, `message`},
 			}},
 		&QuitCommand{
-			ChatCommand{
+			Command{
 				Name:           `quit`,
 				Syntax:         `/quit`,
 				Description:    `Quit chat server`,
@@ -78,6 +104,7 @@ func init() {
 	}
 }
 
+// GetCommand gets a command if it exists
 func GetCommand(input string) (Executable, error) {
 	if len(input) < 2 || input[0:1] != `/` {
 		return nil, errors.New("Input too short to be a command")
@@ -93,11 +120,7 @@ func GetCommand(input string) (Executable, error) {
 	return nil, errors.New("Command not found")
 }
 
-type HelpCommand struct {
-	ChatCommand
-}
-
-// Shows all available chat commands on this server
+// Execute shows all available chat commands on this server
 func (c *HelpCommand) Execute(params CommandParams) error {
 	if params.user1 == nil {
 		return errors.New("User param is not set")
@@ -112,11 +135,7 @@ func (c *HelpCommand) Execute(params CommandParams) error {
 	return nil
 }
 
-type ListCommand struct {
-	ChatCommand
-}
-
-// Lists all the users in a channel to a user
+// Execute lists all the users in a channel to a user
 func (c *ListCommand) Execute(params CommandParams) error {
 	listMessage := "Here is the list of all users in this channel\n"
 
@@ -140,11 +159,7 @@ func (c *ListCommand) Execute(params CommandParams) error {
 	return nil
 }
 
-type IgnoreCommand struct {
-	ChatCommand
-}
-
-// Allows a user to ignore another user so to suppress all incoming messages from that user
+// Execute allows a user to ignore another user so to suppress all incoming messages from that user
 func (c *IgnoreCommand) Execute(params CommandParams) error {
 	if params.user1 == nil {
 		return errors.New("User1 param is not set")
@@ -163,11 +178,7 @@ func (c *IgnoreCommand) Execute(params CommandParams) error {
 	return nil
 }
 
-type JoinCommand struct {
-	ChatCommand
-}
-
-// Allows a user to join a channel
+// Execute allows a user to join a channel
 func (c *JoinCommand) Execute(params CommandParams) error {
 	if params.user1 == nil {
 		return errors.New("User1 param is not set")
@@ -195,11 +206,7 @@ func (c *JoinCommand) Execute(params CommandParams) error {
 	return nil
 }
 
-type PrivateMessageCommand struct {
-	ChatCommand
-}
-
-// Allows a user to send a private message to another user
+// Execute allows a user to send a private message to another user
 func (c *PrivateMessageCommand) Execute(params CommandParams) error {
 	if params.user1 == nil {
 		return errors.New("User1 param is not set")
@@ -225,11 +232,7 @@ func (c *PrivateMessageCommand) Execute(params CommandParams) error {
 	return nil
 }
 
-type QuitCommand struct {
-	ChatCommand
-}
-
-// Disconnects a user from server
+// Execute disconnects a user from server
 func (c *QuitCommand) Execute(params CommandParams) error {
 	if params.user1 == nil {
 		return errors.New("User1 param is not set")

@@ -6,12 +6,13 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// Connection is an middleman between the WebSocket connection and Chat Server
+// ChatConnection is an middleman between the WebSocket connection and Chat Server
 type ChatConnection struct {
 	Connection *websocket.Conn
 	Incoming   chan []byte
 }
 
+// NewChatConnection returns a new ChatConnection
 func NewChatConnection() *ChatConnection {
 	newChatConnection := &ChatConnection{
 		Incoming: make(chan []byte),
@@ -19,6 +20,7 @@ func NewChatConnection() *ChatConnection {
 	return newChatConnection
 }
 
+// Write writes to a ChatConnection
 func (c *ChatConnection) Write(p []byte) (int, error) {
 	err := handleOutgoing(1, c, p)
 	if err != nil {
@@ -27,6 +29,7 @@ func (c *ChatConnection) Write(p []byte) (int, error) {
 	return len(p) - 1, nil
 }
 
+// Close closes a ChatConnection
 func (c *ChatConnection) Close() error {
 	err := c.Connection.Close()
 	if err != nil {
@@ -34,11 +37,14 @@ func (c *ChatConnection) Close() error {
 	}
 	return nil
 }
+
+// RemoteAddr returns the remote address of the connected user
 func (c *ChatConnection) RemoteAddr() net.Addr {
 	return c.Connection.RemoteAddr()
 }
 
-//P is a buffered, write only from the start and maintain the size
+// Read reads from a ChatConnection
+// P is a buffered, write only from the start and maintain the size
 func (c *ChatConnection) Read(p []byte) (int, error) {
 	i := 0
 	message := <-c.Incoming

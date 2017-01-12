@@ -13,7 +13,7 @@ func Test_ParsingChatCommands(t *testing.T) {
 	cmd4 := `foo bar baz`
 	cmd5 := `#channel`
 
-	chatCommand := new(chat.ChatCommand)
+	chatCommand := new(chat.Command)
 
 	if output, _ := chatCommand.ParseCommandFromInput(cmd1); output != `msg` {
 		t.Errorf("Could not parse command name properly, got %s", output)
@@ -78,7 +78,7 @@ func Test_ParsingChatCommands(t *testing.T) {
 
 func Test_DoesCommandRequireParam(t *testing.T) {
 	fakeCommand := &chat.QuitCommand{
-		ChatCommand: chat.ChatCommand{
+		Command: chat.Command{
 			Name:           `quit`,
 			Syntax:         `/quit`,
 			Description:    `Quit chat server`,
@@ -86,11 +86,11 @@ func Test_DoesCommandRequireParam(t *testing.T) {
 		},
 	}
 
-	if fakeCommand.ChatCommand.DoesCommandRequireParam(`user1`) == false {
+	if fakeCommand.Command.DoesCommandRequireParam(`user1`) == false {
 		t.Errorf("Required param user1 was not seen as required.")
 	}
 
-	if fakeCommand.ChatCommand.DoesCommandRequireParam(`user2`) == true {
+	if fakeCommand.Command.DoesCommandRequireParam(`user2`) == true {
 		t.Errorf("Not-required param user2 was not seen as required.")
 	}
 }

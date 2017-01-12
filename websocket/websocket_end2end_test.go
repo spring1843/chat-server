@@ -14,7 +14,6 @@ import (
 )
 
 func Test_CantStartAndConnect(t *testing.T) {
-
 	config := config.Config{
 		IP:            `0.0.0.0`,
 		WebsocketPort: 4004,

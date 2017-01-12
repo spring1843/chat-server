@@ -6,9 +6,9 @@ import (
 	"strings"
 )
 
-// A user entity
+// User is temporarily in connected to a chat server, and can be in certain channels
 type User struct {
-	Connection          ChatConnection
+	Connection          Connection
 	NickName            string
 	Server              *Server
 	Channel             *Channel
@@ -19,7 +19,8 @@ type User struct {
 	LastIncomingMessage string
 }
 
-func NewUser(connection ChatConnection) *User {
+// NewUser returns a new User
+func NewUser(connection Connection) *User {
 	User := &User{
 		Connection: connection,
 		NickName:   ``,
@@ -35,7 +36,7 @@ func NewUser(connection ChatConnection) *User {
 	return User
 }
 
-// Writes to the user's connection and remembers the last message that was sent out
+// Write writes to the user's connection and remembers the last message that was sent out
 func (u *User) Write() {
 	for message := range u.Outgoing {
 		u.Connection.Write([]byte(message + "\n"))
@@ -43,7 +44,7 @@ func (u *User) Write() {
 	}
 }
 
-// Reads and interprets a message from a user
+// Read reads and interprets a message from a user
 func (u *User) Read() {
 	for {
 		message := make([]byte, 256)
@@ -69,23 +70,23 @@ func (u *User) Read() {
 	}
 }
 
-// Sets the server this user belongs to
+// SetServer sets the server this user belongs to
 func (u *User) SetServer(server *Server) {
 	u.Server = server
 }
 
-// Starts reading from and writing to a user
+// Listen starts reading from and writing to a user
 func (u *User) Listen() {
 	go u.Read()
 	go u.Write()
 }
 
-// Ignores a user
+// Ignore ignores a user
 func (u *User) Ignore(user User) {
 	u.IgnoreList = append(u.IgnoreList, user)
 }
 
-// Checks to see if a user has ignored another user or not
+// HasIgnored checks to see if a user has ignored another user or not
 func (u *User) HasIgnored(user User) bool {
 	for _, ignoredUser := range u.IgnoreList {
 		if ignoredUser.NickName == user.NickName {
@@ -95,13 +96,13 @@ func (u *User) HasIgnored(user User) bool {
 	return false
 }
 
-// Disconnects a user from this server
+// Disconnect disconnects a user from this server
 func (u *User) Disconnect() {
 	u.Server.LogPrintf("connection \t disconnecting=@%s", u.NickName)
 	u.Connection.Close()
 }
 
-// Checks to see if a new input from user is a command
+// handleNewInput Checks to see if a new input from user is a command
 // If it is a command then it tries executing func
 // If it's not a command then it will output to the channel
 func (u *User) handleNewInput(input string) bool {
@@ -123,7 +124,7 @@ func (u *User) handleNewInput(input string) bool {
 	return false
 }
 
-// Executes a given command
+// ExecuteCommand Executes a given command
 // First it finds all the required parameters from the input and populates them
 func (u *User) ExecuteCommand(input string, command Executable) error {
 	commandParams := CommandParams{

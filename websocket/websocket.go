@@ -12,7 +12,7 @@ import (
 	"github.com/spring1843/chat-server/config"
 )
 
-var ChatServer *chat.Server
+var chatServer *chat.Server
 
 func serveClient(w http.ResponseWriter, r *http.Request) {
 	var cwd, _ = os.Getwd()
@@ -29,23 +29,24 @@ func serveClient(w http.ResponseWriter, r *http.Request) {
 	clientTemplate.Execute(w, r.Host)
 }
 
-func serveWebsocket(w http.ResponseWriter, r *http.Request) {
+func serveWebSocket(w http.ResponseWriter, r *http.Request) {
 	var upgrader = new(websocket.Upgrader)
 	chatConnection := NewChatConnection()
 
-	c, err := upgrader.Upgrade(w, r, nil)
+	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		return
 	}
-	chatConnection.Connection = c
+	chatConnection.Connection = conn
 	go listen(chatConnection)
-	ChatServer.Connection <- chatConnection
+	chatServer.Connection <- chatConnection
 }
 
+// Start starts chat server
 func Start(chatServer *chat.Server, config config.Config) error {
-	ChatServer = chatServer
+	chatServer = chatServer
 	http.HandleFunc("/client", serveClient)
-	http.HandleFunc("/ws", serveWebsocket)
+	http.HandleFunc("/ws", serveWebSocket)
 
 	go func() {
 		err := http.ListenAndServe(config.IP+`:`+strconv.Itoa(config.WebsocketPort), nil)

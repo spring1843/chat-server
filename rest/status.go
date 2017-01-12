@@ -4,16 +4,8 @@ import (
 	"github.com/emicklei/go-restful"
 )
 
-type StatusResource struct{}
-
-type StatusResponse struct {
-	Response
-	Data struct {
-		Health string `json:"health"`
-	}
-}
-
-func (g StatusResource) Register(container *restful.Container) {
+// Register registers the status endpoint
+func (g statusEndpoint) Register(container *restful.Container) {
 	ws := new(restful.WebService)
 	ws.Path("/status").
 		Doc("Returns the status").
@@ -21,13 +13,24 @@ func (g StatusResource) Register(container *restful.Container) {
 		Produces(restful.MIME_JSON)
 
 	ws.Route(ws.GET("").To(Status).
-		Writes(StatusResponse{}))
+		Writes(statusResp{}))
 
 	container.Add(ws)
 }
 
+type (
+	statusEndpoint struct{}
+	statusResp     struct {
+		Response
+		Data struct {
+			Health string `json:"health"`
+		}
+	}
+)
+
+// Status shows the status of the chat server to the users
 func Status(request *restful.Request, response *restful.Response) {
-	resp := new(StatusResponse)
+	resp := new(statusResp)
 	resp.Data.Health = `ok`
 	resp.DecorateResponse(request)
 	response.WriteEntity(resp)
