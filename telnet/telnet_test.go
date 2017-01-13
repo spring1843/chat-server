@@ -1,4 +1,4 @@
-package integration_test
+package telnet_test
 
 import (
 	"bufio"
@@ -10,12 +10,12 @@ import (
 	"strings"
 
 	"github.com/spring1843/chat-server/chat"
-	"github.com/spring1843/chat-server/integration"
+	"github.com/spring1843/chat-server/config"
 	"github.com/spring1843/chat-server/telnet"
 )
 
 func TestCanStartTelnetAndConnectToIt(t *testing.T) {
-	config := integration.Config{
+	config := config.Config{
 		IP:         `0.0.0.0`,
 		TelnetPort: 4000,
 		LogFile:    `/dev/null`,
@@ -49,7 +49,7 @@ func TestCanStartTelnetAndConnectToIt(t *testing.T) {
 }
 
 func TestOutputErrorWhenCantStart(t *testing.T) {
-	config := integration.Config{
+	config := config.Config{
 		IP:         `0.0.0.0`,
 		TelnetPort: -1,
 		LogFile:    `/dev/null`,

@@ -13,11 +13,9 @@ type Channel struct {
 
 // NewChannel returns a channel
 func NewChannel() *Channel {
-	channel := &Channel{
+	return &Channel{
 		Users: make([]*User, 0),
 	}
-
-	return channel
 }
 
 // AddUser adds a user to this channel
@@ -46,7 +44,6 @@ func (c *Channel) RemoveUser(user *User) error {
 
 // Broadcast sends a message to every user in the chat room
 func (c *Channel) Broadcast(message string) {
-
 	now := time.Now()
 	message = now.Format(time.Kitchen) + `-` + message
 

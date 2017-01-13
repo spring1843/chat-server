@@ -33,7 +33,7 @@ type (
 
 // NewServer returns a new instance of the Server
 func NewServer() *Server {
-	server := &Server{
+	return &Server{
 		Connection: make(chan Connection),
 		Users:      make([]*User, 0),
 		Channels:   make([]*Channel, 0),
@@ -42,8 +42,6 @@ func NewServer() *Server {
 		Logger:     new(log.Logger),
 		CanLog:     false,
 	}
-
-	return server
 }
 
 // Listen Makes this server start listening to connections, when a user is connected he or she is welcomed

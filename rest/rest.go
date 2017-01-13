@@ -7,7 +7,7 @@ import (
 	"github.com/emicklei/go-restful"
 	"github.com/emicklei/go-restful/swagger"
 	"github.com/spring1843/chat-server/chat"
-	"github.com/spring1843/chat-server/integration"
+	"github.com/spring1843/chat-server/config"
 )
 
 // messageEndpoint an instance of the chat.Server
@@ -38,7 +38,7 @@ func configureSwagger(wsContainer *restful.Container) swagger.Config {
 }
 
 // Start the rest server and configures it
-func Start(chatServer *chat.Server, config integration.Config) {
+func Start(chatServer *chat.Server, config config.Config) {
 	LogFilePath = config.LogFile
 
 	wsContainer := restful.NewContainer()

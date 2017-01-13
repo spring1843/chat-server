@@ -1,0 +1,32 @@
+package config
+
+import (
+	"encoding/json"
+	"io/ioutil"
+	"log"
+)
+
+// Config holds the values ChatServer needs in order to run
+type Config struct {
+	TelnetPort    int    `json:"telnet_port"`
+	RestPort      int    `json:"rest_port"`
+	WebsocketPort int    `json:"websocket_port"`
+	LogFile       string `json:"log_file"`
+	IP            string `json:"ip"`
+}
+
+// FromFile parses Config from a .json file
+func FromFile(configFile string) Config {
+	fileContents, err := ioutil.ReadFile(configFile)
+	if err != nil {
+		log.Fatalf("Error reading config file: %s", err)
+	}
+
+	config := new(Config)
+	err = json.Unmarshal([]byte(fileContents), &config)
+	if err != nil {
+		log.Fatalf("Error parsing JSON config file: %s", err)
+	}
+
+	return *config
+}

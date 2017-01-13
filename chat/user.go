@@ -30,7 +30,6 @@ func NewUser(connection Connection) *User {
 		Incoming:   make(chan string),
 		Outgoing:   make(chan string),
 	}
-
 	User.Listen()
 
 	return User
@@ -66,7 +65,6 @@ func (u *User) Read() {
 		if input != "\n" && input != `` {
 			u.Incoming <- input
 		}
-
 	}
 }
 
