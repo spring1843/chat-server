@@ -14,7 +14,7 @@ lint:
 optimize_imports:
 	@goimports -l -w .
 
-beautify: format lint optimize_imports
+beautify: format optimize_imports
 
 vet:
 	@go vet ./...
@@ -22,7 +22,7 @@ vet:
 race:
 	@go test -race $(GOFLAGS) ./...
 
-audit: vet race
+audit: vet race lint
 
 install:
 	@go get $(GOFLAGS) ./...
