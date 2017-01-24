@@ -9,7 +9,6 @@ import (
 )
 
 func Test_CanAddUsers(t *testing.T) {
-
 	var (
 		channel = chat.NewChannel()
 		user1   = new(chat.User)

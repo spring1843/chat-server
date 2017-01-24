@@ -100,9 +100,9 @@ func Test_WelcomeNewUser(t *testing.T) {
 	server.SetLogFile(logFile)
 
 	server.Listen()
-	connection.incomingMutex.Lock()
+	connection.lock.Lock()
 	connection.incoming = []byte("foo\n")
-	connection.incomingMutex.Unlock()
+	connection.lock.Unlock()
 
 	server.WelcomeNewUser(connection)
 
@@ -115,7 +115,7 @@ type MockedChatConnectionNetwork struct{}
 
 func NewMockedChatConnection() *MockedChatConnection {
 	mockedChatConnection := new(MockedChatConnection)
-	mockedChatConnection.incomingMutex = &sync.Mutex{}
+	mockedChatConnection.lock = &sync.Mutex{}
 	return mockedChatConnection
 }
 
@@ -127,20 +127,29 @@ func (f *MockedChatConnectionNetwork) String() string {
 }
 
 type MockedChatConnection struct {
-	outgoing      []byte
-	incoming      []byte
-	incomingMutex *sync.Mutex
+	outgoing []byte
+	incoming []byte
+	lock     *sync.Mutex
 }
 
 func (m *MockedChatConnection) Write(p []byte) (n int, err error) {
+	m.lock.Lock()
 	m.outgoing = p
+	m.lock.Unlock()
 	return len(m.outgoing), nil
 }
 
+func (m *MockedChatConnection) ReadOutgoing() []byte {
+	m.lock.Lock()
+	outgoing := m.outgoing
+	m.lock.Unlock()
+	return outgoing
+}
+
 func (m *MockedChatConnection) Read(p []byte) (n int, err error) {
-	m.incomingMutex.Lock()
+	m.lock.Lock()
 	if len(m.incoming) == 0 {
-		m.incomingMutex.Unlock()
+		m.lock.Unlock()
 		return 0, io.EOF
 	}
 	i := 0
@@ -148,7 +157,7 @@ func (m *MockedChatConnection) Read(p []byte) (n int, err error) {
 		p[i] = bit
 		i++
 	}
-	m.incomingMutex.Unlock()
+	m.lock.Unlock()
 	return i, nil
 }
 

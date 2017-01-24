@@ -28,7 +28,8 @@ func Test_CanWriteToUser(t *testing.T) {
 
 	user1.Outgoing <- `foo`
 
-	if reflect.DeepEqual(fakeWriter.outgoing, []byte("foo\n")) == false {
+	outgoing := fakeWriter.ReadOutgoing()
+	if reflect.DeepEqual(outgoing, []byte("foo\n")) == false {
 		t.Errorf("Message was not written to the user")
 	}
 }
