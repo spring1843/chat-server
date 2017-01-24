@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -43,7 +44,7 @@ func serveWebSocket(w http.ResponseWriter, r *http.Request) {
 }
 
 // Start starts chat server
-func Start(chatServerParam *chat.Server, config config.Config) error {
+func Start(chatServerParam *chat.Server, config config.Config) {
 	chatServer = chatServerParam
 	http.HandleFunc("/client", serveClient)
 	http.HandleFunc("/ws", serveWebSocket)
@@ -51,11 +52,9 @@ func Start(chatServerParam *chat.Server, config config.Config) error {
 	go func() {
 		err := http.ListenAndServe(config.IP+`:`+strconv.Itoa(config.WebsocketPort), nil)
 		if err != nil {
-			panic("Could not open websocket connection, address already in use?")
+			log.Fatalf("Could not open websocket connection. Error %s", err)
 		}
-
 	}()
-	chatServerParam.LogPrintf("info \t Websocket server listening=%s:%d\nBrowse http://%s:%d/client/ for Websocket client", config.IP, config.WebsocketPort, config.IP, config.WebsocketPort)
 
-	return nil
+	chatServerParam.LogPrintf("info \t Websocket server listening=%s:%d\nBrowse http://%s:%d/client/ for Websocket client", config.IP, config.WebsocketPort, config.IP, config.WebsocketPort)
 }

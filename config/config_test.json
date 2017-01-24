@@ -1,0 +1,7 @@
+{
+  "telnet_port" : 4000,
+  "rest_port" : 4001,
+  "websocket_port" : 4004,
+  "log_file" : "chat-server.log",
+  "ip" : "6.6.6.6"
+}

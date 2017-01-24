@@ -26,10 +26,7 @@ func Test_CantStartAndConnect(t *testing.T) {
 	testFile, _ := os.OpenFile(config.LogFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	chatServer.SetLogFile(testFile)
 
-	err := websocket.Start(chatServer, config)
-	if err != nil {
-		t.Errorf("Could not start WebSocket server: %s", err.Error())
-	}
+	websocket.Start(chatServer, config)
 
 	u := url.URL{Scheme: "ws", Host: "127.0.0.1:" + strconv.Itoa(config.WebsocketPort), Path: "/ws"}
 

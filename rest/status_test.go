@@ -25,7 +25,8 @@ func TestCanStartAndGetStatus(t *testing.T) {
 	testFile, _ := os.OpenFile(config.LogFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	chatServer.SetLogFile(testFile)
 
-	rest.Start(chatServer, config)
+	restfulAPI := rest.NewRESTfulAPI(config, chatServer)
+	go restfulAPI.ListenAndServe()
 
 	response, err := http.Get("http://localhost:4001/status")
 	if err != nil {

@@ -37,8 +37,8 @@ func configureSwagger(wsContainer *restful.Container) swagger.Config {
 	}
 }
 
-// Start the rest server and configures it
-func Start(chatServer *chat.Server, config config.Config) {
+// NewRESTfulAPI the rest server and configures it
+func NewRESTfulAPI(config config.Config, chatServer *chat.Server) *http.Server {
 	LogFilePath = config.LogFile
 
 	wsContainer := restful.NewContainer()
@@ -47,12 +47,5 @@ func Start(chatServer *chat.Server, config config.Config) {
 
 	chatServer.LogPrintf("info \t Rest server listening=%s:%d\nBrowse http://%s:%d/docs/ for RESTful endpoint docs", config.IP, config.RestPort, config.IP, config.RestPort)
 
-	server := &http.Server{Addr: ":" + strconv.Itoa(config.RestPort), Handler: wsContainer}
-
-	go func() {
-		err := server.ListenAndServe()
-		if err != nil {
-			panic(err)
-		}
-	}()
+	return &http.Server{Addr: ":" + strconv.Itoa(config.RestPort), Handler: wsContainer}
 }

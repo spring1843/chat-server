@@ -3,12 +3,12 @@
 package telnet
 
 import (
-	"errors"
 	"net"
 	"strconv"
 
 	"github.com/spring1843/chat-server/chat"
 	"github.com/spring1843/chat-server/config"
+	"github.com/spring1843/pomain/src/shared/errs"
 )
 
 // Start starts the telnet server and configures it
@@ -17,7 +17,7 @@ func Start(chatServer *chat.Server, config config.Config) error {
 
 	if err != nil {
 		chatServer.LogPrintf("error \t port in use? Error while listening for telnet connections on %s:%d : %v\n", config.IP, config.TelnetPort, err)
-		return errors.New("Could not open telnet connection")
+		return errs.Wrap(err, "Could not open telnet connection")
 	}
 
 	go func(chatServer *chat.Server) {
