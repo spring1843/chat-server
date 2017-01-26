@@ -13,7 +13,7 @@ import (
 )
 
 func bootstrap(config config.Config) {
-	chatServer := chat.NewServer()
+	chatServer := chat.NewService()
 
 	if err := setLogFile(config.LogFile, chatServer); err != nil {
 		log.Printf("Error - opening log file %s : %v", config.LogFile, err)

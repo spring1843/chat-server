@@ -19,7 +19,7 @@ func TestCanStartAndGetStatus(t *testing.T) {
 		LogFile:  `/dev/null`,
 	}
 
-	chatServer := chat.NewServer()
+	chatServer := chat.NewService()
 	chatServer.Listen()
 
 	testFile, _ := os.OpenFile(config.LogFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)

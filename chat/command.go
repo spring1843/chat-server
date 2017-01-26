@@ -137,11 +137,11 @@ func (c *ListCommand) Execute(params CommandParams) error {
 		return errors.New("User is not in a channel")
 	}
 
-	for _, user := range params.user1.Channel.Users {
-		if user.NickName == params.user1.NickName {
+	for nickName := range params.user1.Channel.Users {
+		if nickName == params.user1.NickName {
 			continue
 		}
-		listMessage += "@" + user.NickName + ".\n"
+		listMessage += "@" + nickName + ".\n"
 	}
 
 	params.user1.Outgoing <- listMessage
@@ -163,7 +163,7 @@ func (c *IgnoreCommand) Execute(params CommandParams) error {
 		return errors.New("We don't let one ignore themselves")
 	}
 
-	params.user1.Ignore(*params.user2)
+	params.user1.Ignore(params.user2.NickName)
 	params.user1.Outgoing <- params.user2.NickName + " is now ignored."
 	return nil
 }
@@ -187,12 +187,12 @@ func (c *JoinCommand) Execute(params CommandParams) error {
 		return errors.New("You are already in channel #" + params.channel.Name)
 	}
 
-	params.channel.AddUser(params.user1)
+	params.channel.AddUser(params.user1.NickName)
 	params.user1.Channel = params.channel
 
 	params.user1.Outgoing <- "There are " + strconv.Itoa(len(params.channel.Users)) + " other users this channel."
 
-	params.channel.Broadcast(`@` + params.user1.NickName + ` just joined channel #` + params.channel.Name)
+	params.channel.Broadcast(RunningServer, `@`+params.user1.NickName+` just joined channel #`+params.channel.Name)
 	return nil
 }
 
@@ -210,7 +210,7 @@ func (c *PrivateMessageCommand) Execute(params CommandParams) error {
 		return errors.New("Users are not in the same channel")
 	}
 
-	if params.user2.HasIgnored(*params.user1) {
+	if params.user2.HasIgnored(params.user1.NickName) {
 		return errors.New("User has ignored the sender")
 	}
 
@@ -228,9 +228,11 @@ func (c *QuitCommand) Execute(params CommandParams) error {
 		return errors.New("User1 param is not set")
 	}
 
-	params.user1.Server.RemoveUser(params.user1)
+	if err := params.user1.Server.RemoveUser(params.user1.NickName); err != nil {
+		return errors.New("Could not remove user afeter quit command")
+	}
 	if params.user1.Channel != nil {
-		params.user1.Channel.RemoveUser(params.user1)
+		params.user1.Channel.RemoveUser(params.user1.NickName)
 	}
 	params.user1.Disconnect()
 

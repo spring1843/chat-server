@@ -7,17 +7,20 @@ import (
 	"github.com/spring1843/chat-server/chat"
 )
 
-func Test_CanIgnore(t *testing.T) {
-	user1 := &chat.User{NickName: `u1`}
-	user2 := &chat.User{NickName: `u2`}
-	user3 := &chat.User{NickName: `u3`}
+var (
+	user1 = &chat.User{NickName: `u1`, Outgoing: make(chan string), IgnoreList: make(map[string]bool)}
+	user2 = &chat.User{NickName: `u2`, Outgoing: make(chan string), IgnoreList: make(map[string]bool)}
+	user3 = &chat.User{NickName: `u3`, Outgoing: make(chan string), IgnoreList: make(map[string]bool)}
+)
 
-	user1.Ignore(*user2)
-	if user1.HasIgnored(*user2) != true {
+func Test_CanIgnore(t *testing.T) {
+
+	user1.Ignore(user2.NickName)
+	if user1.HasIgnored(user2.NickName) != true {
 		t.Errorf("User was not ignored when he should have been")
 	}
 
-	if user1.HasIgnored(*user3) != false {
+	if user1.HasIgnored(user3.NickName) != false {
 		t.Errorf("User was ignored when he should not have been")
 	}
 }

@@ -43,7 +43,7 @@ func Test_HelpCommand(t *testing.T) {
 	fakeConnection := NewMockedChatConnection()
 	fakeConnection.incoming = []byte("/help\n")
 
-	server := chat.NewServer()
+	server := chat.NewService()
 	user := chat.NewUser(fakeConnection)
 	server.AddUser(user)
 	msg := <-user.Outgoing
@@ -58,7 +58,7 @@ func Test_ListCommand(t *testing.T) {
 	fakeConnection2 := NewMockedChatConnection()
 	fakeConnection3 := NewMockedChatConnection()
 
-	server := chat.NewServer()
+	server := chat.NewService()
 	server.AddChannel(`foo`)
 
 	input := `/join #foo`
@@ -101,7 +101,7 @@ func Test_IgnoreCommand(t *testing.T) {
 	fakeConnection1 := NewMockedChatConnection()
 	fakeConnection2 := NewMockedChatConnection()
 
-	server := chat.NewServer()
+	server := chat.NewService()
 
 	user1 := chat.NewUser(fakeConnection1)
 	user2 := chat.NewUser(fakeConnection2)
@@ -113,7 +113,7 @@ func Test_IgnoreCommand(t *testing.T) {
 	input := `/ignore @u2`
 	ignoreCommand, _ := chat.GetCommand(input)
 	user1.ExecuteCommand(input, ignoreCommand)
-	if user1.HasIgnored(*user2) != true {
+	if user1.HasIgnored(user2.NickName) != true {
 		t.Errorf("User was not ignored after ignore command executed")
 	}
 }
@@ -121,7 +121,7 @@ func Test_IgnoreCommand(t *testing.T) {
 func Test_JoinCommand(t *testing.T) {
 	fakeConnection1 := NewMockedChatConnection()
 
-	server := chat.NewServer()
+	server := chat.NewService()
 	user1 := chat.NewUser(fakeConnection1)
 	server.AddUser(user1)
 
@@ -141,7 +141,7 @@ func Test_MessageCommand(t *testing.T) {
 	fakeConnection1 := NewMockedChatConnection()
 	fakeConnection2 := NewMockedChatConnection()
 
-	server := chat.NewServer()
+	server := chat.NewService()
 
 	user1 := chat.NewUser(fakeConnection1)
 	user1.NickName = `u1`
@@ -170,7 +170,7 @@ func Test_MessageCommand(t *testing.T) {
 func Test_QuitCommand(t *testing.T) {
 	fakeConnection := NewMockedChatConnection()
 
-	server := chat.NewServer()
+	server := chat.NewService()
 	user := chat.NewUser(fakeConnection)
 	user.NickName = `foo`
 	server.AddUser(user)

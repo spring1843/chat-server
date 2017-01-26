@@ -12,7 +12,7 @@ type User struct {
 	NickName            string
 	Server              *Service
 	Channel             *Channel
-	IgnoreList          []User
+	IgnoreList          map[string]bool
 	Incoming            chan string
 	Outgoing            chan string
 	LastOutGoingMessage string
@@ -26,7 +26,7 @@ func NewUser(connection Connection) *User {
 		NickName:   ``,
 		Server:     nil,
 		Channel:    nil,
-		IgnoreList: make([]User, 0),
+		IgnoreList: make(map[string]bool),
 		Incoming:   make(chan string),
 		Outgoing:   make(chan string),
 	}
@@ -68,11 +68,6 @@ func (u *User) Read() {
 	}
 }
 
-// SetServer sets the server this user belongs to
-func (u *User) SetServer(server *Service) {
-	u.Server = server
-}
-
 // Listen starts reading from and writing to a user
 func (u *User) Listen() {
 	go u.Read()
@@ -80,16 +75,14 @@ func (u *User) Listen() {
 }
 
 // Ignore a user
-func (u *User) Ignore(user User) {
-	u.IgnoreList = append(u.IgnoreList, user)
+func (u *User) Ignore(nickName string) {
+	u.IgnoreList[nickName] = true
 }
 
 // HasIgnored checks to see if a user has ignored another user or not
-func (u *User) HasIgnored(user User) bool {
-	for _, ignoredUser := range u.IgnoreList {
-		if ignoredUser.NickName == user.NickName {
-			return true
-		}
+func (u *User) HasIgnored(nickName string) bool {
+	if _, ok := u.IgnoreList[nickName]; ok {
+		return true
 	}
 	return false
 }
@@ -115,7 +108,7 @@ func (u *User) handleNewInput(input string) bool {
 
 	if u.Channel != nil {
 		u.Server.LogPrintf("message \t @%s in #%s message=%s", u.NickName, u.Channel.Name, input)
-		u.Channel.Broadcast(`@` + u.NickName + `: ` + input)
+		u.Channel.Broadcast(RunningServer, `@`+u.NickName+`: `+input)
 		return true
 	}
 
