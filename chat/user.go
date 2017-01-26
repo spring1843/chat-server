@@ -10,7 +10,7 @@ import (
 type User struct {
 	Connection          Connection
 	NickName            string
-	Server              *Server
+	Server              *Service
 	Channel             *Channel
 	IgnoreList          []User
 	Incoming            chan string
@@ -69,7 +69,7 @@ func (u *User) Read() {
 }
 
 // SetServer sets the server this user belongs to
-func (u *User) SetServer(server *Server) {
+func (u *User) SetServer(server *Service) {
 	u.Server = server
 }
 

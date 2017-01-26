@@ -30,7 +30,7 @@ install:
 test: install
 	@go test $(GOFLAGS) ./...
 
-checkin : beautify audit
+commit : beautify audit
 	@git add -p .
 
 bench: install

@@ -44,16 +44,6 @@ func (c *Command) getChatCommand() Command {
 	return *c
 }
 
-// Executable every command must be executable
-type Executable interface {
-	Execute(params CommandParams) error
-	getChatCommand() Command
-	ParseNickNameFomInput(input string) (string, error)
-	ParseChannelFromInput(input string) (string, error)
-	ParseMessageFromInput(input string) (string, error)
-	ParseCommandFromInput(input string) (string, error)
-}
-
 // AllChatCommands all valid chat commands supported by this server
 var AllChatCommands []Executable
 
