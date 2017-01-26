@@ -52,7 +52,6 @@ func Test_CantStartAndConnect(t *testing.T) {
 		t.Error("Could not set user nickname")
 	}
 
-	t.Skipf("Enable this separately")
 	conn.WriteMessage(1, []byte(`/quit`))
 	_, message, err = conn.ReadMessage()
 

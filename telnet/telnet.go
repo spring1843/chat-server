@@ -12,7 +12,7 @@ import (
 )
 
 // Start starts the telnet server and configures it
-func Start(chatServer *chat.Service, config config.Config) error {
+func Start(chatServer chat.Server, config config.Config) error {
 	listener, err := net.Listen("tcp", config.IP+`:`+strconv.Itoa(config.TelnetPort))
 
 	if err != nil {
@@ -20,13 +20,13 @@ func Start(chatServer *chat.Service, config config.Config) error {
 		return errs.Wrap(err, "Could not open telnet connection")
 	}
 
-	go func(chatServer *chat.Service) {
+	go func(chatServer chat.Server) {
 		for {
 			connection, err := listener.Accept()
 			if err != nil {
-				chatServer.Logger.Printf("Error accepting connection %s", err.Error())
+				chatServer.LogPrintf("Error accepting connection %s", err.Error())
 			}
-			chatServer.Connection <- connection
+			chatServer.ReceiveConnection(connection)
 		}
 	}(chatServer)
 

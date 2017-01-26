@@ -179,8 +179,8 @@ func (c *JoinCommand) Execute(params CommandParams) error {
 		if err != nil {
 			return errors.New("Could not parse channel name")
 		}
-		params.user1.Server.AddChannel(channelName)
-		params.channel, _ = params.user1.Server.GetChannel(channelName)
+		params.server.AddChannel(channelName)
+		params.channel, _ = params.server.GetChannel(channelName)
 	}
 
 	if params.user1.Channel != nil && params.user1.Channel.Name == params.channel.Name {
@@ -214,7 +214,7 @@ func (c *PrivateMessageCommand) Execute(params CommandParams) error {
 		return errors.New("User has ignored the sender")
 	}
 
-	params.user1.Server.LogPrintf("message \t @%s to @%s message=%s", params.user1.NickName, params.user2.NickName, params.message)
+	params.server.LogPrintf("message \t @%s to @%s message=%s", params.user1.NickName, params.user2.NickName, params.message)
 
 	now := time.Now()
 	params.user2.Outgoing <- now.Format(time.Kitchen) + ` - *Private from @` + params.user1.NickName + `: ` + params.message
@@ -228,7 +228,7 @@ func (c *QuitCommand) Execute(params CommandParams) error {
 		return errors.New("User1 param is not set")
 	}
 
-	if err := params.user1.Server.RemoveUser(params.user1.NickName); err != nil {
+	if err := params.server.RemoveUser(params.user1.NickName); err != nil {
 		return errors.New("Could not remove user afeter quit command")
 	}
 	if params.user1.Channel != nil {

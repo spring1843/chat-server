@@ -9,15 +9,22 @@ type (
 	// Server is an interface for the chat server
 	Server interface {
 		Listen()
+		ReceiveConnection(conn Connection)
+		Broadcast(message string)
+
 		SetLogFile(file io.Writer)
 		LogPrintf(format string, v ...interface{})
+
 		AddUser(user *User)
-		RemoveUser(*User) error
-		GetUser(string) (*User, error)
+		RemoveUser(nickName string) error
+		GetUser(nickName string) (*User, error)
 		IsUserConnected(string) bool
+		ConnectedUsersCount() int
+		WelcomeNewUser(connection Connection)
+
 		GetChannel(string) (*Channel, error)
 		AddChannel(channelName string) *Channel
-		WelcomeNewUser(connection Connection)
+		GetChannelCount() int
 	}
 	// Connection is an interface for a network connection
 	Connection interface {

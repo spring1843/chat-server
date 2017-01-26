@@ -11,14 +11,12 @@ import (
 	"time"
 )
 
-var RunningServer = NewService()
-
 type (
 	// Service  keeps listening for connections, it contains users and channels
 	Service struct {
 		Connection chan Connection
 		Logger     *log.Logger
-		Channels   []*Channel
+		Channels   map[string]*Channel
 		Users      map[string]*User
 		Incoming   chan string
 		Outgoing   chan string
@@ -27,18 +25,22 @@ type (
 	}
 )
 
+// RunningServer is the running instance of chat server
+var RunningServer = NewService()
+
 // NewService returns a new instance of the Server
-func NewService() *Service {
-	return &Service{
+func NewService() Server {
+	runningServer := &Service{
 		Connection: make(chan Connection),
+		Channels:   make(map[string]*Channel),
 		Users:      make(map[string]*User),
-		Channels:   make([]*Channel, 0),
 		Incoming:   make(chan string),
 		Outgoing:   make(chan string),
 		Logger:     new(log.Logger),
 		CanLog:     false,
 		lock:       new(sync.Mutex),
 	}
+	return runningServer
 }
 
 // Listen Makes this server start listening to connections, when a user is connected he or she is welcomed
@@ -82,9 +84,6 @@ func (s *Service) AddUser(user *User) {
 // RemoveUser from this server
 func (s *Service) RemoveUser(nickName string) error {
 	s.lock.Lock()
-	if _, ok := s.Users[nickName]; !ok {
-		return errors.New("Can not remove user, nickname " + nickName + " does not exist")
-	}
 	delete(s.Users, nickName)
 	s.lock.Unlock()
 	return nil
@@ -111,29 +110,69 @@ func (s *Service) IsUserConnected(nickName string) bool {
 	return true
 }
 
+// ReceiveConnection is used when there's a new connection
+func (s *Service) ReceiveConnection(conn Connection) {
+	s.Connection <- conn
+}
+
 // GetChannel gets a channel from the given channelName
 func (s *Service) GetChannel(channelName string) (*Channel, error) {
-	for _, channel := range s.Channels {
-		if channel.Name == channelName {
-			return channel, nil
-		}
+	s.lock.Lock()
+	if _, ok := s.Channels[channelName]; ok {
+		channel := s.Channels[channelName]
+		s.lock.Unlock()
+		return channel, nil
 	}
+	s.lock.Unlock()
+
 	return nil, errors.New(`Channel #` + channelName + ` does not exist on this server`)
+}
+
+// GetChannelCount returns the number of channels on this server
+func (s *Service) GetChannelCount() int {
+	s.lock.Lock()
+	count := len(s.Channels)
+	s.lock.Unlock()
+	return count
 }
 
 // AddChannel adds a channel to this server
 func (s *Service) AddChannel(channelName string) *Channel {
 	channel := NewChannel()
 	channel.Name = channelName
-	s.Channels = append(s.Channels, channel)
+
+	s.lock.Lock()
+	s.Channels[channelName] = channel
+	s.lock.Unlock()
+
 	return channel
 }
 
+// ConnectedUsersCount returns the number of connected users
 func (s *Service) ConnectedUsersCount() int {
 	s.lock.Lock()
 	count := len(s.Users)
 	s.lock.Unlock()
 	return count
+}
+
+// Broadcast sends a message to every user connected to the server
+func (s *Service) Broadcast(message string) {
+	now := time.Now()
+	message = now.Format(time.Kitchen) + `-` + message
+
+	s.lock.Lock()
+	users := s.Users
+	s.lock.Unlock()
+
+	for nickName := range users {
+		user, err := s.GetUser(nickName)
+		// User may no longer be connected to the chat server
+		if err != nil {
+			continue
+		}
+		user.Outgoing <- message
+	}
 }
 
 // WelcomeNewUser shows a welcome message to a new user and makes a new user entity by asking the new user to pick a nickname

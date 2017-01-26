@@ -33,21 +33,22 @@ func (c *Channel) RemoveUser(nickName string) {
 	c.lock.Unlock()
 }
 
-// Broadcast sends a message to every user in the chat room
-func (c *Channel) Broadcast(chatServer *Service, message string) error {
+// Broadcast sends a message to every user in a channel
+func (c *Channel) Broadcast(chatServer Server, message string) {
 	now := time.Now()
 	message = now.Format(time.Kitchen) + `-` + message
 
-	for nickName := range c.Users {
-		chatServer.lock.Lock()
-		user := chatServer.Users[nickName]
-		chatServer.lock.Unlock()
+	c.lock.Lock()
+	users := c.Users
+	c.lock.Unlock()
+
+	for nickName := range users {
+		user, err := chatServer.GetUser(nickName)
 		// User may no longer be connected to the chat server
-		if user == nil {
+		if err != nil {
 			c.RemoveUser(nickName)
 			continue
 		}
 		user.Outgoing <- message
 	}
-	return nil
 }

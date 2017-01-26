@@ -53,7 +53,7 @@ func Test_CanRemoveUser(t *testing.T) {
 		t.Errorf("User is was not removed when should have been")
 	}
 
-	if len(server.Users) != 1 {
+	if server.ConnectedUsersCount() != 1 {
 		t.Errorf("After adding two users and removing one user total users does not equal 1")
 	}
 }
@@ -63,9 +63,9 @@ func Test_AddChannel(t *testing.T) {
 		server = chat.NewService()
 	)
 
-	channel := server.AddChannel(`foo`)
+	server.AddChannel(`foo`)
 
-	if server.Channels[0].Name != channel.Name {
+	if server.GetChannelCount() != 1 {
 		t.Errorf("Couldn't add a channel")
 	}
 }
@@ -99,8 +99,8 @@ func Test_WelcomeNewUser(t *testing.T) {
 
 	server.WelcomeNewUser(connection)
 
-	if len(server.Users) != 1 {
-		t.Errorf("User was not added to the server")
+	if server.ConnectedUsersCount() != 1 {
+		t.Errorf("User was not added to the server, expected 1 got %d", server.ConnectedUsersCount())
 	}
 }
 

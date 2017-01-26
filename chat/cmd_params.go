@@ -12,6 +12,7 @@ type CommandParams struct {
 	channel  *Channel
 	message  string
 	rawInput string
+	server   Server
 }
 
 // ParseNickNameFomInput parses a nickname starting with @ from string

@@ -10,7 +10,6 @@ import (
 type User struct {
 	Connection          Connection
 	NickName            string
-	Server              *Service
 	Channel             *Channel
 	IgnoreList          map[string]bool
 	Incoming            chan string
@@ -24,7 +23,6 @@ func NewUser(connection Connection) *User {
 	User := &User{
 		Connection: connection,
 		NickName:   ``,
-		Server:     nil,
 		Channel:    nil,
 		IgnoreList: make(map[string]bool),
 		Incoming:   make(chan string),
@@ -57,7 +55,7 @@ func (u *User) Read() {
 			input = strings.TrimSpace(input)
 		}
 
-		if u.handleNewInput(input) == true {
+		if u.handleNewInput(input) {
 			//If handled then continue reading
 			continue
 		}
@@ -89,7 +87,7 @@ func (u *User) HasIgnored(nickName string) bool {
 
 // Disconnect a user from this server
 func (u *User) Disconnect() {
-	u.Server.LogPrintf("connection \t disconnecting=@%s", u.NickName)
+	RunningServer.LogPrintf("connection \t disconnecting=@%s", u.NickName)
 	u.Connection.Close()
 }
 
@@ -101,13 +99,13 @@ func (u *User) handleNewInput(input string) bool {
 		err = u.ExecuteCommand(input, command)
 		if err != nil {
 			u.Outgoing <- `Could not execute command. Error:` + err.Error()
-			u.Server.LogPrintf("error \t failed @%s's command %s", u.NickName, input)
+			RunningServer.LogPrintf("error \t failed @%s's command %s", u.NickName, input)
 		}
 		return true
 	}
 
 	if u.Channel != nil {
-		u.Server.LogPrintf("message \t @%s in #%s message=%s", u.NickName, u.Channel.Name, input)
+		RunningServer.LogPrintf("message \t @%s in #%s message=%s", u.NickName, u.Channel.Name, input)
 		u.Channel.Broadcast(RunningServer, `@`+u.NickName+`: `+input)
 		return true
 	}
@@ -121,6 +119,7 @@ func (u *User) ExecuteCommand(input string, command Executable) error {
 	commandParams := CommandParams{
 		user1:    u,
 		rawInput: input,
+		server:   RunningServer,
 	}
 
 	chatCommand := command.getChatCommand()
@@ -131,7 +130,7 @@ func (u *User) ExecuteCommand(input string, command Executable) error {
 			return errors.New("Could not find the required @nickname in the input")
 		}
 
-		user2, err := u.Server.GetUser(nickname)
+		user2, err := RunningServer.GetUser(nickname)
 		if err != nil {
 			return err
 		}
@@ -143,7 +142,7 @@ func (u *User) ExecuteCommand(input string, command Executable) error {
 		if err != nil {
 			return errors.New("Could not find the required #channel in the input")
 		}
-		channel, err := u.Server.GetChannel(channelName)
+		channel, err := RunningServer.GetChannel(channelName)
 		if err == nil {
 			commandParams.channel = channel
 		}
@@ -159,10 +158,10 @@ func (u *User) ExecuteCommand(input string, command Executable) error {
 
 	err := command.Execute(commandParams)
 	if err != nil {
-		u.Server.LogPrintf("error \t @%s command=%s error=%s", u.NickName, input, err.Error())
+		RunningServer.LogPrintf("error \t @%s command=%s error=%s", u.NickName, input, err.Error())
 		return err
 	}
-	u.Server.LogPrintf("command \t @%s command=%s", u.NickName, input)
+	RunningServer.LogPrintf("command \t @%s command=%s", u.NickName, input)
 
 	return nil
 }

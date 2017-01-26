@@ -36,7 +36,7 @@ type (
 	}
 	messageResp struct {
 		Response
-		RecipientUsers []string `json:"recipients"`
+		Success bool `json:"success"`
 	}
 	searchLogResp struct {
 		Response
@@ -73,20 +73,16 @@ func (r *messageEndpoint) broadCastMessage(request *restful.Request, response *r
 	messageRequest := new(messageReq)
 	ParseRequestBody(request, messageRequest)
 
-	if len(r.ChatServer.Users) == 0 {
+	if r.ChatServer.ConnectedUsersCount() == 0 {
 		messageResponse.AddError(errMessageNoUsers)
 	}
 
 	r.ChatServer.LogPrintf("message \t RESTful public annoucnement=%s", messageRequest.Message)
 
-	var recipientUsers []string
-	for _, user := range r.ChatServer.Users {
-		user.Outgoing <- "Public Server Announcement: " + messageRequest.Message
-		recipientUsers = append(recipientUsers, "@"+user.NickName)
-	}
+	r.ChatServer.Broadcast("Public Server Announcement: " + messageRequest.Message)
 
-	messageResponse.RecipientUsers = recipientUsers
 	messageResponse.DecorateResponse(request)
+	messageResponse.Success = true
 	response.WriteEntity(messageResponse)
 }
 
