@@ -5,6 +5,8 @@ import (
 	"errors"
 	"strings"
 	"sync"
+
+	"github.com/spring1843/chat-server/plugins/command"
 )
 
 // User is temporarily in connected to a chat server, and can be in certain channels
@@ -31,7 +33,7 @@ func NewUser(nickName string) *User {
 }
 
 // NewConnectedUser returns a new User with a connection
-func NewConnectedUser(chatServer Server, connection Connection) *User {
+func NewConnectedUser(chatServer *Server, connection Connection) *User {
 	user := NewUser("")
 	user.conn = connection
 	user.Listen(chatServer)
@@ -94,7 +96,7 @@ func (u *User) Write() {
 }
 
 // Read and interprets a message from a user
-func (u *User) Read(chatServer Server) {
+func (u *User) Read(chatServer *Server) {
 	for {
 		message := make([]byte, 256)
 		u.conn.Read(message)
@@ -123,7 +125,7 @@ func (u *User) Read(chatServer Server) {
 }
 
 // Listen starts reading from and writing to a user
-func (u *User) Listen(chatServer Server) {
+func (u *User) Listen(chatServer *Server) {
 	go u.Read(chatServer)
 	go u.Write()
 }
@@ -142,7 +144,7 @@ func (u *User) HasIgnored(nickName string) bool {
 }
 
 // Disconnect a user from this server
-func (u *User) Disconnect(chatServer Server) error {
+func (u *User) Disconnect(chatServer *Server) error {
 	chatServer.LogPrintf("connection \t disconnecting=@%s", u.nickName)
 	return u.conn.Close()
 }
@@ -150,8 +152,8 @@ func (u *User) Disconnect(chatServer Server) error {
 // Checks to see if a new input from user is a command
 // If it is a command then it tries executing func
 // If it's not a command then it will output to the channel
-func (u *User) handleNewInput(chatServer Server, input string) (bool, error) {
-	if command, err := GetCommand(input); err == nil && command != nil {
+func (u *User) handleNewInput(chatServer *Server, input string) (bool, error) {
+	if command, err := command.GetCommand(input); err == nil && command != nil {
 		err = u.ExecuteCommand(chatServer, input, command)
 		if err != nil {
 			u.outgoing <- `Could not execute command. Error:` + err.Error()
@@ -175,14 +177,14 @@ func (u *User) handleNewInput(chatServer Server, input string) (bool, error) {
 
 // ExecuteCommand Executes a given command
 // First it finds all the required parameters from the input and populates them
-func (u *User) ExecuteCommand(chatServer Server, input string, command Executable) error {
-	commandParams := CommandParams{
-		user1:    u,
-		rawInput: input,
-		server:   chatServer,
+func (u *User) ExecuteCommand(chatServer *Server, input string, executable command.Executable) error {
+	commandParams := command.CommandParams{
+		User1:    u,
+		RawInput: input,
+		Server:   chatServer,
 	}
 
-	chatCommand := command.getChatCommand()
+	chatCommand := executable.GetChatCommand()
 
 	if chatCommand.RequiresParam(`user2`) {
 		nickname, err := chatCommand.ParseNickNameFomInput(input)
@@ -194,7 +196,7 @@ func (u *User) ExecuteCommand(chatServer Server, input string, command Executabl
 		if err != nil {
 			return errors.New("User " + nickname + " + is not connected to this server")
 		}
-		commandParams.user2 = user2
+		commandParams.User2 = user2
 	}
 
 	if chatCommand.RequiresParam(`channel`) {
@@ -204,7 +206,7 @@ func (u *User) ExecuteCommand(chatServer Server, input string, command Executabl
 		}
 		channel, err := chatServer.GetChannel(channelName)
 		if err == nil {
-			commandParams.channel = channel
+			commandParams.Channel = channel
 		}
 	}
 
@@ -213,10 +215,10 @@ func (u *User) ExecuteCommand(chatServer Server, input string, command Executabl
 		if err != nil {
 			return errors.New("Could not required message in the input")
 		}
-		commandParams.message = message
+		commandParams.Message = message
 	}
 
-	err := command.Execute(commandParams)
+	err := executable.Execute(commandParams)
 	if err != nil {
 		chatServer.LogPrintf("error \t @%s command=%s error=%s", u.nickName, input, err.Error())
 		return err

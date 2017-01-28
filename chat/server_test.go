@@ -1,26 +1,23 @@
 package chat_test
 
 import (
-	"io"
-	"net"
 	"os"
 	"strings"
-	"sync"
 	"testing"
 
 	"github.com/spring1843/chat-server/chat"
 )
 
 var (
-	server = chat.NewService()
+	server = chat.NewServer()
 )
 
 func Test_CanLogToFile(t *testing.T) {
-	fakeWriter := NewMockedChatConnection()
+	fakeWriter := chat.NewMockedChatConnection()
 	server.SetLogFile(fakeWriter)
 	server.LogPrintf("test \t foo\n")
 
-	logMessage := string(fakeWriter.outgoing)
+	logMessage := string(fakeWriter.Outgoing)
 
 	if strings.Contains(logMessage, `foo`) == false {
 		t.Errorf("Did not send log to file")
@@ -61,96 +58,38 @@ func Test_AddChannel(t *testing.T) {
 }
 
 func Test_GetSameChannel(t *testing.T) {
-	channel := server.AddChannel(`foo`)
+	server.AddChannel(`foo`)
 	sameChannel, err := server.GetChannel(`foo`)
 
-	if err != nil || channel != sameChannel {
+	if err != nil || "foo" != sameChannel.GetName() {
 		t.Errorf("Couldn't add and get channel")
 	}
 }
 
 func Test_WelcomeNewUsers(t *testing.T) {
-	server = chat.NewService()
+	server = chat.NewServer()
 	logFile, _ := os.OpenFile(`/dev/null`, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	server.SetLogFile(logFile)
 
 	server.Listen()
 
-	connection1 := NewMockedChatConnection()
-	connection1.lock.Lock()
-	connection1.incoming = []byte("foo\n")
-	connection1.lock.Unlock()
+	connection1 := chat.NewMockedChatConnection()
+	connection1.Lock.Lock()
+	defer connection1.Lock.Unlock()
+	connection1.Incoming = []byte("foo\n")
 
 	server.WelcomeNewUser(connection1)
 	if !server.IsUserConnected("foo") {
 		t.Error("User foo not added to the server")
 	}
 
-	connection2 := NewMockedChatConnection()
-	connection2.lock.Lock()
-	connection2.incoming = []byte("bar\n")
-	connection2.lock.Unlock()
+	connection2 := chat.NewMockedChatConnection()
+	connection2.Lock.Lock()
+	defer connection2.Lock.Unlock()
+	connection2.Incoming = []byte("bar\n")
 
 	server.WelcomeNewUser(connection2)
 	if !server.IsUserConnected("bar") {
 		t.Error("User bar not added to the server")
 	}
-}
-
-type MockedChatConnectionNetwork struct{}
-
-func NewMockedChatConnection() *MockedChatConnection {
-	mockedChatConnection := new(MockedChatConnection)
-	mockedChatConnection.lock = &sync.Mutex{}
-	return mockedChatConnection
-}
-
-func (f *MockedChatConnectionNetwork) Network() string {
-	return ``
-}
-func (f *MockedChatConnectionNetwork) String() string {
-	return ``
-}
-
-type MockedChatConnection struct {
-	outgoing []byte
-	incoming []byte
-	lock     *sync.Mutex
-}
-
-func (m *MockedChatConnection) Write(p []byte) (n int, err error) {
-	m.lock.Lock()
-	m.outgoing = p
-	m.lock.Unlock()
-	return len(m.outgoing), nil
-}
-
-func (m *MockedChatConnection) ReadOutgoing() []byte {
-	m.lock.Lock()
-	outgoing := m.outgoing
-	m.lock.Unlock()
-	return outgoing
-}
-
-func (m *MockedChatConnection) Read(p []byte) (n int, err error) {
-	m.lock.Lock()
-	if len(m.incoming) == 0 {
-		m.lock.Unlock()
-		return 0, io.EOF
-	}
-	i := 0
-	for _, bit := range m.incoming {
-		p[i] = bit
-		i++
-	}
-	m.lock.Unlock()
-	return i, nil
-}
-
-func (m *MockedChatConnection) Close() error {
-	return nil
-}
-
-func (m *MockedChatConnection) RemoteAddr() net.Addr {
-	return new(MockedChatConnectionNetwork)
 }

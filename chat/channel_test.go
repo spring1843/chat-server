@@ -22,7 +22,7 @@ func Test_CanBroadCast(t *testing.T) {
 	channel.AddUser(user1.GetNickName())
 	channel.AddUser(user2.GetNickName())
 
-	var chatServer = chat.NewService()
+	var chatServer = chat.NewServer()
 	chatServer.AddUser(user1)
 	chatServer.AddUser(user2)
 

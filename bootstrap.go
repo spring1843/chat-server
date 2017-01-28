@@ -13,7 +13,7 @@ import (
 )
 
 func bootstrap(config config.Config) {
-	chatServer := chat.NewService()
+	chatServer := chat.NewServer()
 
 	if err := setLogFile(config.LogFile, chatServer); err != nil {
 		log.Printf("Error - opening log file %s : %v", config.LogFile, err)
@@ -31,7 +31,7 @@ func bootstrap(config config.Config) {
 	startRESTFulAPI(config, chatServer)
 }
 
-func setLogFile(logFile string, chatServer chat.Server) error {
+func setLogFile(logFile string, chatServer *chat.Server) error {
 	if logFile == `` {
 		return errs.New("Logfile can not be empty")
 	}
@@ -45,7 +45,7 @@ func setLogFile(logFile string, chatServer chat.Server) error {
 	return nil
 }
 
-func startTelnet(config config.Config, chatServer chat.Server) error {
+func startTelnet(config config.Config, chatServer *chat.Server) error {
 	err := telnet.Start(chatServer, config)
 	if err != nil {
 		return err
@@ -55,13 +55,13 @@ func startTelnet(config config.Config, chatServer chat.Server) error {
 	return nil
 }
 
-func startWebSocket(config config.Config, chatServer chat.Server) {
+func startWebSocket(config config.Config, chatServer *chat.Server) {
 	websocket.Start(chatServer, config)
 	log.Printf("Info - WebSocket server started")
 }
 
 // startRESTFulAPI starts the restful API
-func startRESTFulAPI(config config.Config, chatServer chat.Server) {
+func startRESTFulAPI(config config.Config, chatServer *chat.Server) {
 	server := rest.NewRESTfulAPI(config, chatServer)
 	go func() {
 		if err := server.ListenAndServe(); err != nil {

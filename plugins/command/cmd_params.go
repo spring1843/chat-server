@@ -1,4 +1,4 @@
-package chat
+package command
 
 import (
 	"errors"
@@ -7,12 +7,12 @@ import (
 
 // CommandParams is all the params that are supported by chat commands, a chat command may use some or all of these params
 type CommandParams struct {
-	user1    Chatter
-	user2    Chatter
-	channel  Chan
-	message  string
-	rawInput string
-	server   Server
+	User1    Chatter
+	User2    Chatter
+	Channel  Chan
+	Message  string
+	RawInput string
+	Server   Server
 }
 
 // ParseNickNameFomInput parses a nickname starting with @ from string
@@ -85,7 +85,7 @@ func Filter(input string, function func(string) bool) []string {
 
 // RequiresParam checks to see if a command requires the given parameter
 func (c *Command) RequiresParam(param string) bool {
-	params := c.getChatCommand().RequiredParams
+	params := c.GetChatCommand().RequiredParams
 	for _, p := range params {
 		if p == param {
 			return true

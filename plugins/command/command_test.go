@@ -1,10 +1,17 @@
-package chat_test
+package command_test
 
 import (
 	"strings"
 	"testing"
 
 	"github.com/spring1843/chat-server/chat"
+	"github.com/spring1843/chat-server/plugins/command"
+)
+
+var (
+	user1 = chat.NewUser("u1")
+	user2 = chat.NewUser("u2")
+	user3 = chat.NewUser("u3")
 )
 
 func Test_CanValidate(t *testing.T) {
@@ -16,32 +23,32 @@ func Test_CanValidate(t *testing.T) {
 		validCommand2   = `/join`
 	)
 
-	if _, err := chat.GetCommand(invalidCommand1); err == nil {
+	if _, err := command.GetCommand(invalidCommand1); err == nil {
 		t.Errorf("Invalid command was detected valid, got %s", invalidCommand1)
 	}
 
-	if _, err := chat.GetCommand(invalidCommand2); err == nil {
+	if _, err := command.GetCommand(invalidCommand2); err == nil {
 		t.Errorf("Invalid command was detected valid, got %s", invalidCommand2)
 	}
 
-	if _, err := chat.GetCommand(invalidCommand3); err == nil {
+	if _, err := command.GetCommand(invalidCommand3); err == nil {
 		t.Errorf("Invalid command was detected valid, got %s", invalidCommand3)
 	}
 
-	if _, err := chat.GetCommand(validCommand1); err != nil {
+	if _, err := command.GetCommand(validCommand1); err != nil {
 		t.Errorf("Valid command was detected invalid, got %s", validCommand1)
 	}
 
-	if _, err := chat.GetCommand(validCommand2); err != nil {
+	if _, err := command.GetCommand(validCommand2); err != nil {
 		t.Errorf("Valid command was detected invalid, got %s", validCommand2)
 	}
 }
 
 func Test_HelpCommand(t *testing.T) {
-	fakeConnection := NewMockedChatConnection()
-	fakeConnection.incoming = []byte("/help\n")
+	fakeConnection := chat.NewMockedChatConnection()
+	fakeConnection.Incoming = []byte("/help\n")
 
-	server := chat.NewService()
+	server := chat.NewServer()
 	user := chat.NewConnectedUser(server, fakeConnection)
 	server.AddUser(user)
 	msg := user.GetOutgoing()
@@ -52,15 +59,15 @@ func Test_HelpCommand(t *testing.T) {
 }
 
 func Test_ListCommand(t *testing.T) {
-	fakeConnection1 := NewMockedChatConnection()
-	fakeConnection2 := NewMockedChatConnection()
-	fakeConnection3 := NewMockedChatConnection()
+	fakeConnection1 := chat.NewMockedChatConnection()
+	fakeConnection2 := chat.NewMockedChatConnection()
+	fakeConnection3 := chat.NewMockedChatConnection()
 
-	server := chat.NewService()
+	server := chat.NewServer()
 	server.AddChannel(`foo`)
 
 	input := `/join #foo`
-	joinCommand, err := chat.GetCommand(input)
+	joinCommand, err := command.GetCommand(input)
 	if err != nil {
 		t.Errorf("Could not get an instance of list command")
 	}
@@ -83,7 +90,7 @@ func Test_ListCommand(t *testing.T) {
 	user3.ExecuteCommand(server, input, joinCommand)
 
 	input = "/list \n"
-	listCommand, err := chat.GetCommand(input)
+	listCommand, err := command.GetCommand(input)
 	if err != nil {
 		t.Errorf("Could not get an instance of list command")
 	}
@@ -96,10 +103,10 @@ func Test_ListCommand(t *testing.T) {
 }
 
 func Test_IgnoreCommand(t *testing.T) {
-	fakeConnection1 := NewMockedChatConnection()
-	fakeConnection2 := NewMockedChatConnection()
+	fakeConnection1 := chat.NewMockedChatConnection()
+	fakeConnection2 := chat.NewMockedChatConnection()
 
-	server := chat.NewService()
+	server := chat.NewServer()
 
 	user1 := chat.NewConnectedUser(server, fakeConnection1)
 	user2 := chat.NewConnectedUser(server, fakeConnection2)
@@ -109,7 +116,7 @@ func Test_IgnoreCommand(t *testing.T) {
 	server.AddUser(user2)
 
 	input := `/ignore @u2`
-	ignoreCommand, _ := chat.GetCommand(input)
+	ignoreCommand, _ := command.GetCommand(input)
 	user1.ExecuteCommand(server, input, ignoreCommand)
 	if user1.HasIgnored(user2.GetNickName()) != true {
 		t.Errorf("User was not ignored after ignore command executed")
@@ -117,10 +124,10 @@ func Test_IgnoreCommand(t *testing.T) {
 }
 
 func Test_JoinCommand(t *testing.T) {
-	fakeConnection := NewMockedChatConnection()
-	fakeConnection.incoming = []byte("/join #r\n")
+	fakeConnection := chat.NewMockedChatConnection()
+	fakeConnection.Incoming = []byte("/join #r\n")
 
-	server := chat.NewService()
+	server := chat.NewServer()
 	user1 := chat.NewConnectedUser(server, fakeConnection)
 	server.AddUser(user1)
 
@@ -135,7 +142,7 @@ func Test_JoinCommand(t *testing.T) {
 }
 
 func Test_MessageCommand(t *testing.T) {
-	server := chat.NewService()
+	server := chat.NewServer()
 
 	server.AddUser(user1)
 	server.AddUser(user2)
@@ -145,7 +152,7 @@ func Test_MessageCommand(t *testing.T) {
 	user1.SetChannel(channel.Name)
 	user2.SetChannel(channel.Name)
 	input := `/msg @u2 foo`
-	messageCommand, err := chat.GetCommand(input)
+	messageCommand, err := command.GetCommand(input)
 	if err != nil {
 		t.Fatalf("Failed getting message command. Error %s", err)
 	}
@@ -161,9 +168,9 @@ func Test_MessageCommand(t *testing.T) {
 }
 
 func Test_QuitCommand(t *testing.T) {
-	fakeConnection := NewMockedChatConnection()
+	fakeConnection := chat.NewMockedChatConnection()
 
-	server := chat.NewService()
+	server := chat.NewServer()
 	user := chat.NewConnectedUser(server, fakeConnection)
 	user.SetNickName(`foo`)
 	server.AddUser(user)
@@ -173,7 +180,7 @@ func Test_QuitCommand(t *testing.T) {
 	}
 
 	input := `/quit`
-	quitCommand, _ := chat.GetCommand(input)
+	quitCommand, _ := command.GetCommand(input)
 	user.ExecuteCommand(server, input, quitCommand)
 
 	if server.IsUserConnected(`foo`) {

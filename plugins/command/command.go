@@ -1,4 +1,4 @@
-package chat
+package command
 
 import (
 	"errors"
@@ -40,7 +40,7 @@ type (
 	}
 )
 
-func (c *Command) getChatCommand() Command {
+func (c *Command) GetChatCommand() Command {
 	return *c
 }
 
@@ -102,7 +102,7 @@ func GetCommand(input string) (Executable, error) {
 
 	validCommands := AllChatCommands
 	for _, command := range validCommands {
-		commandName := `/` + command.getChatCommand().Name
+		commandName := `/` + command.GetChatCommand().Name
 		if len(input) >= len(commandName) && input[:len(commandName)] == commandName {
 			return command, nil
 		}
@@ -112,16 +112,16 @@ func GetCommand(input string) (Executable, error) {
 
 // Execute shows all available chat commands on this server
 func (c *HelpCommand) Execute(params CommandParams) error {
-	if params.user1 == nil {
+	if params.User1 == nil {
 		return errors.New("User param is not set")
 	}
 
 	helpMessage := "Here is the list of all available commands\n"
 	for _, command := range AllChatCommands {
-		helpMessage += command.getChatCommand().Syntax + "\t" + command.getChatCommand().Description + ".\n"
+		helpMessage += command.GetChatCommand().Syntax + "\t" + command.GetChatCommand().Description + ".\n"
 	}
 
-	params.user1.SetOutgoing(helpMessage)
+	params.User1.SetOutgoing(helpMessage)
 	return nil
 }
 
@@ -129,115 +129,111 @@ func (c *HelpCommand) Execute(params CommandParams) error {
 func (c *ListCommand) Execute(params CommandParams) error {
 	listMessage := "Here is the list of all users in this channel\n"
 
-	if params.user1 == nil {
+	if params.User1 == nil {
 		return errors.New("User param is not set")
 	}
 
-	if params.user1.GetChannel() == "" {
+	if params.User1.GetChannel() == "" {
 		return errors.New("User is not in a channel")
 	}
 
-	channel, err := params.server.GetChannel(params.user1.GetChannel())
-	if err != nil {
-		return err
-	}
-	for nickName := range channel.Users {
-		if nickName == params.user1.GetNickName() {
+	for nickName := range params.Channel.GetUsers() {
+		if nickName == params.User1.GetNickName() {
 			continue
 		}
 		listMessage += "@" + nickName + ".\n"
 	}
 
-	params.user1.SetOutgoing(listMessage)
+	params.User1.SetOutgoing(listMessage)
 
 	return nil
 }
 
 // Execute allows a user to ignore another user so to suppress all incoming messages from that user
 func (c *IgnoreCommand) Execute(params CommandParams) error {
-	if params.user1 == nil {
+	if params.User1 == nil {
 		return errors.New("User1 param is not set")
 	}
 
-	if params.user2 == nil {
+	if params.User2 == nil {
 		return errors.New("User2 param is not set")
 	}
 
-	if params.user2.GetNickName() == params.user1.GetNickName() {
+	if params.User2.GetNickName() == params.User1.GetNickName() {
 		return errors.New("We don't let one ignore themselves")
 	}
 
-	params.user1.Ignore(params.user2.GetNickName())
-	params.user1.SetOutgoing(params.user2.GetNickName() + " is now ignored.")
+	params.User1.Ignore(params.User2.GetNickName())
+	params.User1.SetOutgoing(params.User2.GetNickName() + " is now ignored.")
 	return nil
 }
 
 // Execute allows a user to join a channel
 func (c *JoinCommand) Execute(params CommandParams) error {
-	if params.user1 == nil {
+	if params.User1 == nil {
 		return errors.New("User1 param is not set")
 	}
-	if params.channel == nil {
-		chatCommand := c.getChatCommand()
-		channelName, err := chatCommand.ParseChannelFromInput(params.rawInput)
+
+	channelName := ""
+	if params.Channel == nil {
+		chatCommand := c.GetChatCommand()
+		channelName, err := chatCommand.ParseChannelFromInput(params.RawInput)
 		if err != nil {
 			return errors.New("Could not parse channel name")
 		}
-		params.server.AddChannel(channelName)
-		params.channel, _ = params.server.GetChannel(channelName)
+		params.Server.AddChannel(channelName)
 	}
 
-	if params.user1.GetChannel() != "" && params.user1.GetChannel() == params.channel.GetName() {
-		return errors.New("You are already in channel #" + params.channel.GetName())
+	if params.User1.GetChannel() != "" && params.User1.GetChannel() == params.Channel.GetName() {
+		return errors.New("You are already in channel #" + params.Channel.GetName())
 	}
 
-	params.channel.AddUser(params.user1.GetNickName())
-	params.user1.SetChannel(params.channel.GetName())
+	params.Channel.AddUser(params.User1.GetNickName())
+	params.User1.SetChannel(channelName)
 
-	params.user1.SetOutgoing("There are " + strconv.Itoa(params.channel.GetUserCount()) + " other users this channel.")
-	params.channel.Broadcast(params.server, `@`+params.user1.GetNickName()+` just joined channel #`+params.channel.GetName())
-	return nil
+	params.User1.SetOutgoing("There are " + strconv.Itoa(params.Channel.GetUserCount()) + " other users this channel.")
+	return params.Server.BroadcastInChannel(channelName, `@`+params.User1.GetNickName()+` just joined channel #`+params.Channel.GetName())
 }
 
 // Execute allows a user to send a private message to another user
 func (c *PrivateMessageCommand) Execute(params CommandParams) error {
-	if params.user1 == nil {
+	if params.User1 == nil {
 		return errors.New("User1 param is not set")
 	}
 
-	if params.user2 == nil {
+	if params.User2 == nil {
 		return errors.New("User2 param is not set")
 	}
 
-	if params.user1.GetChannel() != params.user2.GetChannel() {
+	if params.User1.GetChannel() != params.User2.GetChannel() {
 		return errors.New("Users are not in the same channel")
 	}
 
-	if params.user2.HasIgnored(params.user1.GetNickName()) {
+	if params.User2.HasIgnored(params.User1.GetNickName()) {
 		return errors.New("User has ignored the sender")
 	}
 
-	params.server.LogPrintf("message \t @%s to @%s message=%s", params.user1.GetNickName(), params.user2.GetNickName(), params.message)
+	params.Server.LogPrintf("message \t @%s to @%s message=%s", params.User1.GetNickName(), params.User2.GetNickName(), params.Message)
 
 	now := time.Now()
-	go params.user2.SetOutgoing(now.Format(time.Kitchen) + ` - *Private from @` + params.user1.GetNickName() + `: ` + params.message)
+	go params.User2.SetOutgoing(now.Format(time.Kitchen) + ` - *Private from @` + params.User1.GetNickName() + `: ` + params.Message)
 	return nil
 }
 
 // Execute disconnects a user from server
 func (c *QuitCommand) Execute(params CommandParams) error {
-	if params.user1 == nil {
+	if params.User1 == nil {
 		return errors.New("User1 param is not set")
 	}
 
-	if err := params.server.RemoveUser(params.user1.GetNickName()); err != nil {
+	if err := params.Server.RemoveUser(params.User1.GetNickName()); err != nil {
 		return errors.New("Could not remove user afeter quit command")
 	}
-	if params.user1.GetChannel() != "" {
-		params.server.RemoveUserFromChannel(params.user1.GetNickName(), params.user1.GetChannel())
+	if params.User1.GetChannel() != "" {
+		params.Server.RemoveUserFromChannel(params.User1.GetNickName(), params.User1.GetChannel())
 	}
 
-	if err := params.user1.Disconnect(params.server); err != nil {
+	if err := params.Server.DisconnectUser(params.User1.GetNickName()); err != nil {
 		return errors.New("Could not disconnect user")
 	}
 	return nil

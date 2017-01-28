@@ -47,8 +47,15 @@ func (c *Channel) GetUserCount() int {
 	return len(c.Users)
 }
 
+// GetUserCount returns the number of connected users to this channel
+func (c *Channel) GetUsers() map[string]bool {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	return c.Users
+}
+
 // Broadcast sends a message to every user in a channel
-func (c *Channel) Broadcast(chatServer Server, message string) {
+func (c *Channel) Broadcast(chatServer *Server, message string) {
 	now := time.Now()
 	message = now.Format(time.Kitchen) + `-` + message
 

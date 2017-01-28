@@ -12,13 +12,13 @@ import (
 
 // messageEndpoint an instance of the chat.Server
 type messageEndpoint struct {
-	ChatServer chat.Server
+	ChatServer *chat.Server
 }
 
 // LogFilePath path to API log file
 var LogFilePath string
 
-func registerAllEndpoints(chatServer chat.Server, container *restful.Container) {
+func registerAllEndpoints(chatServer *chat.Server, container *restful.Container) {
 	messageResource := new(messageEndpoint)
 	messageResource.ChatServer = chatServer
 	messageResource.Register(container)
@@ -38,7 +38,7 @@ func configureSwagger(wsContainer *restful.Container) swagger.Config {
 }
 
 // NewRESTfulAPI the rest server and configures it
-func NewRESTfulAPI(config config.Config, chatServer chat.Server) *http.Server {
+func NewRESTfulAPI(config config.Config, chatServer *chat.Server) *http.Server {
 	LogFilePath = config.LogFile
 
 	wsContainer := restful.NewContainer()

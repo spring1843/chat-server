@@ -1,9 +1,9 @@
-package chat_test
+package command_test
 
 import (
 	"testing"
 
-	"github.com/spring1843/chat-server/chat"
+	"github.com/spring1843/chat-server/plugins/command"
 )
 
 func Test_ParsingChatCommands(t *testing.T) {
@@ -13,7 +13,7 @@ func Test_ParsingChatCommands(t *testing.T) {
 	cmd4 := `foo bar baz`
 	cmd5 := `#channel`
 
-	chatCommand := new(chat.Command)
+	chatCommand := new(command.Command)
 
 	if output, _ := chatCommand.ParseCommandFromInput(cmd1); output != `msg` {
 		t.Errorf("Could not parse command name properly, got %s", output)
@@ -77,8 +77,8 @@ func Test_ParsingChatCommands(t *testing.T) {
 }
 
 func Test_DoesCommandRequireParam(t *testing.T) {
-	fakeCommand := &chat.QuitCommand{
-		Command: chat.Command{
+	fakeCommand := &command.QuitCommand{
+		Command: command.Command{
 			Name:           `quit`,
 			Syntax:         `/quit`,
 			Description:    `Quit chat server`,

@@ -11,23 +11,21 @@ import (
 	"time"
 )
 
-type (
-	// Service  keeps listening for connections, it contains users and channels
-	Service struct {
-		Connection chan Connection
-		Logger     *log.Logger
-		Channels   map[string]*Channel
-		Users      map[string]*User
-		Incoming   chan string
-		Outgoing   chan string
-		CanLog     bool
-		lock       *sync.Mutex
-	}
-)
+// Server  keeps listening for connections, it contains users and channels
+type Server struct {
+	Connection chan Connection
+	Logger     *log.Logger
+	Channels   map[string]*Channel
+	Users      map[string]*User
+	Incoming   chan string
+	Outgoing   chan string
+	CanLog     bool
+	lock       *sync.Mutex
+}
 
-// NewService returns a new instance of the Server
-func NewService() Server {
-	runningServer := &Service{
+// NewServer returns a new instance of the chat server
+func NewServer() *Server {
+	server := &Server{
 		Connection: make(chan Connection),
 		Channels:   make(map[string]*Channel),
 		Users:      make(map[string]*User),
@@ -37,11 +35,11 @@ func NewService() Server {
 		CanLog:     false,
 		lock:       new(sync.Mutex),
 	}
-	return runningServer
+	return server
 }
 
 // Listen Makes this server start listening to connections, when a user is connected he or she is welcomed
-func (s *Service) Listen() {
+func (s *Server) Listen() {
 	go func() {
 		for {
 			for connection := range s.Connection {
@@ -53,7 +51,7 @@ func (s *Service) Listen() {
 
 // SetLogFile a log file for this server and makes this server able to log
 // Use server.Log() to send logs to this file
-func (s *Service) SetLogFile(file io.Writer) {
+func (s *Server) SetLogFile(file io.Writer) {
 	logger := new(log.Logger)
 	logger.SetOutput(file)
 	s.Logger = logger
@@ -63,7 +61,7 @@ func (s *Service) SetLogFile(file io.Writer) {
 // LogPrintf is a centralized logging function, so that all logs go to the same file and they all have time stamps
 // Ads a time stamp to every log entry
 // For readability start the message with a category followed by \t
-func (s *Service) LogPrintf(format string, v ...interface{}) {
+func (s *Server) LogPrintf(format string, v ...interface{}) {
 	if s.CanLog != true {
 		return
 	}
@@ -72,22 +70,25 @@ func (s *Service) LogPrintf(format string, v ...interface{}) {
 }
 
 // AddUser to this server
-func (s *Service) AddUser(user *User) {
+func (s *Server) AddUser(user *User) {
 	s.lock.Lock()
+	defer s.lock.Unlock()
 	s.Users[user.nickName] = user
-	s.lock.Unlock()
 }
 
 // RemoveUser from this server
-func (s *Service) RemoveUser(nickName string) error {
+func (s *Server) RemoveUser(nickName string) error {
 	s.lock.Lock()
+	defer s.lock.Unlock()
+	if _, ok := s.Users[nickName]; !ok {
+		return errors.New("User " + nickName + " is not connected to this server")
+	}
 	delete(s.Users, nickName)
-	s.lock.Unlock()
 	return nil
 }
 
 // RemoveUserFromChannel removes a user from a channel
-func (s *Service) RemoveUserFromChannel(nickName, channelName string) error {
+func (s *Server) RemoveUserFromChannel(nickName, channelName string) error {
 	channel, err := s.GetChannel(channelName)
 	if err != nil {
 		return err
@@ -98,19 +99,18 @@ func (s *Service) RemoveUserFromChannel(nickName, channelName string) error {
 }
 
 // GetUser gets a connected user
-func (s *Service) GetUser(nickName string) (*User, error) {
+func (s *Server) GetUser(nickName string) (*User, error) {
 	s.lock.Lock()
+	defer s.lock.Unlock()
 	if _, ok := s.Users[nickName]; ok {
 		user := s.Users[nickName]
-		s.lock.Unlock()
 		return user, nil
 	}
-	s.lock.Unlock()
 	return nil, errors.New(`User @` + nickName + ` not connected`)
 }
 
 // IsUserConnected checks to see if a user with the given nickname is connected to this server or not
-func (s *Service) IsUserConnected(nickName string) bool {
+func (s *Server) IsUserConnected(nickName string) bool {
 	_, err := s.GetUser(nickName)
 	if err != nil {
 		return false
@@ -119,59 +119,54 @@ func (s *Service) IsUserConnected(nickName string) bool {
 }
 
 // ReceiveConnection is used when there's a new connection
-func (s *Service) ReceiveConnection(conn Connection) {
+func (s *Server) ReceiveConnection(conn Connection) {
 	s.Connection <- conn
 }
 
 // GetChannel gets a channel from the given channelName
-func (s *Service) GetChannel(channelName string) (*Channel, error) {
+func (s *Server) GetChannel(channelName string) (*Channel, error) {
 	s.lock.Lock()
+	defer s.lock.Unlock()
 	if _, ok := s.Channels[channelName]; ok {
 		channel := s.Channels[channelName]
-		s.lock.Unlock()
 		return channel, nil
 	}
-	s.lock.Unlock()
 
 	return nil, errors.New(`Channel #` + channelName + ` does not exist on this server`)
 }
 
 // GetChannelCount returns the number of channels on this server
-func (s *Service) GetChannelCount() int {
+func (s *Server) GetChannelCount() int {
 	s.lock.Lock()
-	count := len(s.Channels)
-	s.lock.Unlock()
-	return count
+	defer s.lock.Unlock()
+	return len(s.Channels)
 }
 
 // AddChannel adds a channel to this server
-func (s *Service) AddChannel(channelName string) *Channel {
+func (s *Server) AddChannel(channelName string) {
 	channel := NewChannel()
 	channel.Name = channelName
 
 	s.lock.Lock()
+	defer s.lock.Unlock()
 	s.Channels[channelName] = channel
-	s.lock.Unlock()
-
-	return channel
 }
 
 // ConnectedUsersCount returns the number of connected users
-func (s *Service) ConnectedUsersCount() int {
+func (s *Server) ConnectedUsersCount() int {
 	s.lock.Lock()
-	count := len(s.Users)
-	s.lock.Unlock()
-	return count
+	defer s.lock.Unlock()
+	return len(s.Users)
 }
 
 // Broadcast sends a message to every user connected to the server
-func (s *Service) Broadcast(message string) {
+func (s *Server) Broadcast(message string) {
 	now := time.Now()
 	message = now.Format(time.Kitchen) + `-` + message
 
 	s.lock.Lock()
+	defer s.lock.Unlock()
 	users := s.Users
-	s.lock.Unlock()
 
 	for nickName := range users {
 		user, err := s.GetUser(nickName)
@@ -183,8 +178,27 @@ func (s *Service) Broadcast(message string) {
 	}
 }
 
+// DisconnectUser disconnects a user from this server
+func (s *Server) DisconnectUser(nickName string) error {
+	user, err := s.GetUser(nickName)
+	if err != nil {
+		return err
+	}
+	return user.Disconnect(s)
+}
+
+func (s *Server) BroadcastInChannel(channelName, message string) error {
+	channel, err := s.GetChannel(channelName)
+	if err != nil {
+		return err
+	}
+
+	channel.Broadcast(s, message)
+	return nil
+}
+
 // WelcomeNewUser shows a welcome message to a new user and makes a new user entity by asking the new user to pick a nickname
-func (s *Service) WelcomeNewUser(connection Connection) {
+func (s *Server) WelcomeNewUser(connection Connection) {
 	s.LogPrintf("connection \t New connection from address=%s", connection.RemoteAddr().String())
 
 	user := NewConnectedUser(s, connection)
