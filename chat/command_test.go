@@ -44,7 +44,7 @@ func Test_HelpCommand(t *testing.T) {
 	fakeConnection.incoming = []byte("/help\n")
 
 	server := chat.NewService()
-	user := chat.NewUser(fakeConnection)
+	user := chat.NewConnectedUser(fakeConnection)
 	server.AddUser(user)
 	msg := user.GetOutgoing()
 
@@ -67,13 +67,13 @@ func Test_ListCommand(t *testing.T) {
 		t.Errorf("Could not get an instance of list command")
 	}
 
-	user1 := chat.NewUser(fakeConnection1)
+	user1 := chat.NewConnectedUser(fakeConnection1)
 	user1.NickName = `u1`
 
-	user2 := chat.NewUser(fakeConnection2)
+	user2 := chat.NewConnectedUser(fakeConnection2)
 	user2.NickName = `u2`
 
-	user3 := chat.NewUser(fakeConnection3)
+	user3 := chat.NewConnectedUser(fakeConnection3)
 	user3.NickName = `u3`
 
 	server.AddUser(user1)
@@ -103,8 +103,8 @@ func Test_IgnoreCommand(t *testing.T) {
 
 	server := chat.NewService()
 
-	user1 := chat.NewUser(fakeConnection1)
-	user2 := chat.NewUser(fakeConnection2)
+	user1 := chat.NewConnectedUser(fakeConnection1)
+	user2 := chat.NewConnectedUser(fakeConnection2)
 	user2.NickName = `u2`
 
 	server.AddUser(user1)
@@ -122,7 +122,7 @@ func Test_JoinCommand(t *testing.T) {
 	fakeConnection1 := NewMockedChatConnection()
 
 	server := chat.NewService()
-	user1 := chat.NewUser(fakeConnection1)
+	user1 := chat.NewConnectedUser(fakeConnection1)
 	server.AddUser(user1)
 
 	input := `/join #r`
@@ -143,10 +143,10 @@ func Test_MessageCommand(t *testing.T) {
 
 	server := chat.NewService()
 
-	user1 := chat.NewUser(fakeConnection1)
+	user1 := chat.NewConnectedUser(fakeConnection1)
 	user1.NickName = `u1`
 
-	user2 := chat.NewUser(fakeConnection2)
+	user2 := chat.NewConnectedUser(fakeConnection2)
 	user2.NickName = `u2`
 
 	server.AddUser(user1)
@@ -171,7 +171,7 @@ func Test_QuitCommand(t *testing.T) {
 	fakeConnection := NewMockedChatConnection()
 
 	server := chat.NewService()
-	user := chat.NewUser(fakeConnection)
+	user := chat.NewConnectedUser(fakeConnection)
 	user.NickName = `foo`
 	server.AddUser(user)
 

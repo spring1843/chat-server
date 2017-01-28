@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	user1 = &chat.User{NickName: `u1`, Outgoing: make(chan string), IgnoreList: make(map[string]bool)}
-	user2 = &chat.User{NickName: `u2`, Outgoing: make(chan string), IgnoreList: make(map[string]bool)}
-	user3 = &chat.User{NickName: `u3`, Outgoing: make(chan string), IgnoreList: make(map[string]bool)}
+	user1 = chat.NewUser("u1")
+	user2 = chat.NewUser("u2")
+	user3 = chat.NewUser("u3")
 )
 
 func Test_CanIgnore(t *testing.T) {
@@ -26,7 +26,7 @@ func Test_CanIgnore(t *testing.T) {
 
 func Test_CanWriteToUser(t *testing.T) {
 	fakeWriter := NewMockedChatConnection()
-	user1 := chat.NewUser(fakeWriter)
+	user1 := chat.NewConnectedUser(fakeWriter)
 
 	user1.SetOutgoing(`foo`)
 
@@ -39,7 +39,7 @@ func Test_CanReadFromUser(t *testing.T) {
 	fakeReader := NewMockedChatConnection()
 	fakeReader.incoming = []byte("foo\n")
 
-	user1 := chat.NewUser(fakeReader)
+	user1 := chat.NewConnectedUser(fakeReader)
 	msg := user1.GetIncoming()
 
 	if msg != "foo" {

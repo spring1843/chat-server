@@ -12,46 +12,61 @@ type User struct {
 	NickName            string
 	Channel             *Channel
 	IgnoreList          map[string]bool
-	Incoming            chan string
-	Outgoing            chan string
+	incoming            chan string
+	outgoing            chan string
 	LastOutGoingMessage string
 	LastIncomingMessage string
 }
 
-// NewUser returns a new User
-func NewUser(connection Connection) *User {
+// NewUser returns a new new User
+func NewUser(nickName string) *User {
+	return &User{
+		NickName:   nickName,
+		Channel:    nil,
+		IgnoreList: make(map[string]bool),
+		incoming:   make(chan string),
+		outgoing:   make(chan string),
+	}
+}
+
+// NewConnectedUser returns a new User with a connection
+func NewConnectedUser(connection Connection) *User {
 	User := &User{
 		Connection: connection,
 		NickName:   ``,
 		Channel:    nil,
 		IgnoreList: make(map[string]bool),
-		Incoming:   make(chan string),
-		Outgoing:   make(chan string),
+		incoming:   make(chan string),
+		outgoing:   make(chan string),
 	}
 	User.Listen()
 
 	return User
 }
 
+// GetOutgoing gets the outgoing message for a user
 func (u *User) GetOutgoing() string {
-	return <-u.Outgoing
+	return <-u.outgoing
 }
 
+// SetOutgoing sets an outgoing message to the user
 func (u *User) SetOutgoing(message string) {
-	u.Outgoing <- message
+	u.outgoing <- message
 }
 
+// GetIncoming gets the incoming message from the user
 func (u *User) GetIncoming() string {
-	return <-u.Incoming
+	return <-u.incoming
 }
 
-func (u *User) SetIncomming(message string) {
-	u.Incoming <- message
+// SetIncoming sets an incoming message from the user
+func (u *User) SetIncoming(message string) {
+	u.incoming <- message
 }
 
 // Write to the user's connection and remembers the last message that was sent out
 func (u *User) Write() {
-	for message := range u.Outgoing {
+	for message := range u.outgoing {
 		u.Connection.Write([]byte(message + "\n"))
 		u.LastOutGoingMessage = message
 	}
@@ -77,7 +92,7 @@ func (u *User) Read() {
 		}
 
 		if input != "\n" && input != `` {
-			u.SetIncomming(input)
+			u.SetIncoming(input)
 		}
 	}
 }
@@ -114,7 +129,7 @@ func (u *User) handleNewInput(input string) bool {
 	if command, err := GetCommand(input); err == nil && command != nil {
 		err = u.ExecuteCommand(input, command)
 		if err != nil {
-			u.Outgoing <- `Could not execute command. Error:` + err.Error()
+			u.outgoing <- `Could not execute command. Error:` + err.Error()
 			RunningServer.LogPrintf("error \t failed @%s's command %s", u.NickName, input)
 		}
 		return true

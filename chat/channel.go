@@ -49,6 +49,6 @@ func (c *Channel) Broadcast(chatServer Server, message string) {
 			c.RemoveUser(nickName)
 			continue
 		}
-		user.Outgoing <- message
+		user.outgoing <- message
 	}
 }
