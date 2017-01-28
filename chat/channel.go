@@ -33,6 +33,20 @@ func (c *Channel) RemoveUser(nickName string) {
 	delete(c.Users, nickName)
 }
 
+// RemoveUser removes a user from this server
+func (c *Channel) GetName() string {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	return c.Name
+}
+
+// GetUserCount returns the number of connected users to this channel
+func (c *Channel) GetUserCount() int {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	return len(c.Users)
+}
+
 // Broadcast sends a message to every user in a channel
 func (c *Channel) Broadcast(chatServer Server, message string) {
 	now := time.Now()

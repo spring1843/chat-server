@@ -9,7 +9,7 @@ import (
 type CommandParams struct {
 	user1    Chatter
 	user2    Chatter
-	channel  *Channel
+	channel  Chan
 	message  string
 	rawInput string
 	server   Server

@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	// Server is an interface for the chat server
+	// Server is an interface for a chat server
 	Server interface {
 		Listen()
 		ReceiveConnection(conn Connection)
@@ -27,14 +27,15 @@ type (
 		GetChannelCount() int
 		RemoveUserFromChannel(nickName, channelName string) error
 	}
-	// Connection is an interface for a network connection
-	Connection interface {
-		Read(p []byte) (n int, err error)
-		Write(p []byte) (n int, err error)
-		Close() error
-		RemoteAddr() net.Addr
+	// Chan is an interface for a chat channel
+	Chan interface {
+		AddUser(nickName string)
+		RemoveUser(nickName string)
+		Broadcast(chatServer Server, message string)
+		GetName() string
+		GetUserCount() int
 	}
-	// Chatter is an interface for users
+	// Chatter is an interface for a chat user
 	Chatter interface {
 		SetOutgoing(message string)
 		GetChannel() string
@@ -52,5 +53,12 @@ type (
 		ParseChannelFromInput(input string) (string, error)
 		ParseMessageFromInput(input string) (string, error)
 		ParseCommandFromInput(input string) (string, error)
+	}
+	// Connection is an interface for a network connection
+	Connection interface {
+		Read(p []byte) (n int, err error)
+		Write(p []byte) (n int, err error)
+		Close() error
+		RemoteAddr() net.Addr
 	}
 )

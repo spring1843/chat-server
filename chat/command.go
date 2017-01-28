@@ -187,15 +187,15 @@ func (c *JoinCommand) Execute(params CommandParams) error {
 		params.channel, _ = params.server.GetChannel(channelName)
 	}
 
-	if params.user1.GetChannel() != "" && params.user1.GetChannel() == params.channel.Name {
-		return errors.New("You are already in channel #" + params.channel.Name)
+	if params.user1.GetChannel() != "" && params.user1.GetChannel() == params.channel.GetName() {
+		return errors.New("You are already in channel #" + params.channel.GetName())
 	}
 
 	params.channel.AddUser(params.user1.GetNickName())
-	params.user1.SetChannel(params.channel.Name)
+	params.user1.SetChannel(params.channel.GetName())
 
-	params.user1.SetOutgoing("There are " + strconv.Itoa(len(params.channel.Users)) + " other users this channel.")
-	params.channel.Broadcast(params.server, `@`+params.user1.GetNickName()+` just joined channel #`+params.channel.Name)
+	params.user1.SetOutgoing("There are " + strconv.Itoa(params.channel.GetUserCount()) + " other users this channel.")
+	params.channel.Broadcast(params.server, `@`+params.user1.GetNickName()+` just joined channel #`+params.channel.GetName())
 	return nil
 }
 
