@@ -41,7 +41,7 @@ func Test_CanRemoveUser(t *testing.T) {
 	server.AddUser(user1)
 	server.AddUser(user2)
 
-	server.RemoveUser(user1.NickName)
+	server.RemoveUser(user1.GetNickName())
 
 	if server.IsUserConnected(`u1`) {
 		t.Errorf("User is was not removed when should have been")

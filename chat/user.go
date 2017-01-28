@@ -9,10 +9,10 @@ import (
 
 // User is temporarily in connected to a chat server, and can be in certain channels
 type User struct {
-	Connection Connection
-	NickName   string
-	Channel    string
-	IgnoreList map[string]bool
+	conn       Connection
+	nickName   string
+	channel    string
+	ignoreList map[string]bool
 	incoming   chan string
 	outgoing   chan string
 	lock       *sync.Mutex
@@ -21,9 +21,9 @@ type User struct {
 // NewUser returns a new new User
 func NewUser(nickName string) *User {
 	return &User{
-		NickName:   nickName,
-		Channel:    "",
-		IgnoreList: make(map[string]bool),
+		nickName:   nickName,
+		channel:    "",
+		ignoreList: make(map[string]bool),
 		incoming:   make(chan string),
 		outgoing:   make(chan string),
 		lock:       new(sync.Mutex),
@@ -33,7 +33,7 @@ func NewUser(nickName string) *User {
 // NewConnectedUser returns a new User with a connection
 func NewConnectedUser(chatServer Server, connection Connection) *User {
 	user := NewUser("")
-	user.Connection = connection
+	user.conn = connection
 	user.Listen(chatServer)
 	return user
 }
@@ -61,22 +61,35 @@ func (u *User) SetIncoming(message string) {
 // GetChannel gets the current channel name for the user
 func (u *User) GetChannel() string {
 	u.lock.Lock()
-	name := u.Channel
-	u.lock.Unlock()
-	return name
+	defer u.lock.Unlock()
+	return u.channel
+}
+
+// GetNickName returns the nickname of this user
+func (u *User) GetNickName() string {
+	u.lock.Lock()
+	defer u.lock.Unlock()
+	return u.nickName
+}
+
+// SetNickName sets the nickname for this user
+func (u *User) SetNickName(nickName string) {
+	u.lock.Lock()
+	defer u.lock.Unlock()
+	u.nickName = nickName
 }
 
 // SetChannel sets the current channel name for the user
 func (u *User) SetChannel(name string) {
 	u.lock.Lock()
-	u.Channel = name
-	u.lock.Unlock()
+	defer u.lock.Unlock()
+	u.channel = name
 }
 
 // Write to the user's connection and remembers the last message that was sent out
 func (u *User) Write() {
 	for message := range u.outgoing {
-		u.Connection.Write([]byte(message + "\n"))
+		u.conn.Write([]byte(message + "\n"))
 	}
 }
 
@@ -84,7 +97,7 @@ func (u *User) Write() {
 func (u *User) Read(chatServer Server) {
 	for {
 		message := make([]byte, 256)
-		u.Connection.Read(message)
+		u.conn.Read(message)
 
 		message = bytes.Trim(message, "\x00")
 
@@ -96,7 +109,7 @@ func (u *User) Read(chatServer Server) {
 
 		handled, err := u.handleNewInput(chatServer, input)
 		if err != nil {
-			chatServer.LogPrintf("Error reading input from user @%s. Error %s", u.NickName, err)
+			chatServer.LogPrintf("Error reading input from user @%s. Error %s", u.nickName, err)
 		}
 		if handled {
 			//If handled then continue reading
@@ -117,12 +130,12 @@ func (u *User) Listen(chatServer Server) {
 
 // Ignore a user
 func (u *User) Ignore(nickName string) {
-	u.IgnoreList[nickName] = true
+	u.ignoreList[nickName] = true
 }
 
 // HasIgnored checks to see if a user has ignored another user or not
 func (u *User) HasIgnored(nickName string) bool {
-	if _, ok := u.IgnoreList[nickName]; ok {
+	if _, ok := u.ignoreList[nickName]; ok {
 		return true
 	}
 	return false
@@ -130,8 +143,8 @@ func (u *User) HasIgnored(nickName string) bool {
 
 // Disconnect a user from this server
 func (u *User) Disconnect(chatServer Server) error {
-	chatServer.LogPrintf("connection \t disconnecting=@%s", u.NickName)
-	return u.Connection.Close()
+	chatServer.LogPrintf("connection \t disconnecting=@%s", u.nickName)
+	return u.conn.Close()
 }
 
 // Checks to see if a new input from user is a command
@@ -142,18 +155,18 @@ func (u *User) handleNewInput(chatServer Server, input string) (bool, error) {
 		err = u.ExecuteCommand(chatServer, input, command)
 		if err != nil {
 			u.outgoing <- `Could not execute command. Error:` + err.Error()
-			chatServer.LogPrintf("error \t failed @%s's command %s", u.NickName, input)
+			chatServer.LogPrintf("error \t failed @%s's command %s", u.nickName, input)
 		}
 		return true, nil
 	}
 
 	if u.GetChannel() != "" {
-		chatServer.LogPrintf("message \t @%s in #%s message=%s", u.NickName, u.GetChannel(), input)
+		chatServer.LogPrintf("message \t @%s in #%s message=%s", u.nickName, u.GetChannel(), input)
 		channel, err := chatServer.GetChannel(u.GetChannel())
 		if err != nil {
 			return false, err
 		}
-		channel.Broadcast(chatServer, `@`+u.NickName+`: `+input)
+		channel.Broadcast(chatServer, `@`+u.nickName+`: `+input)
 		return true, nil
 	}
 
@@ -205,11 +218,11 @@ func (u *User) ExecuteCommand(chatServer Server, input string, command Executabl
 
 	err := command.Execute(commandParams)
 	if err != nil {
-		chatServer.LogPrintf("error \t @%s command=%s error=%s", u.NickName, input, err.Error())
+		chatServer.LogPrintf("error \t @%s command=%s error=%s", u.nickName, input, err.Error())
 		return err
 	}
 
-	chatServer.LogPrintf("command \t @%s command=%s", u.NickName, input)
+	chatServer.LogPrintf("command \t @%s command=%s", u.nickName, input)
 
 	return nil
 }

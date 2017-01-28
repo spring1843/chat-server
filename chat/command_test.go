@@ -66,13 +66,13 @@ func Test_ListCommand(t *testing.T) {
 	}
 
 	user1 := chat.NewConnectedUser(server, fakeConnection1)
-	user1.NickName = `u1`
+	user1.SetNickName(`u1`)
 
 	user2 := chat.NewConnectedUser(server, fakeConnection2)
-	user2.NickName = `u2`
+	user1.SetNickName(`u2`)
 
 	user3 := chat.NewConnectedUser(server, fakeConnection3)
-	user3.NickName = `u3`
+	user1.SetNickName(`u3`)
 
 	server.AddUser(user1)
 	server.AddUser(user2)
@@ -103,7 +103,7 @@ func Test_IgnoreCommand(t *testing.T) {
 
 	user1 := chat.NewConnectedUser(server, fakeConnection1)
 	user2 := chat.NewConnectedUser(server, fakeConnection2)
-	user2.NickName = `u2`
+	user2.SetNickName(`u2`)
 
 	server.AddUser(user1)
 	server.AddUser(user2)
@@ -111,7 +111,7 @@ func Test_IgnoreCommand(t *testing.T) {
 	input := `/ignore @u2`
 	ignoreCommand, _ := chat.GetCommand(input)
 	user1.ExecuteCommand(server, input, ignoreCommand)
-	if user1.HasIgnored(user2.NickName) != true {
+	if user1.HasIgnored(user2.GetNickName()) != true {
 		t.Errorf("User was not ignored after ignore command executed")
 	}
 }
@@ -165,7 +165,7 @@ func Test_QuitCommand(t *testing.T) {
 
 	server := chat.NewService()
 	user := chat.NewConnectedUser(server, fakeConnection)
-	user.NickName = `foo`
+	user.SetNickName(`foo`)
 	server.AddUser(user)
 
 	if server.IsUserConnected(`foo`) != true {

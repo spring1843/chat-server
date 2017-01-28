@@ -74,7 +74,7 @@ func (s *Service) LogPrintf(format string, v ...interface{}) {
 // AddUser to this server
 func (s *Service) AddUser(user *User) {
 	s.lock.Lock()
-	s.Users[user.NickName] = user
+	s.Users[user.nickName] = user
 	s.lock.Unlock()
 }
 
@@ -197,9 +197,9 @@ func (s *Service) WelcomeNewUser(connection Connection) {
 		nickName = <-user.incoming
 	}
 
-	user.NickName = nickName
+	user.nickName = nickName
 	s.AddUser(user)
 	s.LogPrintf("connection \t address=%s authenticated=@%s", connection.RemoteAddr().String(), nickName)
 
-	user.outgoing <- "Thanks " + user.NickName + ", now please type /join #channel to join a channel or /help to get all commands"
+	user.outgoing <- "Thanks " + user.nickName + ", now please type /join #channel to join a channel or /help to get all commands"
 }

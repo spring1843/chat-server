@@ -36,14 +36,13 @@ type (
 	}
 	// Chatter is an interface for users
 	Chatter interface {
-		Write()
-		Read()
-		SetServer(server *Service)
-		Listen()
+		SetOutgoing(message string)
+		GetChannel() string
+		GetNickName() string
 		Ignore(nickName string)
+		SetChannel(name string)
 		HasIgnored(nickName string) bool
-		Disconnect()
-		ExecuteCommand(input string, command Executable)
+		Disconnect(chatServer Server) error
 	}
 	// Executable is an interface for chat commands
 	Executable interface {

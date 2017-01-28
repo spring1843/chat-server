@@ -13,12 +13,12 @@ var (
 )
 
 func Test_CanIgnore(t *testing.T) {
-	user1.Ignore(user2.NickName)
-	if user1.HasIgnored(user2.NickName) != true {
+	user1.Ignore(user2.GetNickName())
+	if user1.HasIgnored(user2.GetNickName()) != true {
 		t.Errorf("User was not ignored when he should have been")
 	}
 
-	if user1.HasIgnored(user3.NickName) != false {
+	if user1.HasIgnored(user3.GetNickName()) != false {
 		t.Errorf("User was ignored when he should not have been")
 	}
 }

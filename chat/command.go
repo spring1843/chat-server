@@ -142,7 +142,7 @@ func (c *ListCommand) Execute(params CommandParams) error {
 		return err
 	}
 	for nickName := range channel.Users {
-		if nickName == params.user1.NickName {
+		if nickName == params.user1.GetNickName() {
 			continue
 		}
 		listMessage += "@" + nickName + ".\n"
@@ -163,12 +163,12 @@ func (c *IgnoreCommand) Execute(params CommandParams) error {
 		return errors.New("User2 param is not set")
 	}
 
-	if params.user2.NickName == params.user1.NickName {
+	if params.user2.GetNickName() == params.user1.GetNickName() {
 		return errors.New("We don't let one ignore themselves")
 	}
 
-	params.user1.Ignore(params.user2.NickName)
-	params.user1.SetOutgoing(params.user2.NickName + " is now ignored.")
+	params.user1.Ignore(params.user2.GetNickName())
+	params.user1.SetOutgoing(params.user2.GetNickName() + " is now ignored.")
 	return nil
 }
 
@@ -191,11 +191,11 @@ func (c *JoinCommand) Execute(params CommandParams) error {
 		return errors.New("You are already in channel #" + params.channel.Name)
 	}
 
-	params.channel.AddUser(params.user1.NickName)
+	params.channel.AddUser(params.user1.GetNickName())
 	params.user1.SetChannel(params.channel.Name)
 
 	params.user1.SetOutgoing("There are " + strconv.Itoa(len(params.channel.Users)) + " other users this channel.")
-	params.channel.Broadcast(params.server, `@`+params.user1.NickName+` just joined channel #`+params.channel.Name)
+	params.channel.Broadcast(params.server, `@`+params.user1.GetNickName()+` just joined channel #`+params.channel.Name)
 	return nil
 }
 
@@ -213,14 +213,14 @@ func (c *PrivateMessageCommand) Execute(params CommandParams) error {
 		return errors.New("Users are not in the same channel")
 	}
 
-	if params.user2.HasIgnored(params.user1.NickName) {
+	if params.user2.HasIgnored(params.user1.GetNickName()) {
 		return errors.New("User has ignored the sender")
 	}
 
-	params.server.LogPrintf("message \t @%s to @%s message=%s", params.user1.NickName, params.user2.NickName, params.message)
+	params.server.LogPrintf("message \t @%s to @%s message=%s", params.user1.GetNickName(), params.user2.GetNickName(), params.message)
 
 	now := time.Now()
-	go params.user2.SetOutgoing(now.Format(time.Kitchen) + ` - *Private from @` + params.user1.NickName + `: ` + params.message)
+	go params.user2.SetOutgoing(now.Format(time.Kitchen) + ` - *Private from @` + params.user1.GetNickName() + `: ` + params.message)
 	return nil
 }
 
@@ -230,11 +230,11 @@ func (c *QuitCommand) Execute(params CommandParams) error {
 		return errors.New("User1 param is not set")
 	}
 
-	if err := params.server.RemoveUser(params.user1.NickName); err != nil {
+	if err := params.server.RemoveUser(params.user1.GetNickName()); err != nil {
 		return errors.New("Could not remove user afeter quit command")
 	}
 	if params.user1.GetChannel() != "" {
-		params.server.RemoveUserFromChannel(params.user1.NickName, params.user1.GetChannel())
+		params.server.RemoveUserFromChannel(params.user1.GetNickName(), params.user1.GetChannel())
 	}
 
 	if err := params.user1.Disconnect(params.server); err != nil {

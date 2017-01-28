@@ -11,16 +11,16 @@ import (
 var channel = &chat.Channel{Name: "foo", Users: make(map[string]bool)}
 
 func Test_CanAddUsers(t *testing.T) {
-	channel.AddUser(user1.NickName)
-	channel.AddUser(user2.NickName)
+	channel.AddUser(user1.GetNickName())
+	channel.AddUser(user2.GetNickName())
 	if len(channel.Users) != 2 {
 		t.Errorf("Users couldn't be added to the channel")
 	}
 }
 
 func Test_CanBroadCast(t *testing.T) {
-	channel.AddUser(user1.NickName)
-	channel.AddUser(user2.NickName)
+	channel.AddUser(user1.GetNickName())
+	channel.AddUser(user2.GetNickName())
 
 	var chatServer = chat.NewService()
 	chatServer.AddUser(user1)
