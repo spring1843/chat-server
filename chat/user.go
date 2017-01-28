@@ -94,7 +94,7 @@ func (u *User) Read(chatServer Server) {
 			input = strings.TrimSpace(input)
 		}
 
-		err, handled := u.handleNewInput(chatServer, input)
+		handled, err := u.handleNewInput(chatServer, input)
 		if err != nil {
 			chatServer.LogPrintf("Error reading input from user @%s. Error %s", u.NickName, err)
 		}
@@ -137,27 +137,27 @@ func (u *User) Disconnect(chatServer Server) error {
 // Checks to see if a new input from user is a command
 // If it is a command then it tries executing func
 // If it's not a command then it will output to the channel
-func (u *User) handleNewInput(chatServer Server, input string) (error, bool) {
+func (u *User) handleNewInput(chatServer Server, input string) (bool, error) {
 	if command, err := GetCommand(input); err == nil && command != nil {
 		err = u.ExecuteCommand(chatServer, input, command)
 		if err != nil {
 			u.outgoing <- `Could not execute command. Error:` + err.Error()
 			chatServer.LogPrintf("error \t failed @%s's command %s", u.NickName, input)
 		}
-		return nil, true
+		return true, nil
 	}
 
 	if u.GetChannel() != "" {
 		chatServer.LogPrintf("message \t @%s in #%s message=%s", u.NickName, u.GetChannel(), input)
 		channel, err := chatServer.GetChannel(u.GetChannel())
 		if err != nil {
-			return err, false
+			return false, err
 		}
 		channel.Broadcast(chatServer, `@`+u.NickName+`: `+input)
-		return nil, true
+		return true, nil
 	}
 
-	return nil, false
+	return false, nil
 }
 
 // ExecuteCommand Executes a given command
