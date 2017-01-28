@@ -28,8 +28,8 @@ func Test_CanBroadCast(t *testing.T) {
 
 	go channel.Broadcast(chatServer, `foo`)
 
-	msg1 := <-user1.Outgoing
-	msg2 := <-user2.Outgoing
+	msg1 := user1.GetOutgoing()
+	msg2 := user2.GetOutgoing()
 
 	if strings.Contains(msg1, `foo`) != true || msg1 != msg2 {
 		t.Errorf("Message wasn't broadcasted to the users in the channel")

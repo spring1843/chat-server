@@ -33,6 +33,22 @@ func NewUser(connection Connection) *User {
 	return User
 }
 
+func (u *User) GetOutgoing() string {
+	return <-u.Outgoing
+}
+
+func (u *User) SetOutgoing(message string) {
+	u.Outgoing <- message
+}
+
+func (u *User) GetIncoming() string {
+	return <-u.Incoming
+}
+
+func (u *User) SetIncomming(message string) {
+	u.Incoming <- message
+}
+
 // Write to the user's connection and remembers the last message that was sent out
 func (u *User) Write() {
 	for message := range u.Outgoing {
@@ -61,7 +77,7 @@ func (u *User) Read() {
 		}
 
 		if input != "\n" && input != `` {
-			u.Incoming <- input
+			u.SetIncomming(input)
 		}
 	}
 }
