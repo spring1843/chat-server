@@ -1,7 +1,6 @@
 package chat_test
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/spring1843/chat-server/chat"
@@ -28,10 +27,11 @@ func Test_CanWriteToUser(t *testing.T) {
 	fakeWriter := NewMockedChatConnection()
 	user1 := chat.NewConnectedUser(server, fakeWriter)
 
-	user1.SetOutgoing(`foo`)
+	go user1.SetOutgoing(`foo`)
+	msg := user1.GetOutgoing()
 
-	if reflect.DeepEqual(fakeWriter.ReadOutgoing(), []byte("foo\n")) == false {
-		t.Errorf("Message was not written to the user")
+	if msg != "foo" {
+		t.Errorf("Message was not written to the user. Msg %s", msg)
 	}
 }
 
