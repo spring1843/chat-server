@@ -26,7 +26,7 @@ func Test_CanIgnore(t *testing.T) {
 
 func Test_CanWriteToUser(t *testing.T) {
 	fakeWriter := NewMockedChatConnection()
-	user1 := chat.NewConnectedUser(fakeWriter)
+	user1 := chat.NewConnectedUser(server, fakeWriter)
 
 	user1.SetOutgoing(`foo`)
 
@@ -39,7 +39,7 @@ func Test_CanReadFromUser(t *testing.T) {
 	fakeReader := NewMockedChatConnection()
 	fakeReader.incoming = []byte("foo\n")
 
-	user1 := chat.NewConnectedUser(fakeReader)
+	user1 := chat.NewConnectedUser(server, fakeReader)
 	msg := user1.GetIncoming()
 
 	if msg != "foo" {

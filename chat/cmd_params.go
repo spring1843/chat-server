@@ -83,8 +83,8 @@ func Filter(input string, function func(string) bool) []string {
 	return vsf
 }
 
-// DoesCommandRequireParam checks to see if a command requires the given parameter
-func (c *Command) DoesCommandRequireParam(param string) bool {
+// RequiresParam checks to see if a command requires the given parameter
+func (c *Command) RequiresParam(param string) bool {
 	params := c.getChatCommand().RequiredParams
 	for _, p := range params {
 		if p == param {

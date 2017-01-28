@@ -44,7 +44,7 @@ func Test_HelpCommand(t *testing.T) {
 	fakeConnection.incoming = []byte("/help\n")
 
 	server := chat.NewService()
-	user := chat.NewConnectedUser(fakeConnection)
+	user := chat.NewConnectedUser(server, fakeConnection)
 	server.AddUser(user)
 	msg := user.GetOutgoing()
 
@@ -67,29 +67,29 @@ func Test_ListCommand(t *testing.T) {
 		t.Errorf("Could not get an instance of list command")
 	}
 
-	user1 := chat.NewConnectedUser(fakeConnection1)
+	user1 := chat.NewConnectedUser(server, fakeConnection1)
 	user1.NickName = `u1`
 
-	user2 := chat.NewConnectedUser(fakeConnection2)
+	user2 := chat.NewConnectedUser(server, fakeConnection2)
 	user2.NickName = `u2`
 
-	user3 := chat.NewConnectedUser(fakeConnection3)
+	user3 := chat.NewConnectedUser(server, fakeConnection3)
 	user3.NickName = `u3`
 
 	server.AddUser(user1)
 	server.AddUser(user2)
 	server.AddUser(user3)
 
-	user1.ExecuteCommand(input, joinCommand)
-	user2.ExecuteCommand(input, joinCommand)
-	user3.ExecuteCommand(input, joinCommand)
+	user1.ExecuteCommand(server, input, joinCommand)
+	user2.ExecuteCommand(server, input, joinCommand)
+	user3.ExecuteCommand(server, input, joinCommand)
 
 	input = "/list \n"
 	listCommand, err := chat.GetCommand(input)
 	if err != nil {
 		t.Errorf("Could not get an instance of list command")
 	}
-	user1.ExecuteCommand(input, listCommand)
+	user1.ExecuteCommand(server, input, listCommand)
 	msg := user1.LastOutGoingMessage
 
 	if strings.Contains(msg, "@u1") != true && strings.Contains(msg, "@u2") != true && strings.Contains(msg, "@u3") != true {
@@ -103,8 +103,8 @@ func Test_IgnoreCommand(t *testing.T) {
 
 	server := chat.NewService()
 
-	user1 := chat.NewConnectedUser(fakeConnection1)
-	user2 := chat.NewConnectedUser(fakeConnection2)
+	user1 := chat.NewConnectedUser(server, fakeConnection1)
+	user2 := chat.NewConnectedUser(server, fakeConnection2)
 	user2.NickName = `u2`
 
 	server.AddUser(user1)
@@ -112,7 +112,7 @@ func Test_IgnoreCommand(t *testing.T) {
 
 	input := `/ignore @u2`
 	ignoreCommand, _ := chat.GetCommand(input)
-	user1.ExecuteCommand(input, ignoreCommand)
+	user1.ExecuteCommand(server, input, ignoreCommand)
 	if user1.HasIgnored(user2.NickName) != true {
 		t.Errorf("User was not ignored after ignore command executed")
 	}
@@ -123,7 +123,7 @@ func Test_JoinCommand(t *testing.T) {
 	fakeConnection.incoming = []byte("/join #r\n")
 
 	server := chat.NewService()
-	user1 := chat.NewConnectedUser(fakeConnection)
+	user1 := chat.NewConnectedUser(server, fakeConnection)
 	server.AddUser(user1)
 
 	msg := user1.GetOutgoing()
@@ -137,16 +137,7 @@ func Test_JoinCommand(t *testing.T) {
 }
 
 func Test_MessageCommand(t *testing.T) {
-	fakeConnection1 := NewMockedChatConnection()
-	fakeConnection2 := NewMockedChatConnection()
-
 	server := chat.NewService()
-
-	user1 := chat.NewConnectedUser(fakeConnection1)
-	user1.NickName = `u1`
-
-	user2 := chat.NewConnectedUser(fakeConnection2)
-	user2.NickName = `u2`
 
 	server.AddUser(user1)
 	server.AddUser(user2)
@@ -154,15 +145,19 @@ func Test_MessageCommand(t *testing.T) {
 	channel := chat.NewChannel()
 	channel.Name = `r`
 	user1.Channel, user2.Channel = channel, channel
-
 	input := `/msg @u2 foo`
-	messageCommand, _ := chat.GetCommand(input)
-	user1.ExecuteCommand(input, messageCommand)
+	messageCommand, err := chat.GetCommand(input)
+	if err != nil {
+		t.Fatalf("Failed getting message command. Error %s", err)
+	}
 
-	msg := user2.LastOutGoingMessage
+	if err := user1.ExecuteCommand(server, input, messageCommand); err != nil {
+		t.Fatalf("Failed executing message. Error %s", err)
+	}
+	msg := user2.GetOutgoing()
 
 	if strings.Contains(msg, "- *Private from @u1: foo") != true {
-		t.Errorf("Private message was not received")
+		t.Errorf("Private message was not received. Last message %s", user2.LastOutGoingMessage)
 	}
 }
 
@@ -170,7 +165,7 @@ func Test_QuitCommand(t *testing.T) {
 	fakeConnection := NewMockedChatConnection()
 
 	server := chat.NewService()
-	user := chat.NewConnectedUser(fakeConnection)
+	user := chat.NewConnectedUser(server, fakeConnection)
 	user.NickName = `foo`
 	server.AddUser(user)
 
@@ -180,7 +175,7 @@ func Test_QuitCommand(t *testing.T) {
 
 	input := `/quit`
 	quitCommand, _ := chat.GetCommand(input)
-	user.ExecuteCommand(input, quitCommand)
+	user.ExecuteCommand(server, input, quitCommand)
 
 	if server.IsUserConnected(`foo`) != false {
 		t.Errorf("User was not disconnected after running quit command")

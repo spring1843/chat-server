@@ -30,7 +30,7 @@ func NewUser(nickName string) *User {
 }
 
 // NewConnectedUser returns a new User with a connection
-func NewConnectedUser(connection Connection) *User {
+func NewConnectedUser(chatServer Server, connection Connection) *User {
 	User := &User{
 		Connection: connection,
 		NickName:   ``,
@@ -39,7 +39,7 @@ func NewConnectedUser(connection Connection) *User {
 		incoming:   make(chan string),
 		outgoing:   make(chan string),
 	}
-	User.Listen()
+	User.Listen(chatServer)
 
 	return User
 }
@@ -73,7 +73,7 @@ func (u *User) Write() {
 }
 
 // Read and interprets a message from a user
-func (u *User) Read() {
+func (u *User) Read(chatServer Server) {
 	for {
 		message := make([]byte, 256)
 		u.Connection.Read(message)
@@ -86,7 +86,7 @@ func (u *User) Read() {
 			input = strings.TrimSpace(input)
 		}
 
-		if u.handleNewInput(input) {
+		if u.handleNewInput(chatServer, input) {
 			//If handled then continue reading
 			continue
 		}
@@ -98,8 +98,8 @@ func (u *User) Read() {
 }
 
 // Listen starts reading from and writing to a user
-func (u *User) Listen() {
-	go u.Read()
+func (u *User) Listen(chatServer Server) {
+	go u.Read(chatServer)
 	go u.Write()
 }
 
@@ -117,27 +117,27 @@ func (u *User) HasIgnored(nickName string) bool {
 }
 
 // Disconnect a user from this server
-func (u *User) Disconnect() {
-	RunningServer.LogPrintf("connection \t disconnecting=@%s", u.NickName)
+func (u *User) Disconnect(chatServer Server) {
+	chatServer.LogPrintf("connection \t disconnecting=@%s", u.NickName)
 	u.Connection.Close()
 }
 
 // Checks to see if a new input from user is a command
 // If it is a command then it tries executing func
 // If it's not a command then it will output to the channel
-func (u *User) handleNewInput(input string) bool {
+func (u *User) handleNewInput(chatServer Server, input string) bool {
 	if command, err := GetCommand(input); err == nil && command != nil {
-		err = u.ExecuteCommand(input, command)
+		err = u.ExecuteCommand(chatServer, input, command)
 		if err != nil {
 			u.outgoing <- `Could not execute command. Error:` + err.Error()
-			RunningServer.LogPrintf("error \t failed @%s's command %s", u.NickName, input)
+			chatServer.LogPrintf("error \t failed @%s's command %s", u.NickName, input)
 		}
 		return true
 	}
 
 	if u.Channel != nil {
-		RunningServer.LogPrintf("message \t @%s in #%s message=%s", u.NickName, u.Channel.Name, input)
-		u.Channel.Broadcast(RunningServer, `@`+u.NickName+`: `+input)
+		chatServer.LogPrintf("message \t @%s in #%s message=%s", u.NickName, u.Channel.Name, input)
+		u.Channel.Broadcast(chatServer, `@`+u.NickName+`: `+input)
 		return true
 	}
 
@@ -146,40 +146,40 @@ func (u *User) handleNewInput(input string) bool {
 
 // ExecuteCommand Executes a given command
 // First it finds all the required parameters from the input and populates them
-func (u *User) ExecuteCommand(input string, command Executable) error {
+func (u *User) ExecuteCommand(chatServer Server, input string, command Executable) error {
 	commandParams := CommandParams{
 		user1:    u,
 		rawInput: input,
-		server:   RunningServer,
+		server:   chatServer,
 	}
 
 	chatCommand := command.getChatCommand()
 
-	if chatCommand.DoesCommandRequireParam(`user2`) == true {
+	if chatCommand.RequiresParam(`user2`) {
 		nickname, err := chatCommand.ParseNickNameFomInput(input)
 		if err != nil {
 			return errors.New("Could not find the required @nickname in the input")
 		}
 
-		user2, err := RunningServer.GetUser(nickname)
+		user2, err := chatServer.GetUser(nickname)
 		if err != nil {
-			return err
+			return errors.New("User " + nickname + " + is not connected to this server")
 		}
 		commandParams.user2 = user2
 	}
 
-	if chatCommand.DoesCommandRequireParam(`channel`) == true {
+	if chatCommand.RequiresParam(`channel`) {
 		channelName, err := chatCommand.ParseChannelFromInput(input)
 		if err != nil {
 			return errors.New("Could not find the required #channel in the input")
 		}
-		channel, err := RunningServer.GetChannel(channelName)
+		channel, err := chatServer.GetChannel(channelName)
 		if err == nil {
 			commandParams.channel = channel
 		}
 	}
 
-	if chatCommand.DoesCommandRequireParam(`message`) == true {
+	if chatCommand.RequiresParam(`message`) {
 		message, err := chatCommand.ParseMessageFromInput(input)
 		if err != nil {
 			return errors.New("Could not required message in the input")
@@ -189,10 +189,11 @@ func (u *User) ExecuteCommand(input string, command Executable) error {
 
 	err := command.Execute(commandParams)
 	if err != nil {
-		RunningServer.LogPrintf("error \t @%s command=%s error=%s", u.NickName, input, err.Error())
+		chatServer.LogPrintf("error \t @%s command=%s error=%s", u.NickName, input, err.Error())
 		return err
 	}
-	RunningServer.LogPrintf("command \t @%s command=%s", u.NickName, input)
+
+	chatServer.LogPrintf("command \t @%s command=%s", u.NickName, input)
 
 	return nil
 }

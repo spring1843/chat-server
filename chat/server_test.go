@@ -11,9 +11,11 @@ import (
 	"github.com/spring1843/chat-server/chat"
 )
 
-func Test_CanLogToFile(t *testing.T) {
-	var server = chat.NewService()
+var (
+	server = chat.NewService()
+)
 
+func Test_CanLogToFile(t *testing.T) {
 	fakeWriter := NewMockedChatConnection()
 	server.SetLogFile(fakeWriter)
 	server.LogPrintf("test \t foo\n")
@@ -26,10 +28,6 @@ func Test_CanLogToFile(t *testing.T) {
 }
 
 func Test_CanAddUser(t *testing.T) {
-	var (
-		server = chat.NewService()
-	)
-
 	server.AddUser(user1)
 	if !server.IsUserConnected(`u1`) {
 		t.Errorf("User is not connected when should have been connected")
@@ -40,10 +38,6 @@ func Test_CanAddUser(t *testing.T) {
 }
 
 func Test_CanRemoveUser(t *testing.T) {
-	var (
-		server = chat.NewService()
-	)
-
 	server.AddUser(user1)
 	server.AddUser(user2)
 
@@ -59,10 +53,6 @@ func Test_CanRemoveUser(t *testing.T) {
 }
 
 func Test_AddChannel(t *testing.T) {
-	var (
-		server = chat.NewService()
-	)
-
 	server.AddChannel(`foo`)
 
 	if server.GetChannelCount() != 1 {
@@ -71,10 +61,6 @@ func Test_AddChannel(t *testing.T) {
 }
 
 func Test_GetSameChannel(t *testing.T) {
-	var (
-		server = chat.NewService()
-	)
-
 	channel := server.AddChannel(`foo`)
 	sameChannel, err := server.GetChannel(`foo`)
 
@@ -83,9 +69,9 @@ func Test_GetSameChannel(t *testing.T) {
 	}
 }
 
-func Test_WelcomeNewUser(t *testing.T) {
+func Test_WelcomeNewUsers(t *testing.T) {
+	server = chat.NewService()
 	var (
-		server     = chat.NewService()
 		connection = NewMockedChatConnection()
 	)
 

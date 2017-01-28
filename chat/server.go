@@ -25,9 +25,6 @@ type (
 	}
 )
 
-// RunningServer is the running instance of chat server
-var RunningServer = NewService()
-
 // NewService returns a new instance of the Server
 func NewService() Server {
 	runningServer := &Service{
@@ -179,7 +176,7 @@ func (s *Service) Broadcast(message string) {
 func (s *Service) WelcomeNewUser(connection Connection) {
 	s.LogPrintf("connection \t New connection from address=%s", connection.RemoteAddr().String())
 
-	user := NewConnectedUser(connection)
+	user := NewConnectedUser(s, connection)
 	user.outgoing <- "Welcome to chat server. There are " + strconv.Itoa(s.ConnectedUsersCount()) + " other users on this server. please enter a nickname"
 
 	nickName := <-user.incoming

@@ -86,11 +86,11 @@ func Test_DoesCommandRequireParam(t *testing.T) {
 		},
 	}
 
-	if fakeCommand.Command.DoesCommandRequireParam(`user1`) == false {
+	if fakeCommand.Command.RequiresParam(`user1`) == false {
 		t.Errorf("Required param user1 was not seen as required.")
 	}
 
-	if fakeCommand.Command.DoesCommandRequireParam(`user2`) == true {
+	if fakeCommand.Command.RequiresParam(`user2`) == true {
 		t.Errorf("Not-required param user2 was not seen as required.")
 	}
 }

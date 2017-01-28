@@ -121,7 +121,7 @@ func (c *HelpCommand) Execute(params CommandParams) error {
 		helpMessage += command.getChatCommand().Syntax + "\t" + command.getChatCommand().Description + ".\n"
 	}
 
-	params.user1.outgoing <- helpMessage
+	params.user1.SetOutgoing(helpMessage)
 	return nil
 }
 
@@ -144,7 +144,7 @@ func (c *ListCommand) Execute(params CommandParams) error {
 		listMessage += "@" + nickName + ".\n"
 	}
 
-	params.user1.outgoing <- listMessage
+	params.user1.SetOutgoing(listMessage)
 
 	return nil
 }
@@ -164,7 +164,7 @@ func (c *IgnoreCommand) Execute(params CommandParams) error {
 	}
 
 	params.user1.Ignore(params.user2.NickName)
-	params.user1.outgoing <- params.user2.NickName + " is now ignored."
+	params.user1.SetOutgoing(params.user2.NickName + " is now ignored.")
 	return nil
 }
 
@@ -190,9 +190,8 @@ func (c *JoinCommand) Execute(params CommandParams) error {
 	params.channel.AddUser(params.user1.NickName)
 	params.user1.Channel = params.channel
 
-	params.user1.outgoing <- "There are " + strconv.Itoa(len(params.channel.Users)) + " other users this channel."
-
-	params.channel.Broadcast(RunningServer, `@`+params.user1.NickName+` just joined channel #`+params.channel.Name)
+	params.user1.SetOutgoing("There are " + strconv.Itoa(len(params.channel.Users)) + " other users this channel.")
+	params.channel.Broadcast(params.server, `@`+params.user1.NickName+` just joined channel #`+params.channel.Name)
 	return nil
 }
 
@@ -217,8 +216,7 @@ func (c *PrivateMessageCommand) Execute(params CommandParams) error {
 	params.server.LogPrintf("message \t @%s to @%s message=%s", params.user1.NickName, params.user2.NickName, params.message)
 
 	now := time.Now()
-	params.user2.outgoing <- now.Format(time.Kitchen) + ` - *Private from @` + params.user1.NickName + `: ` + params.message
-
+	go params.user2.SetOutgoing(now.Format(time.Kitchen) + ` - *Private from @` + params.user1.NickName + `: ` + params.message)
 	return nil
 }
 
@@ -234,7 +232,7 @@ func (c *QuitCommand) Execute(params CommandParams) error {
 	if params.user1.Channel != nil {
 		params.user1.Channel.RemoveUser(params.user1.NickName)
 	}
-	params.user1.Disconnect()
+	params.user1.Disconnect(params.server)
 
 	return nil
 }
