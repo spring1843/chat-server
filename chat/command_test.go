@@ -119,19 +119,18 @@ func Test_IgnoreCommand(t *testing.T) {
 }
 
 func Test_JoinCommand(t *testing.T) {
-	fakeConnection1 := NewMockedChatConnection()
+	fakeConnection := NewMockedChatConnection()
+	fakeConnection.incoming = []byte("/join #r\n")
 
 	server := chat.NewService()
-	user1 := chat.NewConnectedUser(fakeConnection1)
+	user1 := chat.NewConnectedUser(fakeConnection)
 	server.AddUser(user1)
 
-	input := `/join #r`
-	joinCommand, err := chat.GetCommand(input)
-	if err != nil {
-		t.Errorf("Could not get an instance of list command")
+	msg := user1.GetOutgoing()
+	if strings.Contains(msg, "other users this channel") != true {
+		t.Errorf("User did not receive welcome message after joining channel received %s instead", msg)
 	}
 
-	user1.ExecuteCommand(input, joinCommand)
 	if user1.Channel != nil && user1.Channel.Name != `r` {
 		t.Errorf("User did not join the #r channel when he should have")
 	}
