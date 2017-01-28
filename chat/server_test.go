@@ -71,22 +71,29 @@ func Test_GetSameChannel(t *testing.T) {
 
 func Test_WelcomeNewUsers(t *testing.T) {
 	server = chat.NewService()
-	var (
-		connection = NewMockedChatConnection()
-	)
-
 	logFile, _ := os.OpenFile(`/dev/null`, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	server.SetLogFile(logFile)
 
 	server.Listen()
-	connection.lock.Lock()
-	connection.incoming = []byte("foo\n")
-	connection.lock.Unlock()
 
-	server.WelcomeNewUser(connection)
+	connection1 := NewMockedChatConnection()
+	connection1.lock.Lock()
+	connection1.incoming = []byte("foo\n")
+	connection1.lock.Unlock()
 
-	if server.ConnectedUsersCount() != 1 {
-		t.Errorf("User was not added to the server, expected 1 got %d", server.ConnectedUsersCount())
+	server.WelcomeNewUser(connection1)
+	if !server.IsUserConnected("foo") {
+		t.Error("User foo not added to the server")
+	}
+
+	connection2 := NewMockedChatConnection()
+	connection2.lock.Lock()
+	connection2.incoming = []byte("bar\n")
+	connection2.lock.Unlock()
+
+	server.WelcomeNewUser(connection2)
+	if !server.IsUserConnected("bar") {
+		t.Error("User bar not added to the server")
 	}
 }
 
