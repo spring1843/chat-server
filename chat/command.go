@@ -133,11 +133,15 @@ func (c *ListCommand) Execute(params CommandParams) error {
 		return errors.New("User param is not set")
 	}
 
-	if params.user1.Channel == nil {
+	if params.user1.GetChannel() == "" {
 		return errors.New("User is not in a channel")
 	}
 
-	for nickName := range params.user1.Channel.Users {
+	channel, err := params.server.GetChannel(params.user1.GetChannel())
+	if err != nil {
+		return err
+	}
+	for nickName := range channel.Users {
 		if nickName == params.user1.NickName {
 			continue
 		}
@@ -183,12 +187,12 @@ func (c *JoinCommand) Execute(params CommandParams) error {
 		params.channel, _ = params.server.GetChannel(channelName)
 	}
 
-	if params.user1.Channel != nil && params.user1.Channel.Name == params.channel.Name {
+	if params.user1.GetChannel() != "" && params.user1.GetChannel() == params.channel.Name {
 		return errors.New("You are already in channel #" + params.channel.Name)
 	}
 
 	params.channel.AddUser(params.user1.NickName)
-	params.user1.Channel = params.channel
+	params.user1.SetChannel(params.channel.Name)
 
 	params.user1.SetOutgoing("There are " + strconv.Itoa(len(params.channel.Users)) + " other users this channel.")
 	params.channel.Broadcast(params.server, `@`+params.user1.NickName+` just joined channel #`+params.channel.Name)
@@ -205,7 +209,7 @@ func (c *PrivateMessageCommand) Execute(params CommandParams) error {
 		return errors.New("User2 param is not set")
 	}
 
-	if params.user1.Channel != params.user2.Channel {
+	if params.user1.GetChannel() != params.user2.GetChannel() {
 		return errors.New("Users are not in the same channel")
 	}
 
@@ -229,9 +233,10 @@ func (c *QuitCommand) Execute(params CommandParams) error {
 	if err := params.server.RemoveUser(params.user1.NickName); err != nil {
 		return errors.New("Could not remove user afeter quit command")
 	}
-	if params.user1.Channel != nil {
-		params.user1.Channel.RemoveUser(params.user1.NickName)
+	if params.user1.GetChannel() != "" {
+		params.server.RemoveUserFromChannel(params.user1.NickName, params.user1.GetChannel())
 	}
+
 	if err := params.user1.Disconnect(params.server); err != nil {
 		return errors.New("Could not disconnect user")
 	}

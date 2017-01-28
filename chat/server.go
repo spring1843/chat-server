@@ -86,6 +86,17 @@ func (s *Service) RemoveUser(nickName string) error {
 	return nil
 }
 
+// RemoveUserFromChannel removes a user from a channel
+func (s *Service) RemoveUserFromChannel(nickName, channelName string) error {
+	channel, err := s.GetChannel(channelName)
+	if err != nil {
+		return err
+	}
+
+	channel.RemoveUser(nickName)
+	return nil
+}
+
 // GetUser gets a connected user
 func (s *Service) GetUser(nickName string) (*User, error) {
 	s.lock.Lock()

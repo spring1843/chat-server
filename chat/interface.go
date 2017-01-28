@@ -25,6 +25,7 @@ type (
 		GetChannel(string) (*Channel, error)
 		AddChannel(channelName string) *Channel
 		GetChannelCount() int
+		RemoveUserFromChannel(nickName, channelName string) error
 	}
 	// Connection is an interface for a network connection
 	Connection interface {

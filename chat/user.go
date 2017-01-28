@@ -4,44 +4,40 @@ import (
 	"bytes"
 	"errors"
 	"strings"
+	"sync"
 )
 
 // User is temporarily in connected to a chat server, and can be in certain channels
 type User struct {
 	Connection          Connection
 	NickName            string
-	Channel             *Channel
+	Channel             string
 	IgnoreList          map[string]bool
 	incoming            chan string
 	outgoing            chan string
 	LastOutGoingMessage string
 	LastIncomingMessage string
+	lock                *sync.Mutex
 }
 
 // NewUser returns a new new User
 func NewUser(nickName string) *User {
 	return &User{
 		NickName:   nickName,
-		Channel:    nil,
+		Channel:    "",
 		IgnoreList: make(map[string]bool),
 		incoming:   make(chan string),
 		outgoing:   make(chan string),
+		lock:       new(sync.Mutex),
 	}
 }
 
 // NewConnectedUser returns a new User with a connection
 func NewConnectedUser(chatServer Server, connection Connection) *User {
-	User := &User{
-		Connection: connection,
-		NickName:   ``,
-		Channel:    nil,
-		IgnoreList: make(map[string]bool),
-		incoming:   make(chan string),
-		outgoing:   make(chan string),
-	}
-	User.Listen(chatServer)
-
-	return User
+	user := NewUser("")
+	user.Connection = connection
+	user.Listen(chatServer)
+	return user
 }
 
 // GetOutgoing gets the outgoing message for a user
@@ -62,6 +58,21 @@ func (u *User) GetIncoming() string {
 // SetIncoming sets an incoming message from the user
 func (u *User) SetIncoming(message string) {
 	u.incoming <- message
+}
+
+// GetChannel gets the current channel name for the user
+func (u *User) GetChannel() string {
+	u.lock.Lock()
+	name := u.Channel
+	u.lock.Unlock()
+	return name
+}
+
+// SetChannel sets the current channel name for the user
+func (u *User) SetChannel(name string) {
+	u.lock.Lock()
+	u.Channel = name
+	u.lock.Unlock()
 }
 
 // Write to the user's connection and remembers the last message that was sent out
@@ -86,7 +97,11 @@ func (u *User) Read(chatServer Server) {
 			input = strings.TrimSpace(input)
 		}
 
-		if u.handleNewInput(chatServer, input) {
+		err, handled := u.handleNewInput(chatServer, input)
+		if err != nil {
+			chatServer.LogPrintf("Error reading input from user @%s. Error %s", u.NickName, err)
+		}
+		if handled {
 			//If handled then continue reading
 			continue
 		}
@@ -125,23 +140,27 @@ func (u *User) Disconnect(chatServer Server) error {
 // Checks to see if a new input from user is a command
 // If it is a command then it tries executing func
 // If it's not a command then it will output to the channel
-func (u *User) handleNewInput(chatServer Server, input string) bool {
+func (u *User) handleNewInput(chatServer Server, input string) (error, bool) {
 	if command, err := GetCommand(input); err == nil && command != nil {
 		err = u.ExecuteCommand(chatServer, input, command)
 		if err != nil {
 			u.outgoing <- `Could not execute command. Error:` + err.Error()
 			chatServer.LogPrintf("error \t failed @%s's command %s", u.NickName, input)
 		}
-		return true
+		return nil, true
 	}
 
-	if u.Channel != nil {
-		chatServer.LogPrintf("message \t @%s in #%s message=%s", u.NickName, u.Channel.Name, input)
-		u.Channel.Broadcast(chatServer, `@`+u.NickName+`: `+input)
-		return true
+	if u.GetChannel() != "" {
+		chatServer.LogPrintf("message \t @%s in #%s message=%s", u.NickName, u.GetChannel(), input)
+		channel, err := chatServer.GetChannel(u.GetChannel())
+		if err != nil {
+			return err, false
+		}
+		channel.Broadcast(chatServer, `@`+u.NickName+`: `+input)
+		return nil, true
 	}
 
-	return false
+	return nil, false
 }
 
 // ExecuteCommand Executes a given command

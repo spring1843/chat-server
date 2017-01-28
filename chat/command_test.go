@@ -1,5 +1,3 @@
-// +build !race
-
 package chat_test
 
 import (
@@ -131,7 +129,7 @@ func Test_JoinCommand(t *testing.T) {
 		t.Errorf("User did not receive welcome message after joining channel received %s instead", msg)
 	}
 
-	if user1.Channel != nil && user1.Channel.Name != `r` {
+	if user1.GetChannel() != "" && user1.GetChannel() != `r` {
 		t.Errorf("User did not join the #r channel when he should have")
 	}
 }
@@ -144,7 +142,8 @@ func Test_MessageCommand(t *testing.T) {
 
 	channel := chat.NewChannel()
 	channel.Name = `r`
-	user1.Channel, user2.Channel = channel, channel
+	user1.SetChannel(channel.Name)
+	user2.SetChannel(channel.Name)
 	input := `/msg @u2 foo`
 	messageCommand, err := chat.GetCommand(input)
 	if err != nil {
