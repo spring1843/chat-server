@@ -9,15 +9,13 @@ import (
 
 // User is temporarily in connected to a chat server, and can be in certain channels
 type User struct {
-	Connection          Connection
-	NickName            string
-	Channel             string
-	IgnoreList          map[string]bool
-	incoming            chan string
-	outgoing            chan string
-	LastOutGoingMessage string
-	LastIncomingMessage string
-	lock                *sync.Mutex
+	Connection Connection
+	NickName   string
+	Channel    string
+	IgnoreList map[string]bool
+	incoming   chan string
+	outgoing   chan string
+	lock       *sync.Mutex
 }
 
 // NewUser returns a new new User
@@ -79,7 +77,6 @@ func (u *User) SetChannel(name string) {
 func (u *User) Write() {
 	for message := range u.outgoing {
 		u.Connection.Write([]byte(message + "\n"))
-		u.LastOutGoingMessage = message
 	}
 }
 

@@ -88,7 +88,7 @@ func Test_ListCommand(t *testing.T) {
 		t.Errorf("Could not get an instance of list command")
 	}
 	user1.ExecuteCommand(server, input, listCommand)
-	msg := user1.LastOutGoingMessage
+	msg := user1.GetOutgoing()
 
 	if strings.Contains(msg, "@u1") != true && strings.Contains(msg, "@u2") != true && strings.Contains(msg, "@u3") != true {
 		t.Errorf("List command did not show all users in the room")
@@ -156,7 +156,7 @@ func Test_MessageCommand(t *testing.T) {
 	msg := user2.GetOutgoing()
 
 	if strings.Contains(msg, "- *Private from @u1: foo") != true {
-		t.Errorf("Private message was not received. Last message %s", user2.LastOutGoingMessage)
+		t.Errorf("Private message was not received. Last message %s", msg)
 	}
 }
 

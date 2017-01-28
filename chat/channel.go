@@ -22,15 +22,15 @@ func NewChannel() *Channel {
 // AddUser adds a user to this channel
 func (c *Channel) AddUser(nickName string) {
 	c.lock.Lock()
+	defer c.lock.Unlock()
 	c.Users[nickName] = true
-	c.lock.Unlock()
 }
 
 // RemoveUser removes a user from this server
 func (c *Channel) RemoveUser(nickName string) {
 	c.lock.Lock()
+	defer c.lock.Unlock()
 	delete(c.Users, nickName)
-	c.lock.Unlock()
 }
 
 // Broadcast sends a message to every user in a channel
@@ -39,8 +39,8 @@ func (c *Channel) Broadcast(chatServer Server, message string) {
 	message = now.Format(time.Kitchen) + `-` + message
 
 	c.lock.Lock()
+	defer c.lock.Unlock()
 	users := c.Users
-	c.lock.Unlock()
 
 	for nickName := range users {
 		user, err := chatServer.GetUser(nickName)
