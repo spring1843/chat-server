@@ -177,7 +177,7 @@ func Test_QuitCommand(t *testing.T) {
 	quitCommand, _ := chat.GetCommand(input)
 	user.ExecuteCommand(server, input, quitCommand)
 
-	if server.IsUserConnected(`foo`) != false {
+	if server.IsUserConnected(`foo`) {
 		t.Errorf("User was not disconnected after running quit command")
 	}
 }

@@ -232,7 +232,8 @@ func (c *QuitCommand) Execute(params CommandParams) error {
 	if params.user1.Channel != nil {
 		params.user1.Channel.RemoveUser(params.user1.NickName)
 	}
-	params.user1.Disconnect(params.server)
-
+	if err := params.user1.Disconnect(params.server); err!=nil {
+		return errors.New("Could not disconnect user")
+	}
 	return nil
 }

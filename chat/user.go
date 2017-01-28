@@ -117,9 +117,9 @@ func (u *User) HasIgnored(nickName string) bool {
 }
 
 // Disconnect a user from this server
-func (u *User) Disconnect(chatServer Server) {
+func (u *User) Disconnect(chatServer Server) error{
 	chatServer.LogPrintf("connection \t disconnecting=@%s", u.NickName)
-	u.Connection.Close()
+	return u.Connection.Close()
 }
 
 // Checks to see if a new input from user is a command
