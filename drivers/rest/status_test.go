@@ -28,15 +28,16 @@ func TestCanStartAndGetStatus(t *testing.T) {
 		t.Errorf("Error making http call to status")
 	}
 
-	defer response.Body.Close()
 	contents, err := ioutil.ReadAll(response.Body)
-
 	if err != nil {
 		t.Errorf("Error reading response")
 	}
+	if err := response.Body.Close(); err != nil {
+		t.Fatalf("Error closing connection. Error %s.", err)
+	}
 
 	contentsAsString := string(contents)
-	if strings.Contains(contentsAsString, `health`) == false {
+	if !strings.Contains(contentsAsString, `health`) {
 		t.Errorf("Status response did not contain health information")
 	}
 }

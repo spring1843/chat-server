@@ -18,7 +18,7 @@ func TestInterviewUser(t *testing.T) {
 
 	server.Listen()
 
-	connection.SetIncoming("newuser\n")
+	connection.WriteString("newuser\n")
 
 	server.InterviewUser(connection)
 	if server.ConnectedUsersCount() != 1 {

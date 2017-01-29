@@ -33,13 +33,13 @@ func TestCanStartTelnetAndConnectToIt(t *testing.T) {
 		t.Errorf("Could not connect to the telnet server")
 	}
 
-	status, err := bufio.NewReader(conn).ReadString('\n')
+	welcomeMessage, err := bufio.NewReader(conn).ReadString('\n')
 	if err != nil {
 		t.Errorf("Could not read from the telnet server")
 	}
 
-	if strings.Contains(status, `Welcome`) != true {
-		t.Errorf("Could not receive welcome message")
+	if !strings.Contains(welcomeMessage, `Welcome`) {
+		t.Errorf("Could not receive welcome message. Message %s", welcomeMessage)
 	}
 }
 
@@ -53,6 +53,6 @@ func TestOutputErrorWhenCantStart(t *testing.T) {
 
 	err := telnet.Start(chatServer, config)
 	if err == nil {
-		t.Errorf("Server started on an invalid port")
+		t.Errorf("Server started on an invalid port. Error %s", err)
 	}
 }

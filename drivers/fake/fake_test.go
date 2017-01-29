@@ -1,27 +1,23 @@
 package fake_test
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/spring1843/chat-server/drivers/fake"
-	"reflect"
 )
 
-func TestIncomingAndOutGoing(t *testing.T) {
+func TestStringReadAndWrite(t *testing.T) {
 	conn := fake.NewFakeConnection()
-
-	msg1,msg2:="foo","bar"
-
-	conn.SetIncoming(msg1)
-	incoming := conn.GetIncoming()
-	if incoming!= msg1 {
-		t.Fatalf("Couldn't write and read to incoming. Expected %q got %q.", msg1, incoming)
+	msg1 := "foo"
+	conn.WriteString(msg1)
+	outgoing, err := conn.ReadString(len(msg1))
+	if err != nil {
+		t.Fatalf("Error reading from connection. Error: %s", err)
 	}
-	
-	conn.SetOutgoing(msg2)
-	outgoing := conn.GetOutgoing()
-	if outgoing!= msg2 {
-		t.Fatalf("Couldn't write and read to outgoing. Expected %q got %q.", msg2, outgoing)
+
+	if outgoing != msg1 {
+		t.Fatalf("Couldn't write and read to outgoing. Expected %q got %q.", msg1, outgoing)
 	}
 }
 
@@ -30,13 +26,13 @@ func TestReadAndWrite(t *testing.T) {
 
 	const msg = "foo"
 
-	msg1 :=[]byte(msg)
+	msg1 := []byte(msg)
 	msg2 := make([]byte, len(msg), len(msg))
 
 	conn.Write(msg1)
 
 	n, err := conn.Read(msg2)
-		if err!= nil{
+	if err != nil {
 		t.Fatalf("Couldnt read from connection. Error %s.", err)
 	}
 	if n != len(msg) {

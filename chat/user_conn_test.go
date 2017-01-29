@@ -23,7 +23,7 @@ func TestCanWriteToUser(t *testing.T) {
 func TestCanReadFromUser(t *testing.T) {
 	t.Skipf("Racy!")
 	fakeReader := fake.NewFakeConnection()
-	fakeReader.SetIncoming("foo\n")
+	fakeReader.WriteString("foo\n")
 
 	user1 := chat.NewConnectedUser(server, fakeReader)
 	msg := user1.GetIncoming()

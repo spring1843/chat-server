@@ -5,21 +5,17 @@ import (
 	"net"
 	"sync"
 
+	"github.com/spring1843/chat-server/plugins/errs"
 	"github.com/spring1843/chat-server/plugins/logs"
 )
+
+const maxDataLength = 255
 
 type (
 	// FakeConnection is a chat server compatible connection used for testing
 	FakeConnection struct {
-		outgoing     []byte
-		lockOutGoing *sync.Mutex
-
-		incoming     []byte
-		lockIncoming *sync.Mutex
-
-
-		data     []byte
-		lock *sync.Mutex
+		data      []byte
+		lock      *sync.Mutex
 		EnableLog bool
 	}
 	// FakeNetwork is needed to implement the connection interface
@@ -29,13 +25,9 @@ type (
 // NewFakeConnection returns a new fake connection
 func NewFakeConnection() *FakeConnection {
 	return &FakeConnection{
-		data:     make([]byte, 0),
-		incoming:     make([]byte, 0),
-		outgoing:     make([]byte, 0),
-		EnableLog:    false,
-		lock: new(sync.Mutex),
-		lockOutGoing: new(sync.Mutex),
-		lockIncoming: new(sync.Mutex),
+		data:      make([]byte, 0),
+		EnableLog: false,
+		lock:      new(sync.Mutex),
 	}
 }
 
@@ -78,6 +70,9 @@ func (conn *FakeConnection) Read(p []byte) (int, error) {
 	}
 
 	for i, bit := range data {
+		if i >= len(p) {
+			return 0, errs.Newf("Input too small. Length of data is %d", len(data))
+		}
 		p[i] = bit
 	}
 
@@ -85,32 +80,22 @@ func (conn *FakeConnection) Read(p []byte) (int, error) {
 	return len(data), nil
 }
 
-// GetOutgoing gets the outgoing message for a user
-func (conn *FakeConnection) GetOutgoing() string {
-	conn.lockOutGoing.Lock()
-	defer conn.lockOutGoing.Unlock()
-	return string(conn.outgoing)
+// ReadString convenient method for reading
+func (conn *FakeConnection) ReadString(length int) (string, error) {
+	data := make([]byte, length, length)
+	n, err := conn.Read(data)
+	if err != nil {
+		return "", errs.Wrap(err, "Error reading from fake connection.")
+	}
+	if n == 0 {
+		return "", errs.New("Error reading from fake connection. Length of data is zero")
+	}
+	return string(data), nil
 }
 
-// SetOutgoing sets an outgoing message to the user
-func (conn *FakeConnection) SetOutgoing(message string) {
-	conn.lockOutGoing.Lock()
-	defer conn.lockOutGoing.Unlock()
-	conn.outgoing = []byte(message)
-}
-
-// GetIncoming gets the incoming message from the user
-func (conn *FakeConnection) GetIncoming() string {
-	conn.lockIncoming.Lock()
-	defer conn.lockIncoming.Unlock()
-	return string(conn.incoming)
-}
-
-// SetIncoming sets an incoming message from the user
-func (conn *FakeConnection) SetIncoming(message string) {
-	conn.lockIncoming.Lock()
-	defer conn.lockIncoming.Unlock()
-	conn.incoming = []byte(message)
+// WriteString convenient method for writing
+func (conn *FakeConnection) WriteString(message string) (int, error) {
+	return conn.Write([]byte(message))
 }
 
 // Close closes the connection
