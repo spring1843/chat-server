@@ -4,9 +4,7 @@ package chat
 
 import (
 	"errors"
-	"io"
 	"log"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -36,37 +34,6 @@ func NewServer() *Server {
 		lock:       new(sync.Mutex),
 	}
 	return server
-}
-
-// Listen Makes this server start listening to connections, when a user is connected he or she is welcomed
-func (s *Server) Listen() {
-	go func() {
-		for {
-			for connection := range s.Connection {
-				go s.WelcomeNewUser(connection)
-			}
-		}
-	}()
-}
-
-// SetLogFile a log file for this server and makes this server able to log
-// Use server.Log() to send logs to this file
-func (s *Server) SetLogFile(file io.Writer) {
-	logger := new(log.Logger)
-	logger.SetOutput(file)
-	s.Logger = logger
-	s.CanLog = true
-}
-
-// LogPrintf is a centralized logging function, so that all logs go to the same file and they all have time stamps
-// Ads a time stamp to every log entry
-// For readability start the message with a category followed by \t
-func (s *Server) LogPrintf(format string, v ...interface{}) {
-	if s.CanLog != true {
-		return
-	}
-	now := time.Now()
-	s.Logger.Printf(now.Format(time.UnixDate)+"\t"+format, v...)
 }
 
 // AddUser to this server
@@ -109,6 +76,13 @@ func (s *Server) GetUser(nickName string) (*User, error) {
 	return nil, errors.New(`User @` + nickName + ` not connected`)
 }
 
+// ConnectedUsersCount returns the number of connected users
+func (s *Server) ConnectedUsersCount() int {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+	return len(s.Users)
+}
+
 // IsUserConnected checks to see if a user with the given nickname is connected to this server or not
 func (s *Server) IsUserConnected(nickName string) bool {
 	_, err := s.GetUser(nickName)
@@ -116,11 +90,6 @@ func (s *Server) IsUserConnected(nickName string) bool {
 		return false
 	}
 	return true
-}
-
-// ReceiveConnection is used when there's a new connection
-func (s *Server) ReceiveConnection(conn Connection) {
-	s.Connection <- conn
 }
 
 // GetChannel gets a channel from the given channelName
@@ -152,13 +121,6 @@ func (s *Server) AddChannel(channelName string) {
 	s.Channels[channelName] = channel
 }
 
-// ConnectedUsersCount returns the number of connected users
-func (s *Server) ConnectedUsersCount() int {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-	return len(s.Users)
-}
-
 // Broadcast sends a message to every user connected to the server
 func (s *Server) Broadcast(message string) {
 	now := time.Now()
@@ -178,15 +140,6 @@ func (s *Server) Broadcast(message string) {
 	}
 }
 
-// DisconnectUser disconnects a user from this server
-func (s *Server) DisconnectUser(nickName string) error {
-	user, err := s.GetUser(nickName)
-	if err != nil {
-		return err
-	}
-	return user.Disconnect(s)
-}
-
 func (s *Server) BroadcastInChannel(channelName, message string) error {
 	channel, err := s.GetChannel(channelName)
 	if err != nil {
@@ -195,25 +148,4 @@ func (s *Server) BroadcastInChannel(channelName, message string) error {
 
 	channel.Broadcast(s, message)
 	return nil
-}
-
-// WelcomeNewUser shows a welcome message to a new user and makes a new user entity by asking the new user to pick a nickname
-func (s *Server) WelcomeNewUser(connection Connection) {
-	s.LogPrintf("connection \t New connection from address=%s", connection.RemoteAddr().String())
-
-	user := NewConnectedUser(s, connection)
-	user.SetOutgoing("Welcome to chat server. There are " + strconv.Itoa(s.ConnectedUsersCount()) + " other users on this server. please enter a nickname")
-
-	nickName := user.GetIncoming()
-
-	for s.IsUserConnected(nickName) {
-		user.SetOutgoing("Another user with this nickname is connected to this server, Please enter a different nickname")
-		nickName = user.GetIncoming()
-	}
-
-	user.SetNickName(nickName)
-	s.AddUser(user)
-	s.LogPrintf("connection \t address=%s authenticated=@%s", connection.RemoteAddr().String(), nickName)
-
-	user.SetOutgoing("Thanks " + user.nickName + ", now please type /join #channel to join a channel or /help to get all commands")
 }

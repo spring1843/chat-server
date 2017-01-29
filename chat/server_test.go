@@ -1,8 +1,6 @@
 package chat_test
 
 import (
-	"os"
-	"strings"
 	"testing"
 
 	"github.com/spring1843/chat-server/chat"
@@ -11,18 +9,6 @@ import (
 var (
 	server = chat.NewServer()
 )
-
-func Test_CanLogToFile(t *testing.T) {
-	fakeWriter := chat.NewMockedChatConnection()
-	server.SetLogFile(fakeWriter)
-	server.LogPrintf("test \t foo\n")
-
-	logMessage := string(fakeWriter.Outgoing)
-
-	if strings.Contains(logMessage, `foo`) == false {
-		t.Errorf("Did not send log to file")
-	}
-}
 
 func Test_CanAddUser(t *testing.T) {
 	server.AddUser(user1)
@@ -63,33 +49,5 @@ func Test_GetSameChannel(t *testing.T) {
 
 	if err != nil || "foo" != sameChannel.GetName() {
 		t.Errorf("Couldn't add and get channel")
-	}
-}
-
-func Test_WelcomeNewUsers(t *testing.T) {
-	server = chat.NewServer()
-	logFile, _ := os.OpenFile(`/dev/null`, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	server.SetLogFile(logFile)
-
-	server.Listen()
-
-	connection1 := chat.NewMockedChatConnection()
-	connection1.Lock.Lock()
-	defer connection1.Lock.Unlock()
-	connection1.Incoming = []byte("foo\n")
-
-	server.WelcomeNewUser(connection1)
-	if !server.IsUserConnected("foo") {
-		t.Error("User foo not added to the server")
-	}
-
-	connection2 := chat.NewMockedChatConnection()
-	connection2.Lock.Lock()
-	defer connection2.Lock.Unlock()
-	connection2.Incoming = []byte("bar\n")
-
-	server.WelcomeNewUser(connection2)
-	if !server.IsUserConnected("bar") {
-		t.Error("User bar not added to the server")
 	}
 }
