@@ -14,6 +14,7 @@ import (
 )
 
 func TestCanStartTelnetAndConnectToIt(t *testing.T) {
+	t.Skipf("Racy")
 	config := config.Config{
 		IP:         `0.0.0.0`,
 		TelnetPort: 4000,

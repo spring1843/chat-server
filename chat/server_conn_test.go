@@ -18,7 +18,14 @@ func TestInterviewUser(t *testing.T) {
 
 	server.Listen()
 
-	connection.WriteString("newuser\n")
+	input := "newuser\n"
+	n, err := connection.WriteString(input)
+	if err != nil {
+		t.Fatalf("Failed writing to connection. Error %s", err)
+	}
+	if n != len(input) {
+		t.Fatalf("Wrong length after write. Expected %d, got %d.", len(input), n)
+	}
 
 	server.InterviewUser(connection)
 	if server.ConnectedUsersCount() != 1 {

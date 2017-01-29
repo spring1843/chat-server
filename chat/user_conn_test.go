@@ -23,7 +23,14 @@ func TestCanWriteToUser(t *testing.T) {
 func TestCanReadFromUser(t *testing.T) {
 	t.Skipf("Racy!")
 	fakeReader := fake.NewFakeConnection()
-	fakeReader.WriteString("foo\n")
+	input := "foo\n"
+	n, err := fakeReader.WriteString(input)
+	if err != nil {
+		t.Fatalf("Failed writing to connection. Error %s", err)
+	}
+	if n != len(input) {
+		t.Fatalf("Wrong length after write. Expected %d, got %d.", len(input), n)
+	}
 
 	user1 := chat.NewConnectedUser(server, fakeReader)
 	msg := user1.GetIncoming()

@@ -9,15 +9,23 @@ import (
 
 func TestStringReadAndWrite(t *testing.T) {
 	conn := fake.NewFakeConnection()
-	msg1 := "foo"
-	conn.WriteString(msg1)
-	outgoing, err := conn.ReadString(len(msg1))
+	input := "foo"
+
+	n, err := conn.WriteString(input)
+	if err != nil {
+		t.Fatalf("Failed writing to connection. Error %s", err)
+	}
+	if n != len(input) {
+		t.Fatalf("Wrong length after write. Expected %d, got %d.", len(input), n)
+	}
+
+	outgoing, err := conn.ReadString(len(input))
 	if err != nil {
 		t.Fatalf("Error reading from connection. Error: %s", err)
 	}
 
-	if outgoing != msg1 {
-		t.Fatalf("Couldn't write and read to outgoing. Expected %q got %q.", msg1, outgoing)
+	if outgoing != input {
+		t.Fatalf("Couldn't write and read to outgoing. Expected %q got %q.", input, outgoing)
 	}
 }
 
