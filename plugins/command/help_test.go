@@ -14,10 +14,11 @@ func Test_HelpCommand(t *testing.T) {
 
 	server := chat.NewServer()
 	user := chat.NewConnectedUser(server, fakeConnection)
+	user.SetNickName("foo")
 	server.AddUser(user)
 	msg := user.GetOutgoing()
 
 	if strings.Contains(msg, "Shows the list of all available commands") != true {
-		t.Errorf("Help command did not output description of help command")
+		t.Errorf("Help command did not output description of help command. Got %s", msg)
 	}
 }

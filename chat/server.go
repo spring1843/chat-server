@@ -148,3 +148,12 @@ func (s *Server) BroadcastInChannel(channelName string, message string) error {
 	channel.Broadcast(s, message)
 	return nil
 }
+
+// BroadcastInChannel broadcasts a message to all the users in a channel
+func (s *Server) GetChannelUsers(channelName string) (map[string]bool, error) {
+	channel, err := s.GetChannel(channelName)
+	if err != nil {
+		return make(map[string]bool), errs.Wrapf(err, "Couldn't get channel to get users of. Channel %s", channelName)
+	}
+	return channel.GetUsers(), nil
+}

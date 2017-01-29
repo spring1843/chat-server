@@ -101,8 +101,7 @@ func (u *User) Disconnect() error {
 
 // handleNewInput looks at user input and reacts to it
 func (u *User) HandleNewInput(chatServer *Server, userInput string) (bool, error) {
-
-	if u.nickName == "" {
+	if u.GetNickName() == "" {
 		// This is from a user who is not identified yet, we do not do anything
 		// about his input
 		logs.Infof("Unidentified user sent input %q", userInput)

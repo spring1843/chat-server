@@ -15,6 +15,7 @@ func Test_IgnoreCommand(t *testing.T) {
 
 	user1 := chat.NewConnectedUser(server, fakeConnection1)
 	user2 := chat.NewConnectedUser(server, fakeConnection2)
+	user1.SetNickName(`u1`)
 	user2.SetNickName(`u2`)
 
 	server.AddUser(user1)

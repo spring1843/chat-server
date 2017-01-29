@@ -1,6 +1,8 @@
 package command
 
-import "github.com/spring1843/chat-server/plugins/errs"
+import (
+	"github.com/spring1843/chat-server/plugins/errs"
+)
 
 // ListCommand list available users in a channel
 type ListCommand struct {
@@ -22,22 +24,25 @@ func (c *ListCommand) Execute(params Params) error {
 	if params.User1 == nil {
 		return errs.New("User param is not set")
 	}
-	if params.Channel == nil {
-		return errs.New("Channel param is not set")
-	}
 
-	if params.User1.GetChannel() == "" {
+	channelName := params.User1.GetChannel()
+	if channelName == "" {
 		return errs.New("User is not in a channel")
 	}
 
-	for nickName := range params.Channel.GetUsers() {
-		if nickName == params.User1.GetNickName() {
+	userNickName := params.User1.GetNickName()
+
+	channelUsers, err := params.Server.GetChannelUsers(channelName)
+	if err != nil {
+		return errs.Wrapf(err, "Error getting channel users")
+	}
+
+	for nickName := range channelUsers {
+		if nickName == userNickName {
 			continue
 		}
 		listMessage += "@" + nickName + ".\n"
 	}
-
 	params.User1.SetOutgoing(listMessage)
-
 	return nil
 }
