@@ -4,6 +4,8 @@ import (
 	"errors"
 	"strconv"
 	"time"
+
+	"github.com/spring1843/chat-server/plugins/logs"
 )
 
 type (
@@ -213,7 +215,7 @@ func (c *PrivateMessageCommand) Execute(params CommandParams) error {
 		return errors.New("User has ignored the sender")
 	}
 
-	params.Server.LogPrintf("message \t @%s to @%s message=%s", params.User1.GetNickName(), params.User2.GetNickName(), params.Message)
+	logs.Infof("message \t @%s to @%s message=%s", params.User1.GetNickName(), params.User2.GetNickName(), params.Message)
 
 	now := time.Now()
 	go params.User2.SetOutgoing(now.Format(time.Kitchen) + ` - *Private from @` + params.User1.GetNickName() + `: ` + params.Message)

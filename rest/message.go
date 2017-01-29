@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/go-restful"
+	"github.com/spring1843/chat-server/plugins/logs"
 )
 
 // Register the message REST endpoints
@@ -77,7 +78,7 @@ func (r *messageEndpoint) broadCastMessage(request *restful.Request, response *r
 		messageResponse.AddError(errMessageNoUsers)
 	}
 
-	r.ChatServer.LogPrintf("message \t RESTful public annoucnement=%s", messageRequest.Message)
+	logs.Infof("message \t RESTful public annoucnement=%s", messageRequest.Message)
 
 	r.ChatServer.Broadcast("Public Server Announcement: " + messageRequest.Message)
 

@@ -2,11 +2,12 @@ package chat
 
 import (
 	"bytes"
-	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/spring1843/chat-server/plugins/command"
-	"fmt"
+	"github.com/spring1843/chat-server/plugins/errs"
+	"github.com/spring1843/chat-server/plugins/logs"
 )
 
 // NewConnectedUser returns a new User with a connection
@@ -35,11 +36,13 @@ func (u *User) SetOutgoing(message string) {
 
 // GetIncoming gets the incoming message from the user
 func (u *User) GetIncoming() string {
+	fmt.Printf("Getting incomming\n")
 	return <-u.incoming
 }
 
 // SetIncoming sets an incoming message from the user
 func (u *User) SetIncoming(message string) {
+	fmt.Printf("Setting incomming\n")
 	u.incoming <- message
 }
 
@@ -47,7 +50,9 @@ func (u *User) SetIncoming(message string) {
 func (u *User) ReadFrom(chatServer *Server) {
 	for {
 		message := make([]byte, 256)
-		u.conn.Read(message)
+		if _, err := u.conn.Read(message); err != nil {
+			logs.Errf(err, "Error reading from @%s.", u.GetNickName())
+		}
 
 		message = bytes.Trim(message, "\x00")
 
@@ -59,7 +64,7 @@ func (u *User) ReadFrom(chatServer *Server) {
 
 		handled, err := u.handleNewInput(chatServer, input)
 		if err != nil {
-			chatServer.LogPrintf("Error reading input from user @%s. Error %s", u.nickName, err)
+			logs.Errf(err, "Error reading input from user @%s.", u.nickName)
 		}
 		if handled {
 			//If handled then continue reading
@@ -81,7 +86,7 @@ func (u *User) WriteTo() {
 
 // Disconnect a user from this server
 func (u *User) Disconnect(chatServer *Server) error {
-	chatServer.LogPrintf("connection \t disconnecting=@%s", u.nickName)
+	logs.Infof("connection \t disconnecting=@%s", u.nickName)
 	return u.conn.Close()
 }
 
@@ -93,16 +98,18 @@ func (u *User) handleNewInput(chatServer *Server, input string) (bool, error) {
 		err = u.ExecuteCommand(chatServer, input, command)
 		if err != nil {
 			u.outgoing <- `Could not execute command. Error:` + err.Error()
-			chatServer.LogPrintf("error \t failed @%s's command %s", u.nickName, input)
+			err = errs.Wrap(err, "error handling input")
+			logs.Errf(err, "Failed executing %s command by @s", input, u.nickName)
+			return false, err
 		}
 		return true, nil
 	}
 
 	if u.GetChannel() != "" {
-		chatServer.LogPrintf("message \t @%s in #%s message=%s", u.nickName, u.GetChannel(), input)
+		logs.Infof("message \t @%s in #%s message=%s", u.nickName, u.GetChannel(), input)
 		channel, err := chatServer.GetChannel(u.GetChannel())
 		if err != nil {
-			return false, err
+			return false, errs.Wrap(err, "Error getting channel from server")
 		}
 		channel.Broadcast(chatServer, `@`+u.nickName+`: `+input)
 		return true, nil
@@ -125,12 +132,12 @@ func (u *User) ExecuteCommand(chatServer *Server, input string, executable comma
 	if chatCommand.RequiresParam(`user2`) {
 		nickname, err := chatCommand.ParseNickNameFomInput(input)
 		if err != nil {
-			return errors.New("Could not find the required @nickname in the input")
+			return errs.Wrap(err, "Could not find the required @nickname in the input")
 		}
 
 		user2, err := chatServer.GetUser(nickname)
 		if err != nil {
-			return errors.New("User " + nickname + " + is not connected to this server")
+			return errs.Wrap(err, "User "+nickname+" + is not connected to this server")
 		}
 		commandParams.User2 = user2
 	}
@@ -138,7 +145,7 @@ func (u *User) ExecuteCommand(chatServer *Server, input string, executable comma
 	if chatCommand.RequiresParam(`channel`) {
 		channelName, err := chatCommand.ParseChannelFromInput(input)
 		if err != nil {
-			return errors.New("Could not find the required #channel in the input")
+			return errs.Wrap(err, "Could not find the required #channel in the input")
 		}
 		channel, err := chatServer.GetChannel(channelName)
 		if err == nil {
@@ -149,18 +156,18 @@ func (u *User) ExecuteCommand(chatServer *Server, input string, executable comma
 	if chatCommand.RequiresParam(`message`) {
 		message, err := chatCommand.ParseMessageFromInput(input)
 		if err != nil {
-			return errors.New("Could not required message in the input")
+			return errs.Wrap(err, "Could not required message in the input")
 		}
 		commandParams.Message = message
 	}
 
 	err := executable.Execute(commandParams)
 	if err != nil {
-		chatServer.LogPrintf("error \t @%s command=%s error=%s", u.nickName, input, err.Error())
+		logs.Errf(err, "error \t @%s command=%s error=%s", u.nickName, input)
 		return err
 	}
 
-	chatServer.LogPrintf("command \t @%s command=%s", u.nickName, input)
+	logs.Infof("command \t @%s command=%s", u.nickName, input)
 
 	return nil
 }

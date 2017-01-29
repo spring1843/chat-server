@@ -4,7 +4,6 @@ package chat
 
 import (
 	"errors"
-	"log"
 	"sync"
 	"time"
 )
@@ -12,7 +11,6 @@ import (
 // Server  keeps listening for connections, it contains users and channels
 type Server struct {
 	Connection chan Connection
-	Logger     *log.Logger
 	Channels   map[string]*Channel
 	Users      map[string]*User
 	Incoming   chan string
@@ -29,7 +27,6 @@ func NewServer() *Server {
 		Users:      make(map[string]*User),
 		Incoming:   make(chan string),
 		Outgoing:   make(chan string),
-		Logger:     new(log.Logger),
 		CanLog:     false,
 		lock:       new(sync.Mutex),
 	}

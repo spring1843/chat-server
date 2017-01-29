@@ -2,7 +2,6 @@ package websocket_test
 
 import (
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -17,14 +16,10 @@ func Test_CantStartAndConnect(t *testing.T) {
 	config := config.Config{
 		IP:            `0.0.0.0`,
 		WebsocketPort: 4008,
-		LogFile:       `/dev/null`,
 	}
 
 	chatServer := chat.NewServer()
 	chatServer.Listen()
-
-	testFile, _ := os.OpenFile(config.LogFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	chatServer.SetLogFile(testFile)
 
 	websocket.Start(chatServer, config)
 

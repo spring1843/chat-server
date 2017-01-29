@@ -8,6 +8,7 @@ import (
 	"github.com/emicklei/go-restful/swagger"
 	"github.com/spring1843/chat-server/chat"
 	"github.com/spring1843/chat-server/config"
+	"github.com/spring1843/chat-server/plugins/logs"
 )
 
 // messageEndpoint an instance of the chat.Server
@@ -39,13 +40,11 @@ func configureSwagger(wsContainer *restful.Container) swagger.Config {
 
 // NewRESTfulAPI the rest server and configures it
 func NewRESTfulAPI(config config.Config, chatServer *chat.Server) *http.Server {
-	LogFilePath = config.LogFile
-
 	wsContainer := restful.NewContainer()
 	registerAllEndpoints(chatServer, wsContainer)
 	swagger.RegisterSwaggerService(configureSwagger(wsContainer), wsContainer)
 
-	chatServer.LogPrintf("info \t Rest server listening=%s:%d\nBrowse http://%s:%d/docs/ for RESTful endpoint docs", config.IP, config.RestPort, config.IP, config.RestPort)
+	logs.Infof("info \t Rest server listening=%s:%d\nBrowse http://%s:%d/docs/ for RESTful endpoint docs", config.IP, config.RestPort, config.IP, config.RestPort)
 
 	return &http.Server{Addr: ":" + strconv.Itoa(config.RestPort), Handler: wsContainer}
 }

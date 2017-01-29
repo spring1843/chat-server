@@ -1,6 +1,10 @@
 package chat
 
-import "strconv"
+import (
+	"strconv"
+
+	"github.com/spring1843/chat-server/plugins/logs"
+)
 
 // Listen Makes this server start listening to connections, when a user is connected he or she is welcomed
 func (s *Server) Listen() {
@@ -29,7 +33,7 @@ func (s *Server) DisconnectUser(nickName string) error {
 
 // WelcomeNewUser shows a welcome message to a new user and makes a new user entity by asking the new user to pick a nickname
 func (s *Server) WelcomeNewUser(connection Connection) {
-	s.LogPrintf("connection \t New connection from address=%s", connection.RemoteAddr().String())
+	logs.Infof("connection \t New connection from address=%s", connection.RemoteAddr().String())
 
 	user := NewConnectedUser(s, connection)
 	user.SetOutgoing("Welcome to chat server. There are " + strconv.Itoa(s.ConnectedUsersCount()) + " other users on this server. please enter a nickname")
@@ -43,7 +47,7 @@ func (s *Server) WelcomeNewUser(connection Connection) {
 
 	user.SetNickName(nickName)
 	s.AddUser(user)
-	s.LogPrintf("connection \t address=%s authenticated=@%s", connection.RemoteAddr().String(), nickName)
+	logs.Infof("connection \t address=%s authenticated=@%s", connection.RemoteAddr().String(), nickName)
 
 	user.SetOutgoing("Thanks " + user.nickName + ", now please type /join #channel to join a channel or /help to get all commands")
 }

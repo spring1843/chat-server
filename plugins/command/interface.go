@@ -12,8 +12,6 @@ type (
 	}
 	// Server hosts chats
 	Server interface {
-		LogPrintf(format string, v ...interface{})
-
 		RemoveUser(nickName string) error
 
 		AddChannel(channelName string)

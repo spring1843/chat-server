@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/spring1843/chat-server/chat"
 	"github.com/spring1843/chat-server/config"
+	"github.com/spring1843/chat-server/plugins/logs"
 )
 
 var chatServer *chat.Server
@@ -56,5 +57,5 @@ func Start(chatServerParam *chat.Server, config config.Config) {
 		}
 	}()
 
-	chatServerParam.LogPrintf("info \t Websocket server listening=%s:%d\nBrowse http://%s:%d/client/ for Websocket client", config.IP, config.WebsocketPort, config.IP, config.WebsocketPort)
+	logs.Infof("info \t Websocket server listening=%s:%d\nBrowse http://%s:%d/client/ for Websocket client", config.IP, config.WebsocketPort, config.IP, config.WebsocketPort)
 }

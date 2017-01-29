@@ -1,10 +1,6 @@
 package chat
 
-import (
-	"sync"
-
-	"fmt"
-)
+import "sync"
 
 // User is temporarily in connected to a chat server, and can be in certain channels
 type User struct {

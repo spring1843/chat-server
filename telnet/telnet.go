@@ -8,7 +8,8 @@ import (
 
 	"github.com/spring1843/chat-server/chat"
 	"github.com/spring1843/chat-server/config"
-	"github.com/spring1843/pomain/src/shared/errs"
+	"github.com/spring1843/chat-server/plugins/errs"
+	"github.com/spring1843/chat-server/plugins/logs"
 )
 
 // Start starts the telnet server and configures it
@@ -16,7 +17,7 @@ func Start(chatServer *chat.Server, config config.Config) error {
 	listener, err := net.Listen("tcp", config.IP+`:`+strconv.Itoa(config.TelnetPort))
 
 	if err != nil {
-		chatServer.LogPrintf("error \t port in use? Error while listening for telnet connections on %s:%d : %v\n", config.IP, config.TelnetPort, err)
+		logs.Infof("error \t port in use? Error while listening for telnet connections on %s:%d : %v\n", config.IP, config.TelnetPort, err)
 		return errs.Wrap(err, "Could not open telnet connection")
 	}
 
@@ -24,7 +25,7 @@ func Start(chatServer *chat.Server, config config.Config) error {
 		for {
 			connection, err := listener.Accept()
 			if err != nil {
-				chatServer.LogPrintf("Error accepting connection %s", err.Error())
+				logs.Infof("Error accepting connection %s", err.Error())
 			}
 			chatServer.ReceiveConnection(connection)
 		}
