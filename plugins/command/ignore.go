@@ -2,6 +2,19 @@ package command
 
 import "github.com/spring1843/chat-server/plugins/errs"
 
+// IgnoreCommand allows a user to ignore another user
+type IgnoreCommand struct {
+	Command
+}
+
+var ignoreCommand = &IgnoreCommand{
+	Command{
+		Name:           `ignore`,
+		Syntax:         `/ignore @nickname`,
+		Description:    `Ignore a user, followed by user nickname. An ignored user can not send you private messages`,
+		RequiredParams: []string{`user1`, `user2`},
+	}}
+
 // Execute allows a user to ignore another user so to suppress all incoming messages from that user
 func (c *IgnoreCommand) Execute(params Params) error {
 	if params.User1 == nil {

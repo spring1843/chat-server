@@ -2,6 +2,19 @@ package command
 
 import "github.com/spring1843/chat-server/plugins/errs"
 
+// QuitCommand allows a user to disconnect from the server
+type QuitCommand struct {
+	Command
+}
+
+var quitCommand = &QuitCommand{
+	Command{
+		Name:           `quit`,
+		Syntax:         `/quit`,
+		Description:    `Quit chat server`,
+		RequiredParams: []string{`user1`},
+	}}
+
 // Execute disconnects a user from server
 func (c *QuitCommand) Execute(params Params) error {
 	if params.User1 == nil {

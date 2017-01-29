@@ -2,6 +2,19 @@ package command
 
 import "github.com/spring1843/chat-server/plugins/errs"
 
+// HelpCommand Shows list of available commands
+type HelpCommand struct {
+	Command
+}
+
+var helpCommand = &HelpCommand{
+	Command{
+		Name:           `help`,
+		Syntax:         `/help`,
+		Description:    `Shows the list of all available commands`,
+		RequiredParams: []string{`user1`},
+	}}
+
 // Execute shows all available chat commands on this server
 func (c *HelpCommand) Execute(params Params) error {
 	if params.User1 == nil {

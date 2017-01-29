@@ -7,6 +7,19 @@ import (
 	"github.com/spring1843/chat-server/plugins/logs"
 )
 
+// PrivateMessageCommand allows a channel to privately message a user
+type PrivateMessageCommand struct {
+	Command
+}
+
+var privateMessageCommand = &PrivateMessageCommand{
+	Command{
+		Name:           `msg`,
+		Syntax:         `/msg @nickname message`,
+		Description:    `Send a private message to a user in the same channel`,
+		RequiredParams: []string{`user1`, `user2`, `message`},
+	}}
+
 // Execute allows a user to send a private message to another user
 func (c *PrivateMessageCommand) Execute(params Params) error {
 	if params.User1 == nil {

@@ -6,6 +6,19 @@ import (
 	"github.com/spring1843/chat-server/plugins/errs"
 )
 
+// JoinCommand allows user to join a channel
+type JoinCommand struct {
+	Command
+}
+
+var joinCommand = &JoinCommand{
+	Command{
+		Name:           `join`,
+		Syntax:         `/join #channel`,
+		Description:    `Join a channel`,
+		RequiredParams: []string{`user1`, `channel`},
+	}}
+
 // Execute allows a user to join a channel
 func (c *JoinCommand) Execute(params Params) error {
 	if params.User1 == nil {

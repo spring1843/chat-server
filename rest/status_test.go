@@ -3,7 +3,6 @@ package rest_test
 import (
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
 	"testing"
 
@@ -16,14 +15,10 @@ func TestCanStartAndGetStatus(t *testing.T) {
 	config := config.Config{
 		IP:       `0.0.0.0`,
 		RestPort: 4001,
-		LogFile:  `/dev/null`,
 	}
 
 	chatServer := chat.NewServer()
 	chatServer.Listen()
-
-	testFile, _ := os.OpenFile(config.LogFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	chatServer.SetLogFile(testFile)
 
 	restfulAPI := rest.NewRESTfulAPI(config, chatServer)
 	go restfulAPI.ListenAndServe()
