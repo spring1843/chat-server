@@ -10,7 +10,7 @@ var (
 	server = chat.NewServer()
 )
 
-func Test_CanAddUser(t *testing.T) {
+func TestCanAddUser(t *testing.T) {
 	server.AddUser(user1)
 
 	user, err := server.GetUser(user1.GetNickName())
@@ -26,7 +26,7 @@ func Test_CanAddUser(t *testing.T) {
 	}
 }
 
-func Test_CanRemoveUser(t *testing.T) {
+func TestCanRemoveUser(t *testing.T) {
 	server.AddUser(user1)
 	server.AddUser(user2)
 
@@ -41,7 +41,7 @@ func Test_CanRemoveUser(t *testing.T) {
 	}
 }
 
-func Test_AddChannel(t *testing.T) {
+func TestAddChannel(t *testing.T) {
 	server.AddChannel(`foo`)
 
 	if server.GetChannelCount() != 1 {
@@ -49,7 +49,7 @@ func Test_AddChannel(t *testing.T) {
 	}
 }
 
-func Test_GetSameChannel(t *testing.T) {
+func TestGetSameChannel(t *testing.T) {
 	server.AddChannel(`foo`)
 	sameChannel, err := server.GetChannel(`foo`)
 

@@ -8,7 +8,7 @@ import (
 	"github.com/spring1843/chat-server/drivers/fake"
 )
 
-func Test_HelpCommand(t *testing.T) {
+func TestHelpCommand(t *testing.T) {
 	fakeConnection := fake.NewFakeConnection()
 	fakeConnection.Incoming = []byte("/help\n")
 

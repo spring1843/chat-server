@@ -7,7 +7,7 @@ import (
 	"github.com/spring1843/chat-server/drivers/fake"
 )
 
-func Test_CanWriteToUser(t *testing.T) {
+func TestCanWriteToUser(t *testing.T) {
 	fakeWriter := fake.NewFakeConnection()
 	user1 := chat.NewConnectedUser(server, fakeWriter)
 
@@ -19,7 +19,7 @@ func Test_CanWriteToUser(t *testing.T) {
 	}
 }
 
-func Test_CanReadFromUser(t *testing.T) {
+func TestCanReadFromUser(t *testing.T) {
 	fakeReader := fake.NewFakeConnection()
 	fakeReader.Incoming = []byte("foo\n")
 

@@ -12,7 +12,7 @@ import (
 	"github.com/spring1843/chat-server/drivers/websocket"
 )
 
-func Test_CantStartAndConnect(t *testing.T) {
+func TestCantStartAndConnect(t *testing.T) {
 	config := config.Config{
 		IP:            `0.0.0.0`,
 		WebsocketPort: 4008,

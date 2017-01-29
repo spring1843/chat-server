@@ -7,7 +7,7 @@ import (
 	"github.com/spring1843/chat-server/drivers/fake"
 )
 
-func Test_JoinCommand(t *testing.T) {
+func TestJoinCommand(t *testing.T) {
 	fakeConnection := fake.NewFakeConnection()
 
 	server := chat.NewServer()

@@ -7,7 +7,7 @@ import (
 	"github.com/spring1843/chat-server/drivers/fake"
 )
 
-func Test_IgnoreCommand(t *testing.T) {
+func TestIgnoreCommand(t *testing.T) {
 	fakeConnection1 := fake.NewFakeConnection()
 	fakeConnection2 := fake.NewFakeConnection()
 

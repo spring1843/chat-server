@@ -7,7 +7,7 @@ import (
 	"github.com/spring1843/chat-server/drivers/fake"
 )
 
-func Test_QuitCommand(t *testing.T) {
+func TestQuitCommand(t *testing.T) {
 	fakeConnection := fake.NewFakeConnection()
 
 	server := chat.NewServer()

@@ -7,7 +7,7 @@ import (
 	"github.com/spring1843/chat-server/drivers/fake"
 )
 
-func Test_WelcomeNewUsers(t *testing.T) {
+func TestInterviewUser(t *testing.T) {
 	var (
 		server     = chat.NewServer()
 		connection = fake.NewFakeConnection()

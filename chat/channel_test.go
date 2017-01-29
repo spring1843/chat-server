@@ -9,7 +9,7 @@ import (
 
 var channel = &chat.Channel{Name: "foo", Users: make(map[string]bool)}
 
-func Test_CanAddUsers(t *testing.T) {
+func TestCanAddUsers(t *testing.T) {
 	channel.AddUser(user1.GetNickName())
 	channel.AddUser(user2.GetNickName())
 	if len(channel.Users) != 2 {
@@ -17,7 +17,7 @@ func Test_CanAddUsers(t *testing.T) {
 	}
 }
 
-func Test_CanBroadCast(t *testing.T) {
+func TestCanBroadCast(t *testing.T) {
 	channel.AddUser(user1.GetNickName())
 	channel.AddUser(user2.GetNickName())
 

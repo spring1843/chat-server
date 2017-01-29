@@ -6,7 +6,7 @@ import (
 	"github.com/spring1843/chat-server/plugins/command"
 )
 
-func Test_ParsingChatCommands(t *testing.T) {
+func TestParsingChatCommands(t *testing.T) {
 	cmd1 := `/msg @nickname #channel foo bar baz`
 	cmd2 := `#channel @nickname foo bar baz /foo`
 	cmd3 := `foo bar baz @nickname #channel`
@@ -74,7 +74,7 @@ func Test_ParsingChatCommands(t *testing.T) {
 
 }
 
-func Test_DoesCommandRequireParam(t *testing.T) {
+func TestDoesCommandRequireParam(t *testing.T) {
 	fakeCommand := &command.QuitCommand{
 		Command: command.Command{
 			Name:           `quit`,

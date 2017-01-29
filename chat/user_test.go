@@ -12,7 +12,7 @@ var (
 	user3 = chat.NewUser("u3")
 )
 
-func Test_CanIgnore(t *testing.T) {
+func TestCanIgnore(t *testing.T) {
 	user1.Ignore(user2.GetNickName())
 	if user1.HasIgnored(user2.GetNickName()) != true {
 		t.Errorf("User was not ignored when he should have been")

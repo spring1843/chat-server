@@ -7,7 +7,7 @@ import (
 	"github.com/spring1843/chat-server/chat"
 )
 
-func Test_MessageCommand(t *testing.T) {
+func TestMessageCommand(t *testing.T) {
 	server := chat.NewServer()
 
 	server.AddUser(user1)
