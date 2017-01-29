@@ -44,7 +44,7 @@ func TestListCommand(t *testing.T) {
 		t.Fatalf("Failed running list command. Error: %s", err)
 	}
 
-	msg := string(fakeConnection1.ReadOutgoing())
+	msg := fakeConnection1.GetOutgoing()
 	if strings.Contains(msg, "@u1") != true && strings.Contains(msg, "@u2") != true && strings.Contains(msg, "@u3") != true {
 		t.Errorf("List command did not show all users in the room")
 	}

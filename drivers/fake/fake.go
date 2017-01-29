@@ -17,6 +17,9 @@ type (
 		incoming     []byte
 		lockIncoming *sync.Mutex
 
+
+		data     []byte
+		lock *sync.Mutex
 		EnableLog bool
 	}
 	// FakeNetwork is needed to implement the connection interface
@@ -26,9 +29,11 @@ type (
 // NewFakeConnection returns a new fake connection
 func NewFakeConnection() *FakeConnection {
 	return &FakeConnection{
+		data:     make([]byte, 0),
 		incoming:     make([]byte, 0),
 		outgoing:     make([]byte, 0),
 		EnableLog:    false,
+		lock: new(sync.Mutex),
 		lockOutGoing: new(sync.Mutex),
 		lockIncoming: new(sync.Mutex),
 	}
@@ -44,40 +49,40 @@ func (m *FakeConnection) log(message string) {
 
 // Write writes to connection
 func (conn *FakeConnection) Write(p []byte) (int, error) {
+	conn.log("Lock\n")
+	conn.lock.Lock()
 	conn.log("Start - Writing data to connection\n")
-	conn.lockOutGoing.Lock()
-	defer conn.lockOutGoing.Unlock()
-	conn.outgoing = p
-	conn.log("End - Writing data to connection\n")
-	return len(conn.outgoing), nil
-}
 
-// ReadOutgoing reads what's going out to the user
-func (conn *FakeConnection) ReadOutgoing() []byte {
-	conn.log("Start - Reading outgoing data from connection\n")
-	conn.lockOutGoing.Lock()
-	defer conn.lockOutGoing.Unlock()
-	outgoing := conn.outgoing
-	conn.log("End - Reading outgoing data from connection\n")
-	return outgoing
+	conn.data = p
+	n := len(conn.data)
+
+	conn.log("Unlock\n")
+	conn.lock.Unlock()
+	conn.log("End - Writing data to connection\n")
+
+	return n, nil
 }
 
 // Read reads from the connection
 func (conn *FakeConnection) Read(p []byte) (int, error) {
+	conn.log("Lock\n")
+	conn.lock.Lock()
+	data := conn.data
+	conn.log("Unlock\n")
+	conn.lock.Unlock()
+
 	conn.log("Start - Reading data from connection\n")
-	conn.lockIncoming.Lock()
-	defer conn.lockIncoming.Unlock()
-	if len(conn.incoming) == 0 {
+	if len(data) == 0 {
 		conn.log("End - EOF Reading data from connection\n")
 		return 0, io.EOF
 	}
-	i := 0
-	for _, bit := range conn.incoming {
+
+	for i, bit := range data {
 		p[i] = bit
-		i++
 	}
+
 	conn.log("End - Reading data from connection\n")
-	return i, nil
+	return len(data), nil
 }
 
 // GetOutgoing gets the outgoing message for a user
