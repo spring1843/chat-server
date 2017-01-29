@@ -14,7 +14,7 @@ func TestMessageCommand(t *testing.T) {
 	server.AddUser(user2)
 
 	channel := chat.NewChannel()
-	channel.Name = `r`
+	channel.SetName(`r`)
 	user1.SetChannel(channel.Name)
 	user2.SetChannel(channel.Name)
 

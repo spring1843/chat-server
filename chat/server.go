@@ -117,7 +117,7 @@ func (s *Server) GetChannelCount() int {
 // AddChannel adds a channel to this server
 func (s *Server) AddChannel(channelName string) {
 	channel := NewChannel()
-	channel.Name = channelName
+	channel.SetName(channelName)
 
 	s.lockChannels.Lock()
 	defer s.lockChannels.Unlock()

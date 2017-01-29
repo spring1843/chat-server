@@ -11,10 +11,14 @@ import (
 type (
 	// FakeConnection is a chat server compatible connection used for testing
 	FakeConnection struct {
-		Outgoing  []byte
-		Incoming  []byte
-		Lock      *sync.Mutex
+		Outgoing     []byte
+		LockOutGoing *sync.Mutex
+
+		Incoming     []byte
+		LockIncoming *sync.Mutex
+
 		EnableLog bool
+		Lock      *sync.Mutex
 	}
 	// FakeNetwork is needed to implement the connection interface
 	FakeNetwork struct{}
@@ -23,10 +27,12 @@ type (
 // NewFakeConnection returns a new fake connection
 func NewFakeConnection() *FakeConnection {
 	return &FakeConnection{
-		Lock:      new(sync.Mutex),
-		Incoming:  make([]byte, 0),
-		Outgoing:  make([]byte, 0),
-		EnableLog: false,
+		Incoming:     make([]byte, 0),
+		Outgoing:     make([]byte, 0),
+		EnableLog:    false,
+		LockOutGoing: new(sync.Mutex),
+		LockIncoming: new(sync.Mutex),
+		Lock:         new(sync.Mutex),
 	}
 }
 
@@ -41,8 +47,8 @@ func (m *FakeConnection) log(message string) {
 // Write writes to connection
 func (conn *FakeConnection) Write(p []byte) (int, error) {
 	conn.log("Start - Writing data to connection\n")
-	conn.Lock.Lock()
-	defer conn.Lock.Unlock()
+	conn.LockOutGoing.Lock()
+	defer conn.LockOutGoing.Unlock()
 	conn.Outgoing = p
 	conn.log("End - Writing data to connection\n")
 	return len(conn.Outgoing), nil
@@ -51,8 +57,8 @@ func (conn *FakeConnection) Write(p []byte) (int, error) {
 // ReadOutgoing reads what's going out to the user
 func (conn *FakeConnection) ReadOutgoing() []byte {
 	conn.log("Start - Reading outgoing data from connection\n")
-	conn.Lock.Lock()
-	defer conn.Lock.Unlock()
+	conn.LockOutGoing.Lock()
+	defer conn.LockOutGoing.Unlock()
 	outgoing := conn.Outgoing
 	conn.log("End - Reading outgoing data from connection\n")
 	return outgoing
@@ -61,8 +67,8 @@ func (conn *FakeConnection) ReadOutgoing() []byte {
 // Read reads from the connection
 func (conn *FakeConnection) Read(p []byte) (int, error) {
 	conn.log("Start - Reading data from connection\n")
-	conn.Lock.Lock()
-	defer conn.Lock.Unlock()
+	conn.LockIncoming.Lock()
+	defer conn.LockIncoming.Unlock()
 	if len(conn.Incoming) == 0 {
 		conn.log("End - EOF Reading data from connection\n")
 		return 0, io.EOF

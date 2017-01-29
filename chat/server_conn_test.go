@@ -15,9 +15,9 @@ func TestInterviewUser(t *testing.T) {
 
 	server.Listen()
 
-	connection.Lock.Lock()
+	connection.LockIncoming.Lock()
 	connection.Incoming = []byte("newuser\n")
-	connection.Lock.Unlock()
+	connection.LockIncoming.Unlock()
 
 	server.InterviewUser(connection)
 	if server.ConnectedUsersCount() != 1 {
