@@ -31,5 +31,6 @@ type (
 		Ignore(nickName string)
 		SetChannel(name string)
 		HasIgnored(nickName string) bool
+		Disconnect() error
 	}
 )

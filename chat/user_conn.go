@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"strings"
+	"time"
 
 	"github.com/spring1843/chat-server/drivers"
 	"github.com/spring1843/chat-server/plugins/command"
@@ -89,8 +90,12 @@ func (u *User) WriteTo() {
 }
 
 // Disconnect a user from this server
-func (u *User) Disconnect(chatServer *Server) error {
-	logs.Infof("connection \t disconnecting=@%s", u.nickName)
+func (u *User) Disconnect() error {
+	logs.Infof("disconnecting=@%s", u.nickName)
+	u.SetOutgoing("Good Bye, come back again.")
+
+	// Wait 1 second before actually disconnecting
+	<-time.After(time.Second * 1)
 	return u.conn.Close()
 }
 

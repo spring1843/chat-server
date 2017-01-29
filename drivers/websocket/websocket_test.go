@@ -50,11 +50,17 @@ func Test_CantStartAndConnect(t *testing.T) {
 	if !strings.Contains(string(message), "Thanks User1") {
 		t.Fatalf("Could not set user nickname, expected 'Thanks User1' got %s", string(message))
 	}
-	//
-	//conn.WriteMessage(1, []byte(`/quit`))
-	//_, message, err = conn.ReadMessage()
-	//
-	//if err == nil {
-	//	t.Fatal("Connection didn't close after running quit")
-	//}
+
+	if err := conn.WriteMessage(1, []byte(`/quit`)); err != nil {
+		t.Fatalf("Error writing to connection. Error %s", err)
+	}
+
+	_, message, err = conn.ReadMessage()
+	if !strings.Contains(string(message), "Good Bye") {
+		t.Fatalf("Could not quit from server. Expected 'Good Bye' got %s", string(message))
+	}
+
+	if chatServer.IsUserConnected("User1") {
+		t.Fatal("User is still connected to server after quiting")
+	}
 }

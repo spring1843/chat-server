@@ -20,12 +20,11 @@ func (c *QuitCommand) Execute(params Params) error {
 	if params.User1 == nil {
 		return errs.New("User1 param is not set")
 	}
-
 	if err := params.Server.RemoveUser(params.User1.GetNickName()); err != nil {
 		return errs.Wrapf(err, "Could not remove user afeter quit command. . User :%s", params.User1.GetNickName())
 	}
 	if params.User1.GetChannel() != "" {
 		params.Server.RemoveUserFromChannel(params.User1.GetNickName(), params.User1.GetChannel())
 	}
-	return nil
+	return params.User1.Disconnect()
 }
