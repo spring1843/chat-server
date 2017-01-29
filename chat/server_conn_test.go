@@ -19,7 +19,7 @@ func Test_WelcomeNewUsers(t *testing.T) {
 	connection.Incoming = []byte("foo\n")
 	connection.Lock.Unlock()
 
-	server.ConnectUser(connection)
+	server.InterviewUser(connection)
 
 	if len(server.Users) != 1 {
 		t.Errorf("User was not added to the server")

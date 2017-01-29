@@ -11,7 +11,7 @@ import (
 	"github.com/spring1843/chat-server/plugins/logs"
 )
 
-const ReadConnecttionLimitBytes = 256
+const ReadConnectionLimitBytes = 256
 
 // NewConnectedUser returns a new User with a connection
 func NewConnectedUser(chatServer *Server, connection drivers.Connection) *User {
@@ -50,7 +50,7 @@ func (u *User) SetIncoming(message string) {
 // ReadFrom reads data from users and lets chat server interpret it
 func (u *User) ReadFrom(chatServer *Server) {
 	for {
-		message := make([]byte, ReadConnecttionLimitBytes)
+		message := make([]byte, ReadConnectionLimitBytes)
 		if _, err := u.conn.Read(message); err != nil {
 			if err == io.EOF {
 				continue
@@ -95,9 +95,18 @@ func (u *User) Disconnect(chatServer *Server) error {
 }
 
 // handleNewInput looks at user input and reacts to it
-func (u *User) HandleNewInput(chatServer *Server, input string) (bool, error) {
-	if command.IsInputExecutable(input) {
-		return u.handleCommandInput(chatServer, input)
+func (u *User) HandleNewInput(chatServer *Server, userInput string) (bool, error) {
+
+	if u.nickName == "" {
+		// This is from a user who is not identified yet, we do not do anything
+		// about his input
+		logs.Infof("Unidentified user sent input %q", userInput)
+		u.SetIncoming(userInput)
+		return true, nil
+	}
+
+	if command.IsInputExecutable(userInput) {
+		return u.handleCommandInput(chatServer, userInput)
 	}
 
 	// If it's not a command it's a chat message to broadcast into the channel
@@ -105,15 +114,15 @@ func (u *User) HandleNewInput(chatServer *Server, input string) (bool, error) {
 		u.SetOutgoing("You need to join a channel, use /join #channel or use /help for more info.")
 		return false, errs.New("User is not in a channel, and input is not a command")
 	}
-	return u.handleBroadCastInput(chatServer, input)
+	return u.handleBroadCastInput(chatServer, userInput)
 }
 
-func (u *User) handleBroadCastInput(chatServer *Server, input string) (bool, error) {
+func (u *User) handleBroadCastInput(chatServer *Server, userInput string) (bool, error) {
 	channel, err := chatServer.GetChannel(u.GetChannel())
 	if err != nil {
 		return false, errs.Wrap(err, "Error getting channel from server")
 	}
-	channel.Broadcast(chatServer, `@`+u.nickName+`: `+input)
+	channel.Broadcast(chatServer, `@`+u.nickName+`: `+userInput)
 	return true, nil
 }
 
