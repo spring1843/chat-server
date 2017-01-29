@@ -2,7 +2,7 @@ package chat
 
 import (
 	"bytes"
-	"fmt"
+	"io"
 	"strings"
 
 	"github.com/spring1843/chat-server/drivers"
@@ -10,6 +10,8 @@ import (
 	"github.com/spring1843/chat-server/plugins/errs"
 	"github.com/spring1843/chat-server/plugins/logs"
 )
+
+const ReadConnecttionLimitBytes = 256
 
 // NewConnectedUser returns a new User with a connection
 func NewConnectedUser(chatServer *Server, connection drivers.Connection) *User {
@@ -37,21 +39,22 @@ func (u *User) SetOutgoing(message string) {
 
 // GetIncoming gets the incoming message from the user
 func (u *User) GetIncoming() string {
-	fmt.Printf("Getting incomming\n")
 	return <-u.incoming
 }
 
 // SetIncoming sets an incoming message from the user
 func (u *User) SetIncoming(message string) {
-	fmt.Printf("Setting incomming\n")
 	u.incoming <- message
 }
 
 // ReadFrom reads data from users and lets chat server interpret it
 func (u *User) ReadFrom(chatServer *Server) {
 	for {
-		message := make([]byte, 256)
+		message := make([]byte, ReadConnecttionLimitBytes)
 		if _, err := u.conn.Read(message); err != nil {
+			if err == io.EOF {
+				continue
+			}
 			logs.Errf(err, "Error reading from @%s.", u.GetNickName())
 		}
 
@@ -133,7 +136,7 @@ func (u *User) ExecuteCommand(chatServer *Server, input string) (bool, error) {
 		return false, errs.Wrapf(err, "Couldn't execute command %s", input)
 	}
 
-	logs.Infof("command \t @%s command=%s", u.nickName, input)
+	logs.Infof("User @%s executed command: %s", u.nickName, input)
 	return true, nil
 }
 

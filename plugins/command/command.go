@@ -55,5 +55,9 @@ func FromString(input string) (Executable, error) {
 }
 
 func commandPart(input string) string {
-	return input[:strings.Index(input, " ")]
+	spaceIndex := strings.Index(input, " ")
+	if spaceIndex > 0 {
+		return input[:strings.Index(input, " ")]
+	}
+	return input
 }

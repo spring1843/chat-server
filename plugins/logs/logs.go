@@ -1,10 +1,15 @@
 package logs
 
-const prefix = "log-"
+var PrefixFormat = "%s %s\t"
 
 // Infof Logs formatted information
 func Infof(format string, a ...interface{}) {
 	logPrintf(infoLog, format, a...)
+}
+
+// Infof Logs information
+func Info(message string) {
+	logPrint(infoLog, message)
 }
 
 // Infof Logs formatted information

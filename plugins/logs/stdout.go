@@ -10,11 +10,11 @@ import (
 )
 
 const (
-	infoLog = iota
-	warnLog
-	errLog
-	errDetailsLog
-	fatalLog
+	infoLog       = "info"
+	warnLog       = "warn"
+	errLog        = "err"
+	errDetailsLog = "err_details"
+	fatalLog      = "fatal"
 )
 
 var (
@@ -32,7 +32,15 @@ func logErrDetails(err error) {
 	logPrintf(errDetailsLog, "Error Details: %s", err.Error())
 }
 
-func logPrintln(logType int, message string) {
+func logPrintf(logType string, format string, a ...interface{}) {
+	logPrint(logType, fmt.Sprintf(format, a...))
+}
+
+func logPrint(logType string, message string) {
+	logPrintln(logType, message)
+}
+
+func logPrintln(logType string, message string) {
 	prefix := getPrefix(logType)
 	switch logType {
 	case errLog:
@@ -49,15 +57,10 @@ func logPrintln(logType int, message string) {
 	}
 }
 
-func getPrefix(logType int) string {
-	return fmt.Sprintf("%s %s %d\t",
+func getPrefix(logType string) string {
+	return fmt.Sprintf(
+		PrefixFormat,
 		time.Now().Format("2006-01-02 15:04:05 -0700"),
-		prefix,
 		logType,
 	)
-}
-
-func logPrintf(logType int, format string, a ...interface{}) {
-	message := fmt.Sprintf(format, a...)
-	logPrintln(logType, message)
 }
