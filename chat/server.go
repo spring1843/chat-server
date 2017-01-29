@@ -13,39 +13,44 @@ import (
 // Server  keeps listening for connections, it contains users and channels
 type Server struct {
 	Connection chan drivers.Connection
-	Channels   map[string]*Channel
-	Users      map[string]*User
 	Incoming   chan string
 	Outgoing   chan string
-	CanLog     bool
-	lock       *sync.Mutex
+
+	Channels     map[string]*Channel
+	lockChannels *sync.Mutex
+
+	Users     map[string]*User
+	lockUsers *sync.Mutex
+
+	CanLog bool
 }
 
 // NewServer returns a new instance of the chat server
 func NewServer() *Server {
 	server := &Server{
-		Connection: make(chan drivers.Connection),
-		Channels:   make(map[string]*Channel),
-		Users:      make(map[string]*User),
-		Incoming:   make(chan string),
-		Outgoing:   make(chan string),
-		CanLog:     false,
-		lock:       new(sync.Mutex),
+		Connection:   make(chan drivers.Connection),
+		Channels:     make(map[string]*Channel),
+		Users:        make(map[string]*User),
+		Incoming:     make(chan string),
+		Outgoing:     make(chan string),
+		CanLog:       false,
+		lockChannels: new(sync.Mutex),
+		lockUsers:    new(sync.Mutex),
 	}
 	return server
 }
 
 // AddUser to this server
 func (s *Server) AddUser(user *User) {
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	s.lockUsers.Lock()
+	defer s.lockUsers.Unlock()
 	s.Users[user.nickName] = user
 }
 
 // RemoveUser from this server
 func (s *Server) RemoveUser(nickName string) error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	s.lockUsers.Lock()
+	defer s.lockUsers.Unlock()
 	if _, ok := s.Users[nickName]; !ok {
 		return errs.Newf("User %q is not connected to this server", nickName)
 	}
@@ -66,8 +71,8 @@ func (s *Server) RemoveUserFromChannel(nickName, channelName string) error {
 
 // GetUser gets a connected user
 func (s *Server) GetUser(nickName string) (*User, error) {
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	s.lockUsers.Lock()
+	defer s.lockUsers.Unlock()
 	if _, ok := s.Users[nickName]; ok {
 		return s.Users[nickName], nil
 	}
@@ -76,8 +81,8 @@ func (s *Server) GetUser(nickName string) (*User, error) {
 
 // ConnectedUsersCount returns the number of connected users
 func (s *Server) ConnectedUsersCount() int {
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	s.lockUsers.Lock()
+	defer s.lockUsers.Unlock()
 	return len(s.Users)
 }
 
@@ -92,8 +97,8 @@ func (s *Server) IsUserConnected(nickName string) bool {
 
 // GetChannel gets a channel from the given channelName
 func (s *Server) GetChannel(channelName string) (*Channel, error) {
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	s.lockChannels.Lock()
+	defer s.lockChannels.Unlock()
 	if _, ok := s.Channels[channelName]; ok {
 		channel := s.Channels[channelName]
 		return channel, nil
@@ -104,8 +109,8 @@ func (s *Server) GetChannel(channelName string) (*Channel, error) {
 
 // GetChannelCount returns the number of channels on this server
 func (s *Server) GetChannelCount() int {
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	s.lockChannels.Lock()
+	defer s.lockChannels.Unlock()
 	return len(s.Channels)
 }
 
@@ -114,8 +119,8 @@ func (s *Server) AddChannel(channelName string) {
 	channel := NewChannel()
 	channel.Name = channelName
 
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	s.lockChannels.Lock()
+	defer s.lockChannels.Unlock()
 	s.Channels[channelName] = channel
 }
 
@@ -124,9 +129,9 @@ func (s *Server) Broadcast(message string) {
 	now := time.Now()
 	message = now.Format(time.Kitchen) + `-` + message
 
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	s.lockUsers.Lock()
 	users := s.Users
+	s.lockUsers.Unlock()
 
 	for nickName := range users {
 		user, err := s.GetUser(nickName)
