@@ -33,7 +33,7 @@ func (c *Channel) RemoveUser(nickName string) {
 	delete(c.Users, nickName)
 }
 
-// RemoveUser removes a user from this server
+// GetName gets a channel's name
 func (c *Channel) GetName() string {
 	c.lock.Lock()
 	defer c.lock.Unlock()
@@ -47,7 +47,7 @@ func (c *Channel) GetUserCount() int {
 	return len(c.Users)
 }
 
-// GetUserCount returns the number of connected users to this channel
+// GetUsers returns nicknames of connected users
 func (c *Channel) GetUsers() map[string]bool {
 	c.lock.Lock()
 	defer c.lock.Unlock()

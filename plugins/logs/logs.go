@@ -7,6 +7,11 @@ func Infof(format string, a ...interface{}) {
 	logPrintf(infoLog, format, a...)
 }
 
+// Infof Logs formatted information
+func Fatalf(format string, a ...interface{}) {
+	logPrintf(fatalLog, format, a...)
+}
+
 // Warnf logs warnings, and an error
 func Warnf(err error, format string, a ...interface{}) {
 	if err != nil {

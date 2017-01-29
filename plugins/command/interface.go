@@ -3,7 +3,7 @@ package command
 type (
 	// Executable Is a what a command is
 	Executable interface {
-		Execute(params CommandParams) error
+		Execute(params Params) error
 		GetChatCommand() Command
 		ParseNickNameFomInput(input string) (string, error)
 		ParseChannelFromInput(input string) (string, error)

@@ -7,7 +7,7 @@ import (
 )
 
 func Test_CanWriteToUser(t *testing.T) {
-	fakeWriter := chat.NewMockedChatConnection()
+	fakeWriter := chat.NewFakeConnection()
 	user1 := chat.NewConnectedUser(server, fakeWriter)
 
 	go user1.SetOutgoing(`foo`)
@@ -19,7 +19,7 @@ func Test_CanWriteToUser(t *testing.T) {
 }
 
 func Test_CanReadFromUser(t *testing.T) {
-	fakeReader := chat.NewMockedChatConnection()
+	fakeReader := chat.NewFakeConnection()
 	fakeReader.Incoming = []byte("foo\n")
 
 	user1 := chat.NewConnectedUser(server, fakeReader)

@@ -45,7 +45,7 @@ func Test_CanValidate(t *testing.T) {
 }
 
 func Test_HelpCommand(t *testing.T) {
-	fakeConnection := chat.NewMockedChatConnection()
+	fakeConnection := chat.NewFakeConnection()
 	fakeConnection.Incoming = []byte("/help\n")
 
 	server := chat.NewServer()
@@ -59,9 +59,9 @@ func Test_HelpCommand(t *testing.T) {
 }
 
 func Test_ListCommand(t *testing.T) {
-	fakeConnection1 := chat.NewMockedChatConnection()
-	fakeConnection2 := chat.NewMockedChatConnection()
-	fakeConnection3 := chat.NewMockedChatConnection()
+	fakeConnection1 := chat.NewFakeConnection()
+	fakeConnection2 := chat.NewFakeConnection()
+	fakeConnection3 := chat.NewFakeConnection()
 
 	server := chat.NewServer()
 	server.AddChannel(`foo`)
@@ -103,8 +103,8 @@ func Test_ListCommand(t *testing.T) {
 }
 
 func Test_IgnoreCommand(t *testing.T) {
-	fakeConnection1 := chat.NewMockedChatConnection()
-	fakeConnection2 := chat.NewMockedChatConnection()
+	fakeConnection1 := chat.NewFakeConnection()
+	fakeConnection2 := chat.NewFakeConnection()
 
 	server := chat.NewServer()
 
@@ -124,7 +124,7 @@ func Test_IgnoreCommand(t *testing.T) {
 }
 
 func Test_JoinCommand(t *testing.T) {
-	fakeConnection := chat.NewMockedChatConnection()
+	fakeConnection := chat.NewFakeConnection()
 	fakeConnection.Incoming = []byte("/join #r\n")
 
 	server := chat.NewServer()
@@ -168,7 +168,7 @@ func Test_MessageCommand(t *testing.T) {
 }
 
 func Test_QuitCommand(t *testing.T) {
-	fakeConnection := chat.NewMockedChatConnection()
+	fakeConnection := chat.NewFakeConnection()
 
 	server := chat.NewServer()
 	user := chat.NewConnectedUser(server, fakeConnection)

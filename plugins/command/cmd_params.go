@@ -5,8 +5,8 @@ import (
 	"strings"
 )
 
-// CommandParams is all the params that are supported by chat commands, a chat command may use some or all of these params
-type CommandParams struct {
+// Params is all the params that are supported by chat commands, a chat command may use some or all of these params
+type Params struct {
 	User1    Chatter
 	User2    Chatter
 	Channel  Chan

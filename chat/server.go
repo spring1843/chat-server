@@ -137,6 +137,7 @@ func (s *Server) Broadcast(message string) {
 	}
 }
 
+// BroadcastInChannel broadcasts a message to all the users in a channel
 func (s *Server) BroadcastInChannel(channelName, message string) error {
 	channel, err := s.GetChannel(channelName)
 	if err != nil {

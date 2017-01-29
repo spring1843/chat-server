@@ -42,6 +42,7 @@ type (
 	}
 )
 
+// GetChatCommand returns this command
 func (c *Command) GetChatCommand() Command {
 	return *c
 }
@@ -113,7 +114,7 @@ func GetCommand(input string) (Executable, error) {
 }
 
 // Execute shows all available chat commands on this server
-func (c *HelpCommand) Execute(params CommandParams) error {
+func (c *HelpCommand) Execute(params Params) error {
 	if params.User1 == nil {
 		return errors.New("User param is not set")
 	}
@@ -128,7 +129,7 @@ func (c *HelpCommand) Execute(params CommandParams) error {
 }
 
 // Execute lists all the users in a channel to a user
-func (c *ListCommand) Execute(params CommandParams) error {
+func (c *ListCommand) Execute(params Params) error {
 	listMessage := "Here is the list of all users in this channel\n"
 
 	if params.User1 == nil {
@@ -152,7 +153,7 @@ func (c *ListCommand) Execute(params CommandParams) error {
 }
 
 // Execute allows a user to ignore another user so to suppress all incoming messages from that user
-func (c *IgnoreCommand) Execute(params CommandParams) error {
+func (c *IgnoreCommand) Execute(params Params) error {
 	if params.User1 == nil {
 		return errors.New("User1 param is not set")
 	}
@@ -171,7 +172,7 @@ func (c *IgnoreCommand) Execute(params CommandParams) error {
 }
 
 // Execute allows a user to join a channel
-func (c *JoinCommand) Execute(params CommandParams) error {
+func (c *JoinCommand) Execute(params Params) error {
 	if params.User1 == nil {
 		return errors.New("User1 param is not set")
 	}
@@ -198,7 +199,7 @@ func (c *JoinCommand) Execute(params CommandParams) error {
 }
 
 // Execute allows a user to send a private message to another user
-func (c *PrivateMessageCommand) Execute(params CommandParams) error {
+func (c *PrivateMessageCommand) Execute(params Params) error {
 	if params.User1 == nil {
 		return errors.New("User1 param is not set")
 	}
@@ -223,7 +224,7 @@ func (c *PrivateMessageCommand) Execute(params CommandParams) error {
 }
 
 // Execute disconnects a user from server
-func (c *QuitCommand) Execute(params CommandParams) error {
+func (c *QuitCommand) Execute(params Params) error {
 	if params.User1 == nil {
 		return errors.New("User1 param is not set")
 	}

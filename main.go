@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/spring1843/chat-server/config"
+	"github.com/spring1843/chat-server/plugins/logs"
 )
 
 func main() {
@@ -13,7 +14,7 @@ func main() {
 	flag.Parse()
 
 	if configFile == "" {
-		log.Fatal("-config flag is required")
+		logs.Fatalf("-config flag is required")
 	}
 	config := config.FromFile(configFile)
 

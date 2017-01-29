@@ -77,7 +77,7 @@ func (u *User) ReadFrom(chatServer *Server) {
 	}
 }
 
-// Write to the user's connection and remembers the last message that was sent out
+// WriteTo to the user's connection and remembers the last message that was sent out
 func (u *User) WriteTo() {
 	for message := range u.outgoing {
 		u.conn.Write([]byte(message + "\n"))
@@ -121,7 +121,7 @@ func (u *User) handleNewInput(chatServer *Server, input string) (bool, error) {
 // ExecuteCommand Executes a given command
 // First it finds all the required parameters from the input and populates them
 func (u *User) ExecuteCommand(chatServer *Server, input string, executable command.Executable) error {
-	commandParams := command.CommandParams{
+	commandParams := command.Params{
 		User1:    u,
 		RawInput: input,
 		Server:   chatServer,

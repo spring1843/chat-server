@@ -8,17 +8,19 @@ import (
 )
 
 type (
-	// FakeConnection is an interface for a network connection
+	// FakeConnection is a chat server compatible connection used for testing
 	FakeConnection struct {
 		Outgoing  []byte
 		Incoming  []byte
 		Lock      *sync.Mutex
 		EnableLog bool
 	}
+	// FakeNetwork is needed to implement the connection interface
 	FakeNetwork struct{}
 )
 
-func NewMockedChatConnection() *FakeConnection {
+// NewFakeConnection returns a new fake connection
+func NewFakeConnection() *FakeConnection {
 	fmt.Printf("Creating new mocked connection\n")
 	return &FakeConnection{
 		Lock:      new(sync.Mutex),
@@ -28,6 +30,7 @@ func NewMockedChatConnection() *FakeConnection {
 	}
 }
 
+// Write writes to connection
 func (m *FakeConnection) Write(p []byte) (int, error) {
 	fmt.Printf("Start - Writing data to connection\n")
 	m.Lock.Lock()
@@ -37,6 +40,7 @@ func (m *FakeConnection) Write(p []byte) (int, error) {
 	return len(m.Outgoing), nil
 }
 
+// ReadOutgoing reads what's going out to the user
 func (m *FakeConnection) ReadOutgoing() []byte {
 	fmt.Printf("Start - Reading outgoing data from connection\n")
 	m.Lock.Lock()
@@ -46,6 +50,7 @@ func (m *FakeConnection) ReadOutgoing() []byte {
 	return outgoing
 }
 
+// Read reads from the connection
 func (m *FakeConnection) Read(p []byte) (int, error) {
 	fmt.Printf("Start - Reading data from connection\n")
 	m.Lock.Lock()
@@ -63,22 +68,26 @@ func (m *FakeConnection) Read(p []byte) (int, error) {
 	return i, nil
 }
 
-func (f *FakeNetwork) Network() string {
-	fmt.Printf("Reading network\n")
-	return ``
-}
-
-func (f *FakeNetwork) String() string {
-	fmt.Printf("Returning string\n")
-	return ``
-}
-
+// Close closes the connection
 func (m *FakeConnection) Close() error {
 	fmt.Printf("Closing connection\n")
 	return nil
 }
 
+// RemoteAddr will return IP of client
 func (m *FakeConnection) RemoteAddr() net.Addr {
 	fmt.Printf("Reading remote address\n")
 	return new(FakeNetwork)
+}
+
+// Network returns connection's origin network as string
+func (f *FakeNetwork) Network() string {
+	fmt.Printf("Reading network\n")
+	return ``
+}
+
+// String returns network name as string
+func (f *FakeNetwork) String() string {
+	fmt.Printf("Returning string\n")
+	return ``
 }
