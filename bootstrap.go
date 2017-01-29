@@ -5,10 +5,10 @@ import (
 
 	"github.com/spring1843/chat-server/chat"
 	"github.com/spring1843/chat-server/config"
+	"github.com/spring1843/chat-server/drivers/rest"
+	"github.com/spring1843/chat-server/drivers/telnet"
+	"github.com/spring1843/chat-server/drivers/websocket"
 	"github.com/spring1843/chat-server/plugins/logs"
-	"github.com/spring1843/chat-server/rest"
-	"github.com/spring1843/chat-server/telnet"
-	"github.com/spring1843/chat-server/websocket"
 )
 
 func bootstrap(config config.Config) {

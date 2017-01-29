@@ -8,7 +8,7 @@ import (
 
 	"github.com/spring1843/chat-server/chat"
 	"github.com/spring1843/chat-server/config"
-	"github.com/spring1843/chat-server/rest"
+	"github.com/spring1843/chat-server/drivers/rest"
 )
 
 func TestCanStartAndGetStatus(t *testing.T) {

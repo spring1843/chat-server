@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/emicklei/go-restful"
-	"github.com/spring1843/chat-server/rest"
+	"github.com/spring1843/chat-server/drivers/rest"
 )
 
 type MockedReaderCloser struct {

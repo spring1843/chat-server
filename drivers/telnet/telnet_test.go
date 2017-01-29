@@ -10,7 +10,7 @@ import (
 
 	"github.com/spring1843/chat-server/chat"
 	"github.com/spring1843/chat-server/config"
-	"github.com/spring1843/chat-server/telnet"
+	"github.com/spring1843/chat-server/drivers/telnet"
 )
 
 func TestCanStartTelnetAndConnectToIt(t *testing.T) {

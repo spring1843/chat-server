@@ -9,7 +9,7 @@ import (
 	gorilla "github.com/gorilla/websocket"
 	"github.com/spring1843/chat-server/chat"
 	"github.com/spring1843/chat-server/config"
-	"github.com/spring1843/chat-server/websocket"
+	"github.com/spring1843/chat-server/drivers/websocket"
 )
 
 func Test_CantStartAndConnect(t *testing.T) {
