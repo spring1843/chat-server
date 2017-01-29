@@ -7,7 +7,6 @@ import (
 	"sync"
 )
 
-
 type (
 	// FakeConnection is an interface for a network connection
 	FakeConnection struct {

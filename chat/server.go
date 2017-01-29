@@ -202,18 +202,18 @@ func (s *Server) WelcomeNewUser(connection Connection) {
 	s.LogPrintf("connection \t New connection from address=%s", connection.RemoteAddr().String())
 
 	user := NewConnectedUser(s, connection)
-	user.outgoing <- "Welcome to chat server. There are " + strconv.Itoa(s.ConnectedUsersCount()) + " other users on this server. please enter a nickname"
+	user.SetOutgoing("Welcome to chat server. There are " + strconv.Itoa(s.ConnectedUsersCount()) + " other users on this server. please enter a nickname")
 
-	nickName := <-user.incoming
+	nickName := user.GetIncoming()
 
 	for s.IsUserConnected(nickName) {
-		user.outgoing <- "Another user with this nickname is connected to this server, Please enter a different nickname"
-		nickName = <-user.incoming
+		user.SetOutgoing("Another user with this nickname is connected to this server, Please enter a different nickname")
+		nickName = user.GetIncoming()
 	}
 
-	user.nickName = nickName
+	user.SetNickName(nickName)
 	s.AddUser(user)
 	s.LogPrintf("connection \t address=%s authenticated=@%s", connection.RemoteAddr().String(), nickName)
 
-	user.outgoing <- "Thanks " + user.nickName + ", now please type /join #channel to join a channel or /help to get all commands"
+	user.SetOutgoing("Thanks " + user.nickName + ", now please type /join #channel to join a channel or /help to get all commands")
 }

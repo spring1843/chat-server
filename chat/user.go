@@ -40,6 +40,48 @@ func NewConnectedUser(chatServer *Server, connection Connection) *User {
 	return user
 }
 
+// ReadFrom reads data from users and lets chat server interpret it
+func (u *User) ReadFrom(chatServer *Server) {
+	for {
+		message := make([]byte, 256)
+		u.conn.Read(message)
+
+		message = bytes.Trim(message, "\x00")
+
+		input := string(message)
+		//Remove new line
+		if strings.Contains(input, "\n") == true {
+			input = strings.TrimSpace(input)
+		}
+
+		handled, err := u.handleNewInput(chatServer, input)
+		if err != nil {
+			chatServer.LogPrintf("Error reading input from user @%s. Error %s", u.nickName, err)
+		}
+		if handled {
+			//If handled then continue reading
+			continue
+		}
+
+		if input != "\n" && input != `` {
+			u.SetIncoming(input)
+		}
+	}
+}
+
+// Write to the user's connection and remembers the last message that was sent out
+func (u *User) WriteTo() {
+	for message := range u.outgoing {
+		u.conn.Write([]byte(message + "\n"))
+	}
+}
+
+// Listen starts reading from and writing to a user
+func (u *User) Listen(chatServer *Server) {
+	go u.ReadFrom(chatServer)
+	go u.WriteTo()
+}
+
 // GetOutgoing gets the outgoing message for a user
 func (u *User) GetOutgoing() string {
 	return <-u.outgoing
@@ -86,48 +128,6 @@ func (u *User) SetChannel(name string) {
 	u.lock.Lock()
 	defer u.lock.Unlock()
 	u.channel = name
-}
-
-// Write to the user's connection and remembers the last message that was sent out
-func (u *User) Write() {
-	for message := range u.outgoing {
-		u.conn.Write([]byte(message + "\n"))
-	}
-}
-
-// Read and interprets a message from a user
-func (u *User) Read(chatServer *Server) {
-	for {
-		message := make([]byte, 256)
-		u.conn.Read(message)
-
-		message = bytes.Trim(message, "\x00")
-
-		input := string(message)
-		//Remove new line
-		if strings.Contains(input, "\n") == true {
-			input = strings.TrimSpace(input)
-		}
-
-		handled, err := u.handleNewInput(chatServer, input)
-		if err != nil {
-			chatServer.LogPrintf("Error reading input from user @%s. Error %s", u.nickName, err)
-		}
-		if handled {
-			//If handled then continue reading
-			continue
-		}
-
-		if input != "\n" && input != `` {
-			u.SetIncoming(input)
-		}
-	}
-}
-
-// Listen starts reading from and writing to a user
-func (u *User) Listen(chatServer *Server) {
-	go u.Read(chatServer)
-	go u.Write()
 }
 
 // Ignore a user
