@@ -13,14 +13,15 @@ type Command struct {
 // AllChatCommands all valid chat commands supported by this server
 var (
 	AllChatCommands = map[string]Executable{
-		`help`:   helpCommand,
-		`list`:   listCommand,
-		`ignore`: ignoreCommand,
-		`join`:   joinCommand,
-		`msg`:    privateMessageCommand,
-		`quit`:   quitCommand,
+		`/help`:   helpCommand,
+		`/list`:   listCommand,
+		`/ignore`: ignoreCommand,
+		`/join`:   joinCommand,
+		`/msg`:    privateMessageCommand,
+		`/quit`:   quitCommand,
 	}
-	ErrComadNotFound = errs.New("Command not found")
+	ErrNotACommand    = errs.New("Not a command, commands must start with / and be at least 3 characters")
+	ErrCommadNotFound = errs.New("Command not found")
 )
 
 // GetChatCommand returns this command
@@ -28,10 +29,22 @@ func (c *Command) GetChatCommand() Command {
 	return *c
 }
 
-// GetCommand gets a command if it exists
-func GetCommand(input string) (Executable, error) {
-	if command, ok := AllChatCommands[`/`+input]; ok {
+// IsInputExecutable checks if a user input is intended to be a command or not
+func IsInputExecutable(input string) bool {
+	if len(input) > 2 && input[0:1] == "/" {
+		return true
+	}
+	return false
+}
+
+// ParseString gets a command if it can find it in a user input string
+func FromString(commandName string) (Executable, error) {
+	if !IsInputExecutable(commandName) {
+		return nil, errs.Wrapf(ErrNotACommand, "%s was not found in available comands.", commandName)
+	}
+
+	if command, ok := AllChatCommands[commandName]; ok {
 		return command, nil
 	}
-	return nil, ErrComadNotFound
+	return nil, errs.Wrapf(ErrCommadNotFound, "%s was not found in available comands.", commandName)
 }

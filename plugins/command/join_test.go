@@ -1,27 +1,29 @@
 package command_test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/spring1843/chat-server/chat"
 	"github.com/spring1843/chat-server/drivers/fake"
+	"github.com/spring1843/chat-server/plugins/command"
 )
 
 func Test_JoinCommand(t *testing.T) {
 	fakeConnection := fake.NewFakeConnection()
-	fakeConnection.Incoming = []byte("/join #r\n")
 
 	server := chat.NewServer()
 	user1 := chat.NewConnectedUser(server, fakeConnection)
+	user1.SetNickName("u1")
 	server.AddUser(user1)
 
-	msg := user1.GetOutgoing()
-	if strings.Contains(msg, "other users this channel") != true {
-		t.Errorf("User did not receive welcome message after joining channel received %s instead", msg)
+	input := `/join #r`
+	joinCommand, err := command.FromString(input)
+	if err != nil {
+		t.Errorf("Could not get an instance of join command")
 	}
 
-	if user1.GetChannel() != "" && user1.GetChannel() != `r` {
+	user1.ExecuteCommand(server, input, joinCommand)
+	if user1.GetChannel() == "" {
 		t.Errorf("User did not join the #r channel when he should have")
 	}
 }

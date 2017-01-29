@@ -22,7 +22,7 @@ func Test_IgnoreCommand(t *testing.T) {
 	server.AddUser(user2)
 
 	input := `/ignore @u2`
-	ignoreCommand, _ := command.GetCommand(input)
+	ignoreCommand, _ := command.FromString(input)
 	user1.ExecuteCommand(server, input, ignoreCommand)
 	if user1.HasIgnored(user2.GetNickName()) != true {
 		t.Errorf("User was not ignored after ignore command executed")

@@ -21,7 +21,7 @@ func Test_QuitCommand(t *testing.T) {
 	}
 
 	input := `/quit`
-	quitCommand, _ := command.GetCommand(input)
+	quitCommand, _ := command.FromString(input)
 	user.ExecuteCommand(server, input, quitCommand)
 
 	if server.IsUserConnected(`foo`) {

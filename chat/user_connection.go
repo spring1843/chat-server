@@ -91,32 +91,42 @@ func (u *User) Disconnect(chatServer *Server) error {
 	return u.conn.Close()
 }
 
-// Checks to see if a new input from user is a command
-// If it is a command then it tries executing func
-// If it's not a command then it will output to the channel
+// handleNewInput looks at user input and reacts to it
 func (u *User) handleNewInput(chatServer *Server, input string) (bool, error) {
-	if command, err := command.GetCommand(input); err == nil && command != nil {
-		err = u.ExecuteCommand(chatServer, input, command)
-		if err != nil {
-			u.outgoing <- `Could not execute command. Error:` + err.Error()
-			err = errs.Wrap(err, "error handling input")
-			logs.Errf(err, "Failed executing %s command by @s", input, u.nickName)
-			return false, err
-		}
-		return true, nil
+	if command.IsInputExecutable(input) {
+		return u.handleCommandInput(chatServer, input)
 	}
 
-	if u.GetChannel() != "" {
-		logs.Infof("message \t @%s in #%s message=%s", u.nickName, u.GetChannel(), input)
-		channel, err := chatServer.GetChannel(u.GetChannel())
-		if err != nil {
-			return false, errs.Wrap(err, "Error getting channel from server")
-		}
-		channel.Broadcast(chatServer, `@`+u.nickName+`: `+input)
-		return true, nil
+	// If it's not a command it's a chat message to broadcast into the channel
+	if u.GetChannel() == "" {
+		u.SetOutgoing("You need to join a channel, use /join #channel or use /help for more info.")
+		return false, errs.New("User is not in a channel, and input is not a command")
 	}
+	return u.handleBroadcastInput(chatServer, input)
+}
 
-	return false, nil
+func (u *User) handleBroadcastInput(chatServer *Server, input string) (bool, error) {
+	logs.Infof("message \t @%s in #%s message=%s", u.nickName, u.GetChannel(), input)
+	channel, err := chatServer.GetChannel(u.GetChannel())
+	if err != nil {
+		return false, errs.Wrap(err, "Error getting channel from server")
+	}
+	channel.Broadcast(chatServer, `@`+u.nickName+`: `+input)
+	return true, nil
+}
+
+func (u *User) handleCommandInput(chatServer *Server, input string) (bool, error) {
+	userCommand, err := command.FromString(input)
+	if err != nil {
+		u.SetOutgoing("Invalid command, use /help for more info. Error:" + err.Error())
+		logs.Errf(err, "Failed executing %s command by @s", input, u.nickName)
+		return false, errs.Wrap(err, "Error getting command from user input.")
+	}
+	if err = u.ExecuteCommand(chatServer, input, userCommand); err != nil {
+		u.SetOutgoing(`Could not execute command. Error:` + err.Error())
+		return false, errs.Wrap(err, "error handling input")
+	}
+	return true, nil
 }
 
 // ExecuteCommand Executes a given command

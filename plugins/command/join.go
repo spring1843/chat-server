@@ -3,6 +3,8 @@ package command
 import (
 	"strconv"
 
+	"fmt"
+
 	"github.com/spring1843/chat-server/plugins/errs"
 )
 
@@ -38,6 +40,10 @@ func (c *JoinCommand) Execute(params Params) error {
 	if params.User1.GetChannel() != "" && params.User1.GetChannel() == params.Channel.GetName() {
 		return errs.New("You are already in channel #" + params.Channel.GetName())
 	}
+
+	fmt.Printf("User %#v", params.User1)
+	fmt.Printf("Channel %#v", params.Channel)
+	fmt.Printf("params.User1.GetNickName() %#v", params.User1.GetNickName())
 
 	params.Channel.AddUser(params.User1.GetNickName())
 	params.User1.SetChannel(channelName)

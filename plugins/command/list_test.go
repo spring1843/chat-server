@@ -18,7 +18,7 @@ func Test_ListCommand(t *testing.T) {
 	server.AddChannel(`foo`)
 
 	input := `/join #foo`
-	joinCommand, err := command.GetCommand(input)
+	joinCommand, err := command.FromString(input)
 	if err != nil {
 		t.Errorf("Could not get an instance of list command")
 	}
@@ -41,7 +41,7 @@ func Test_ListCommand(t *testing.T) {
 	user3.ExecuteCommand(server, input, joinCommand)
 
 	input = "/list \n"
-	listCommand, err := command.GetCommand(input)
+	listCommand, err := command.FromString(input)
 	if err != nil {
 		t.Errorf("Could not get an instance of list command")
 	}

@@ -19,7 +19,7 @@ func Test_MessageCommand(t *testing.T) {
 	user1.SetChannel(channel.Name)
 	user2.SetChannel(channel.Name)
 	input := `/msg @u2 foo`
-	messageCommand, err := command.GetCommand(input)
+	messageCommand, err := command.FromString(input)
 	if err != nil {
 		t.Fatalf("Failed getting message command. Error %s", err)
 	}
