@@ -8,26 +8,20 @@ import (
 )
 
 func Test_WelcomeNewUsers(t *testing.T) {
-	server = chat.NewServer()
+	var (
+		server     = chat.NewServer()
+		connection = fake.NewFakeConnection()
+	)
+
 	server.Listen()
 
-	conn1 := fake.NewFakeConnection()
-	conn1.Lock.Lock()
-	defer conn1.Lock.Unlock()
-	conn1.Incoming = []byte("foo\n")
+	connection.Lock.Lock()
+	connection.Incoming = []byte("foo\n")
+	connection.Lock.Unlock()
 
-	server.WelcomeNewUser(conn1)
-	if !server.IsUserConnected("foo") {
-		t.Error("User foo not added to the server")
-	}
+	server.ConnectUser(connection)
 
-	connection2 := fake.NewFakeConnection()
-	connection2.Lock.Lock()
-	defer connection2.Lock.Unlock()
-	connection2.Incoming = []byte("bar\n")
-
-	server.WelcomeNewUser(connection2)
-	if !server.IsUserConnected("bar") {
-		t.Error("User bar not added to the server")
+	if len(server.Users) != 1 {
+		t.Errorf("User was not added to the server")
 	}
 }
