@@ -4,11 +4,7 @@ type (
 	// Executable Is a what a command is
 	Executable interface {
 		Execute(params Params) error
-		GetChatCommand() Command
-		ParseNickNameFomInput(input string) (string, error)
-		ParseChannelFromInput(input string) (string, error)
-		ParseMessageFromInput(input string) (string, error)
-		ParseCommandFromInput(input string) (string, error)
+		RequiresParam(param string) bool
 	}
 	// Server hosts chats
 	Server interface {

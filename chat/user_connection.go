@@ -138,10 +138,9 @@ func (u *User) ExecuteCommand(chatServer *Server, input string, executable comma
 		Server:   chatServer,
 	}
 
-	chatCommand := executable.GetChatCommand()
 
-	if chatCommand.RequiresParam(`user2`) {
-		nickname, err := chatCommand.ParseNickNameFomInput(input)
+	if executable.RequiresParam(`user2`) {
+		nickname, err := command.ParseNickNameFomInput(input)
 		if err != nil {
 			return errs.Wrap(err, "Could not find the required @nickname in the input")
 		}
@@ -153,8 +152,8 @@ func (u *User) ExecuteCommand(chatServer *Server, input string, executable comma
 		commandParams.User2 = user2
 	}
 
-	if chatCommand.RequiresParam(`channel`) {
-		channelName, err := chatCommand.ParseChannelFromInput(input)
+	if executable.RequiresParam(`channel`) {
+		channelName, err := command.ParseChannelFromInput(input)
 		if err != nil {
 			return errs.Wrap(err, "Could not find the required #channel in the input")
 		}
@@ -164,8 +163,8 @@ func (u *User) ExecuteCommand(chatServer *Server, input string, executable comma
 		}
 	}
 
-	if chatCommand.RequiresParam(`message`) {
-		message, err := chatCommand.ParseMessageFromInput(input)
+	if executable.RequiresParam(`message`) {
+		message, err := command.ParseMessageFromInput(input)
 		if err != nil {
 			return errs.Wrap(err, "Could not required message in the input")
 		}
