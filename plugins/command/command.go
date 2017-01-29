@@ -11,14 +11,17 @@ type Command struct {
 }
 
 // AllChatCommands all valid chat commands supported by this server
-var AllChatCommands = []Executable{
-	helpCommand,
-	listCommand,
-	ignoreCommand,
-	joinCommand,
-	privateMessageCommand,
-	quitCommand,
-}
+var (
+	AllChatCommands = map[string]Executable{
+		`help`:   helpCommand,
+		`list`:   listCommand,
+		`ignore`: ignoreCommand,
+		`join`:   joinCommand,
+		`msg`:    privateMessageCommand,
+		`quit`:   quitCommand,
+	}
+	ErrComadNotFound = errs.New("Command not found")
+)
 
 // GetChatCommand returns this command
 func (c *Command) GetChatCommand() Command {
@@ -27,16 +30,8 @@ func (c *Command) GetChatCommand() Command {
 
 // GetCommand gets a command if it exists
 func GetCommand(input string) (Executable, error) {
-	if len(input) < 2 || input[0:1] != `/` {
-		return nil, errs.New("Input too short to be a command")
+	if command, ok := AllChatCommands[`/`+input]; ok {
+		return command, nil
 	}
-
-	validCommands := AllChatCommands
-	for _, command := range validCommands {
-		commandName := `/` + command.GetChatCommand().Name
-		if len(input) >= len(commandName) && input[:len(commandName)] == commandName {
-			return command, nil
-		}
-	}
-	return nil, errs.New("Command not found")
+	return nil, ErrComadNotFound
 }

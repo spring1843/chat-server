@@ -1,8 +1,9 @@
 package command
 
 import (
-	"errors"
 	"strings"
+
+	"github.com/spring1843/chat-server/plugins/errs"
 )
 
 // Params is all the params that are supported by chat commands, a chat command may use some or all of these params
@@ -24,7 +25,7 @@ func (c *Command) ParseNickNameFomInput(input string) (string, error) {
 	result := strings.Join(subStrings, " ")
 
 	if result == `` {
-		return ``, errors.New(`@nickname not found in the input`)
+		return ``, errs.New(`@nickname not found in the input`)
 	}
 	return result[1:], nil
 }
@@ -38,7 +39,7 @@ func (c *Command) ParseChannelFromInput(input string) (string, error) {
 	result := strings.Join(subStrings, " ")
 
 	if result == `` {
-		return ``, errors.New(`#channel not found in the input`)
+		return ``, errs.New(`#channel not found in the input`)
 	}
 	return result[1:], nil
 }
@@ -52,7 +53,7 @@ func (c *Command) ParseCommandFromInput(input string) (string, error) {
 	result := strings.Join(subStrings, " ")
 
 	if result == `` {
-		return ``, errors.New(`/command not found in the input`)
+		return ``, errs.New(`/command not found in the input`)
 	}
 	return result[1:], nil
 }
@@ -67,7 +68,7 @@ func (c *Command) ParseMessageFromInput(input string) (string, error) {
 
 	result := strings.Join(subStrings, " ")
 	if result == `` {
-		return ``, errors.New(`Message not found in the input`)
+		return ``, errs.New(`Message not found in the input`)
 	}
 	return result, nil
 }
