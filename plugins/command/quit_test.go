@@ -4,11 +4,12 @@ import (
 	"testing"
 
 	"github.com/spring1843/chat-server/chat"
+	"github.com/spring1843/chat-server/drivers/fake"
 	"github.com/spring1843/chat-server/plugins/command"
 )
 
 func Test_QuitCommand(t *testing.T) {
-	fakeConnection := chat.NewFakeConnection()
+	fakeConnection := fake.NewFakeConnection()
 
 	server := chat.NewServer()
 	user := chat.NewConnectedUser(server, fakeConnection)

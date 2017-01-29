@@ -4,12 +4,13 @@ import (
 	"testing"
 
 	"github.com/spring1843/chat-server/chat"
+	"github.com/spring1843/chat-server/drivers/fake"
 	"github.com/spring1843/chat-server/plugins/command"
 )
 
 func Test_IgnoreCommand(t *testing.T) {
-	fakeConnection1 := chat.NewFakeConnection()
-	fakeConnection2 := chat.NewFakeConnection()
+	fakeConnection1 := fake.NewFakeConnection()
+	fakeConnection2 := fake.NewFakeConnection()
 
 	server := chat.NewServer()
 

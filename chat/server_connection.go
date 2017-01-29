@@ -3,6 +3,7 @@ package chat
 import (
 	"strconv"
 
+	"github.com/spring1843/chat-server/drivers"
 	"github.com/spring1843/chat-server/plugins/logs"
 )
 
@@ -19,7 +20,7 @@ func (s *Server) Listen() {
 }
 
 // ReceiveConnection is used when there's a new connection
-func (s *Server) ReceiveConnection(conn Connection) {
+func (s *Server) ReceiveConnection(conn drivers.Connection) {
 	s.Connection <- conn
 }
 
@@ -33,7 +34,7 @@ func (s *Server) DisconnectUser(nickName string) error {
 }
 
 // WelcomeNewUser shows a welcome message to a new user and makes a new user entity by asking the new user to pick a nickname
-func (s *Server) WelcomeNewUser(connection Connection) {
+func (s *Server) WelcomeNewUser(connection drivers.Connection) {
 	user := NewConnectedUser(s, connection)
 	user.SetOutgoing("Welcome to chat server. There are " + strconv.Itoa(s.ConnectedUsersCount()) + " other users on this server. please enter a nickname")
 

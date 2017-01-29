@@ -5,10 +5,11 @@ import (
 	"testing"
 
 	"github.com/spring1843/chat-server/chat"
+	"github.com/spring1843/chat-server/drivers/fake"
 )
 
 func Test_HelpCommand(t *testing.T) {
-	fakeConnection := chat.NewFakeConnection()
+	fakeConnection := fake.NewFakeConnection()
 	fakeConnection.Incoming = []byte("/help\n")
 
 	server := chat.NewServer()

@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/spring1843/chat-server/drivers"
 	"github.com/spring1843/chat-server/plugins/command"
 	"github.com/spring1843/chat-server/plugins/errs"
 	"github.com/spring1843/chat-server/plugins/logs"
 )
 
 // NewConnectedUser returns a new User with a connection
-func NewConnectedUser(chatServer *Server, connection Connection) *User {
+func NewConnectedUser(chatServer *Server, connection drivers.Connection) *User {
 	user := NewUser("")
 	user.conn = connection
 	user.Listen(chatServer)

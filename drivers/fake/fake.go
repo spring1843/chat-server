@@ -1,4 +1,4 @@
-package chat
+package fake
 
 import (
 	"fmt"

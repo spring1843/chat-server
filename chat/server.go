@@ -6,11 +6,13 @@ import (
 	"errors"
 	"sync"
 	"time"
+
+	"github.com/spring1843/chat-server/drivers"
 )
 
 // Server  keeps listening for connections, it contains users and channels
 type Server struct {
-	Connection chan Connection
+	Connection chan drivers.Connection
 	Channels   map[string]*Channel
 	Users      map[string]*User
 	Incoming   chan string
@@ -22,7 +24,7 @@ type Server struct {
 // NewServer returns a new instance of the chat server
 func NewServer() *Server {
 	server := &Server{
-		Connection: make(chan Connection),
+		Connection: make(chan drivers.Connection),
 		Channels:   make(map[string]*Channel),
 		Users:      make(map[string]*User),
 		Incoming:   make(chan string),

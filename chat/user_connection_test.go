@@ -4,10 +4,11 @@ import (
 	"testing"
 
 	"github.com/spring1843/chat-server/chat"
+	"github.com/spring1843/chat-server/drivers/fake"
 )
 
 func Test_CanWriteToUser(t *testing.T) {
-	fakeWriter := chat.NewFakeConnection()
+	fakeWriter := fake.NewFakeConnection()
 	user1 := chat.NewConnectedUser(server, fakeWriter)
 
 	go user1.SetOutgoing(`foo`)
@@ -19,7 +20,7 @@ func Test_CanWriteToUser(t *testing.T) {
 }
 
 func Test_CanReadFromUser(t *testing.T) {
-	fakeReader := chat.NewFakeConnection()
+	fakeReader := fake.NewFakeConnection()
 	fakeReader.Incoming = []byte("foo\n")
 
 	user1 := chat.NewConnectedUser(server, fakeReader)

@@ -1,10 +1,14 @@
 package chat
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/spring1843/chat-server/drivers"
+)
 
 // User is temporarily in connected to a chat server, and can be in certain channels
 type User struct {
-	conn       Connection
+	conn       drivers.Connection
 	nickName   string
 	channel    string
 	ignoreList map[string]bool

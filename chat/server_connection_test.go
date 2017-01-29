@@ -4,13 +4,14 @@ import (
 	"testing"
 
 	"github.com/spring1843/chat-server/chat"
+	"github.com/spring1843/chat-server/drivers/fake"
 )
 
 func Test_WelcomeNewUsers(t *testing.T) {
 	server = chat.NewServer()
 	server.Listen()
 
-	conn1 := chat.NewFakeConnection()
+	conn1 := fake.NewFakeConnection()
 	conn1.Lock.Lock()
 	defer conn1.Lock.Unlock()
 	conn1.Incoming = []byte("foo\n")
@@ -20,7 +21,7 @@ func Test_WelcomeNewUsers(t *testing.T) {
 		t.Error("User foo not added to the server")
 	}
 
-	connection2 := chat.NewFakeConnection()
+	connection2 := fake.NewFakeConnection()
 	connection2.Lock.Lock()
 	defer connection2.Lock.Unlock()
 	connection2.Incoming = []byte("bar\n")
