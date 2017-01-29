@@ -10,7 +10,7 @@ import (
 
 func TestHelpCommand(t *testing.T) {
 	fakeConnection := fake.NewFakeConnection()
-	fakeConnection.Incoming = []byte("/help\n")
+	fakeConnection.SetIncoming("/help\n")
 
 	server := chat.NewServer()
 	user := chat.NewConnectedUser(server, fakeConnection)
