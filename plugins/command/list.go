@@ -22,6 +22,9 @@ func (c *ListCommand) Execute(params Params) error {
 	if params.User1 == nil {
 		return errs.New("User param is not set")
 	}
+	if params.Channel == nil {
+		return errs.New("Channel param is not set")
+	}
 
 	if params.User1.GetChannel() == "" {
 		return errs.New("User is not in a channel")

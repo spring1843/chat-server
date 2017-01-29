@@ -24,15 +24,6 @@ func (s *Server) ReceiveConnection(conn drivers.Connection) {
 	s.Connection <- conn
 }
 
-// DisconnectUser disconnects a user from this server
-func (s *Server) DisconnectUser(nickName string) error {
-	user, err := s.GetUser(nickName)
-	if err != nil {
-		return err
-	}
-	return user.Disconnect(s)
-}
-
 // ConnectUser shows a welcome message to a new user and makes a new user entity by asking the new user to pick a nickname
 func (s *Server) ConnectUser(connection drivers.Connection) {
 	user := NewConnectedUser(s, connection)

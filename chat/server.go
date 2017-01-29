@@ -57,7 +57,7 @@ func (s *Server) RemoveUser(nickName string) error {
 func (s *Server) RemoveUserFromChannel(nickName, channelName string) error {
 	channel, err := s.GetChannel(channelName)
 	if err != nil {
-		return err
+		return errs.Wrapf(err, "Error whilte trying to get channel to remove user from. User %s Channel %s", nickName, channelName)
 	}
 
 	channel.RemoveUser(nickName)
@@ -69,8 +69,7 @@ func (s *Server) GetUser(nickName string) (*User, error) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	if _, ok := s.Users[nickName]; ok {
-		user := s.Users[nickName]
-		return user, nil
+		return s.Users[nickName], nil
 	}
 	return nil, errs.Newf(`User %q not connected to this server`, nickName)
 }

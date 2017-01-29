@@ -13,9 +13,10 @@ func Test_QuitCommand(t *testing.T) {
 	server := chat.NewServer()
 	user := chat.NewConnectedUser(server, fakeConnection)
 	user.SetNickName(`foo`)
+
 	server.AddUser(user)
 
-	if server.IsUserConnected(`foo`) != true {
+	if !server.IsUserConnected(`foo`) {
 		t.Errorf("User was  disconnected without runnign the quit command")
 	}
 

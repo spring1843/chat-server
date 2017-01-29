@@ -15,7 +15,6 @@ type (
 		GetChannelCount() int
 		RemoveUserFromChannel(nickName, channelName string) error
 		BroadcastInChannel(channelName, message string) error
-		DisconnectUser(nickName string) error
 	}
 	// Chan is an interface for a chat channel
 	Chan interface {

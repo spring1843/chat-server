@@ -22,14 +22,10 @@ func (c *QuitCommand) Execute(params Params) error {
 	}
 
 	if err := params.Server.RemoveUser(params.User1.GetNickName()); err != nil {
-		return errs.New("Could not remove user afeter quit command")
+		return errs.Wrapf(err, "Could not remove user afeter quit command. . User :%s", params.User1.GetNickName())
 	}
 	if params.User1.GetChannel() != "" {
 		params.Server.RemoveUserFromChannel(params.User1.GetNickName(), params.User1.GetChannel())
-	}
-
-	if err := params.Server.DisconnectUser(params.User1.GetNickName()); err != nil {
-		return errs.New("Could not disconnect user")
 	}
 	return nil
 }

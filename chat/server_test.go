@@ -12,7 +12,13 @@ var (
 
 func Test_CanAddUser(t *testing.T) {
 	server.AddUser(user1)
-	if !server.IsUserConnected(`u1`) {
+
+	user, err := server.GetUser(user1.GetNickName())
+	if err != nil {
+		t.Errorf("Couldn't get the user just added. Error %s", err)
+	}
+
+	if !server.IsUserConnected(user.GetNickName()) {
 		t.Errorf("User is not connected when should have been connected")
 	}
 	if server.IsUserConnected(`bar`) {
