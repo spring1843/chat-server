@@ -30,26 +30,29 @@ func NewMockedChatConnection() *FakeConnection {
 }
 
 func (m *FakeConnection) Write(p []byte) (int, error) {
-	fmt.Printf("Writing data to connection\n")
+	fmt.Printf("Start - Writing data to connection\n")
 	m.Lock.Lock()
 	defer m.Lock.Unlock()
 	m.Outgoing = p
+	fmt.Printf("End - Writing data to connection\n")
 	return len(m.Outgoing), nil
 }
 
 func (m *FakeConnection) ReadOutgoing() []byte {
-	fmt.Printf("Reading outgoing data from connection\n")
+	fmt.Printf("Start - Reading outgoing data from connection\n")
 	m.Lock.Lock()
 	defer m.Lock.Unlock()
 	outgoing := m.Outgoing
+	fmt.Printf("End - Reading outgoing data from connection\n")
 	return outgoing
 }
 
 func (m *FakeConnection) Read(p []byte) (int, error) {
-	fmt.Printf("Reading data from connection\n")
+	fmt.Printf("Start - Reading data from connection\n")
 	m.Lock.Lock()
 	defer m.Lock.Unlock()
 	if len(m.Incoming) == 0 {
+		fmt.Printf("End - EOF Reading data from connection\n")
 		return 0, io.EOF
 	}
 	i := 0
@@ -57,6 +60,7 @@ func (m *FakeConnection) Read(p []byte) (int, error) {
 		p[i] = bit
 		i++
 	}
+	fmt.Printf("End - Reading data from connection\n")
 	return i, nil
 }
 
