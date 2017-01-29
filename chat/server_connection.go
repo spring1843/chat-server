@@ -11,6 +11,7 @@ func (s *Server) Listen() {
 	go func() {
 		for {
 			for connection := range s.Connection {
+				logs.Infof("connection \t New connection from address=%s", connection.RemoteAddr().String())
 				go s.WelcomeNewUser(connection)
 			}
 		}
@@ -33,8 +34,6 @@ func (s *Server) DisconnectUser(nickName string) error {
 
 // WelcomeNewUser shows a welcome message to a new user and makes a new user entity by asking the new user to pick a nickname
 func (s *Server) WelcomeNewUser(connection Connection) {
-	logs.Infof("connection \t New connection from address=%s", connection.RemoteAddr().String())
-
 	user := NewConnectedUser(s, connection)
 	user.SetOutgoing("Welcome to chat server. There are " + strconv.Itoa(s.ConnectedUsersCount()) + " other users on this server. please enter a nickname")
 

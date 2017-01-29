@@ -1,12 +1,6 @@
 package command
 
-import (
-	"errors"
-	"strconv"
-	"time"
-
-	"github.com/spring1843/chat-server/plugins/logs"
-)
+import "github.com/spring1843/chat-server/plugins/errs"
 
 type (
 	// Command is executed by a user on a server
@@ -100,7 +94,7 @@ func init() {
 // GetCommand gets a command if it exists
 func GetCommand(input string) (Executable, error) {
 	if len(input) < 2 || input[0:1] != `/` {
-		return nil, errors.New("Input too short to be a command")
+		return nil, errs.New("Input too short to be a command")
 	}
 
 	validCommands := AllChatCommands
@@ -110,134 +104,5 @@ func GetCommand(input string) (Executable, error) {
 			return command, nil
 		}
 	}
-	return nil, errors.New("Command not found")
-}
-
-// Execute shows all available chat commands on this server
-func (c *HelpCommand) Execute(params Params) error {
-	if params.User1 == nil {
-		return errors.New("User param is not set")
-	}
-
-	helpMessage := "Here is the list of all available commands\n"
-	for _, command := range AllChatCommands {
-		helpMessage += command.GetChatCommand().Syntax + "\t" + command.GetChatCommand().Description + ".\n"
-	}
-
-	params.User1.SetOutgoing(helpMessage)
-	return nil
-}
-
-// Execute lists all the users in a channel to a user
-func (c *ListCommand) Execute(params Params) error {
-	listMessage := "Here is the list of all users in this channel\n"
-
-	if params.User1 == nil {
-		return errors.New("User param is not set")
-	}
-
-	if params.User1.GetChannel() == "" {
-		return errors.New("User is not in a channel")
-	}
-
-	for nickName := range params.Channel.GetUsers() {
-		if nickName == params.User1.GetNickName() {
-			continue
-		}
-		listMessage += "@" + nickName + ".\n"
-	}
-
-	params.User1.SetOutgoing(listMessage)
-
-	return nil
-}
-
-// Execute allows a user to ignore another user so to suppress all incoming messages from that user
-func (c *IgnoreCommand) Execute(params Params) error {
-	if params.User1 == nil {
-		return errors.New("User1 param is not set")
-	}
-
-	if params.User2 == nil {
-		return errors.New("User2 param is not set")
-	}
-
-	if params.User2.GetNickName() == params.User1.GetNickName() {
-		return errors.New("We don't let one ignore themselves")
-	}
-
-	params.User1.Ignore(params.User2.GetNickName())
-	params.User1.SetOutgoing(params.User2.GetNickName() + " is now ignored.")
-	return nil
-}
-
-// Execute allows a user to join a channel
-func (c *JoinCommand) Execute(params Params) error {
-	if params.User1 == nil {
-		return errors.New("User1 param is not set")
-	}
-
-	channelName := ""
-	if params.Channel == nil {
-		chatCommand := c.GetChatCommand()
-		channelName, err := chatCommand.ParseChannelFromInput(params.RawInput)
-		if err != nil {
-			return errors.New("Could not parse channel name")
-		}
-		params.Server.AddChannel(channelName)
-	}
-
-	if params.User1.GetChannel() != "" && params.User1.GetChannel() == params.Channel.GetName() {
-		return errors.New("You are already in channel #" + params.Channel.GetName())
-	}
-
-	params.Channel.AddUser(params.User1.GetNickName())
-	params.User1.SetChannel(channelName)
-
-	params.User1.SetOutgoing("There are " + strconv.Itoa(params.Channel.GetUserCount()) + " other users this channel.")
-	return params.Server.BroadcastInChannel(channelName, `@`+params.User1.GetNickName()+` just joined channel #`+params.Channel.GetName())
-}
-
-// Execute allows a user to send a private message to another user
-func (c *PrivateMessageCommand) Execute(params Params) error {
-	if params.User1 == nil {
-		return errors.New("User1 param is not set")
-	}
-
-	if params.User2 == nil {
-		return errors.New("User2 param is not set")
-	}
-
-	if params.User1.GetChannel() != params.User2.GetChannel() {
-		return errors.New("Users are not in the same channel")
-	}
-
-	if params.User2.HasIgnored(params.User1.GetNickName()) {
-		return errors.New("User has ignored the sender")
-	}
-
-	logs.Infof("message \t @%s to @%s message=%s", params.User1.GetNickName(), params.User2.GetNickName(), params.Message)
-
-	now := time.Now()
-	go params.User2.SetOutgoing(now.Format(time.Kitchen) + ` - *Private from @` + params.User1.GetNickName() + `: ` + params.Message)
-	return nil
-}
-
-// Execute disconnects a user from server
-func (c *QuitCommand) Execute(params Params) error {
-	if params.User1 == nil {
-		return errors.New("User1 param is not set")
-	}
-
-	if err := params.Server.RemoveUser(params.User1.GetNickName()); err != nil {
-		return errors.New("Could not remove user afeter quit command")
-	}
-	if params.User1.GetChannel() != "" {
-		params.Server.RemoveUserFromChannel(params.User1.GetNickName(), params.User1.GetChannel())
-	}
-
-	if err := params.Server.DisconnectUser(params.User1.GetNickName()); err != nil {
-		return errors.New("Could not disconnect user")
-	}
-	return nil
+	return nil, errs.New("Command not found")
 }

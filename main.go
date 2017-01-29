@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"log"
 
 	"github.com/spring1843/chat-server/config"
 	"github.com/spring1843/chat-server/plugins/logs"

@@ -1,0 +1,34 @@
+package command
+
+import (
+	"strconv"
+
+	"github.com/spring1843/chat-server/plugins/errs"
+)
+
+// Execute allows a user to join a channel
+func (c *JoinCommand) Execute(params Params) error {
+	if params.User1 == nil {
+		return errs.New("User1 param is not set")
+	}
+
+	channelName := ""
+	if params.Channel == nil {
+		chatCommand := c.GetChatCommand()
+		channelName, err := chatCommand.ParseChannelFromInput(params.RawInput)
+		if err != nil {
+			return errs.New("Could not parse channel name")
+		}
+		params.Server.AddChannel(channelName)
+	}
+
+	if params.User1.GetChannel() != "" && params.User1.GetChannel() == params.Channel.GetName() {
+		return errs.New("You are already in channel #" + params.Channel.GetName())
+	}
+
+	params.Channel.AddUser(params.User1.GetNickName())
+	params.User1.SetChannel(channelName)
+
+	params.User1.SetOutgoing("There are " + strconv.Itoa(params.Channel.GetUserCount()) + " other users this channel.")
+	return params.Server.BroadcastInChannel(channelName, `@`+params.User1.GetNickName()+` just joined channel #`+params.Channel.GetName())
+}

@@ -1,7 +1,6 @@
 package chat_test
 
 import (
-	"os"
 	"testing"
 
 	"github.com/spring1843/chat-server/chat"
