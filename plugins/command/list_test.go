@@ -30,12 +30,12 @@ func Test_ListCommand(t *testing.T) {
 	server.AddUser(user3)
 
 	input := `/join #foo`
-	user1.ExecuteCommand(server, input)
-	user2.ExecuteCommand(server, input)
-	user3.ExecuteCommand(server, input)
+	user1.HandleNewInput(server, input)
+	user2.HandleNewInput(server, input)
+	user3.HandleNewInput(server, input)
 
 	input = "/list \n"
-	user1.ExecuteCommand(server, input)
+	user1.HandleNewInput(server, input)
 	msg := user1.GetOutgoing()
 
 	if strings.Contains(msg, "@u1") != true && strings.Contains(msg, "@u2") != true && strings.Contains(msg, "@u3") != true {

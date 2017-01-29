@@ -20,7 +20,7 @@ func Test_QuitCommand(t *testing.T) {
 	}
 
 	input := `/quit`
-	if _, err := user.ExecuteCommand(server, input); err != nil {
+	if _, err := user.HandleNewInput(server, input); err != nil {
 		t.Fatalf("Failed executing command. Error %s", err)
 	}
 

@@ -15,7 +15,9 @@ func Test_JoinCommand(t *testing.T) {
 	user1.SetNickName("u1")
 	server.AddUser(user1)
 
-	if _, err := user1.ExecuteCommand(server, "/join #r\n"); err != nil {
+	server.AddChannel("r")
+
+	if _, err := user1.HandleNewInput(server, "/join #r"); err != nil {
 		t.Fatalf("Could not execute join. Error %s", err)
 	}
 	if user1.GetChannel() == "" {

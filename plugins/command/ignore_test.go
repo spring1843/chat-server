@@ -20,7 +20,7 @@ func Test_IgnoreCommand(t *testing.T) {
 	server.AddUser(user1)
 	server.AddUser(user2)
 
-	if _, err := user1.ExecuteCommand(server, `/ignore @u2`); err != nil {
+	if _, err := user1.HandleNewInput(server, `/ignore @u2`); err != nil {
 		t.Fatalf("Error ignoring. Error %s", err)
 	}
 	if user1.HasIgnored(user2.GetNickName()) != true {

@@ -19,7 +19,7 @@ func Test_MessageCommand(t *testing.T) {
 	user2.SetChannel(channel.Name)
 
 	input := `/msg @u2 foo`
-	if _, err := user1.ExecuteCommand(server, input); err != nil {
+	if _, err := user1.HandleNewInput(server, input); err != nil {
 		t.Fatalf("Failed executing message. Error %s", err)
 	}
 	msg := user2.GetOutgoing()

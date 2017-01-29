@@ -38,9 +38,14 @@ func (c *JoinCommand) Execute(params Params) error {
 		return errs.New("You are already in channel #" + params.Channel.GetName())
 	}
 
+	channelName = params.Channel.GetName()
+
 	params.Channel.AddUser(params.User1.GetNickName())
 	params.User1.SetChannel(channelName)
 
+	// Welcome user to channel
 	params.User1.SetOutgoing("There are " + strconv.Itoa(params.Channel.GetUserCount()) + " other users this channel.")
+
+	//Tell others someone's joining
 	return params.Server.BroadcastInChannel(channelName, `@`+params.User1.GetNickName()+` just joined channel #`+params.Channel.GetName())
 }

@@ -3,11 +3,11 @@
 package chat
 
 import (
-	"errors"
 	"sync"
 	"time"
 
 	"github.com/spring1843/chat-server/drivers"
+	"github.com/spring1843/chat-server/plugins/errs"
 )
 
 // Server  keeps listening for connections, it contains users and channels
@@ -47,7 +47,7 @@ func (s *Server) RemoveUser(nickName string) error {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	if _, ok := s.Users[nickName]; !ok {
-		return errors.New("User " + nickName + " is not connected to this server")
+		return errs.Newf("User %q is not connected to this server", nickName)
 	}
 	delete(s.Users, nickName)
 	return nil
@@ -72,7 +72,7 @@ func (s *Server) GetUser(nickName string) (*User, error) {
 		user := s.Users[nickName]
 		return user, nil
 	}
-	return nil, errors.New(`User @` + nickName + ` not connected`)
+	return nil, errs.Newf(`User %q not connected to this server`, nickName)
 }
 
 // ConnectedUsersCount returns the number of connected users
@@ -100,7 +100,7 @@ func (s *Server) GetChannel(channelName string) (*Channel, error) {
 		return channel, nil
 	}
 
-	return nil, errors.New(`Channel #` + channelName + ` does not exist on this server`)
+	return nil, errs.Newf(`Channel %q does not exist on this server`, channelName)
 }
 
 // GetChannelCount returns the number of channels on this server
@@ -140,7 +140,7 @@ func (s *Server) Broadcast(message string) {
 }
 
 // BroadcastInChannel broadcasts a message to all the users in a channel
-func (s *Server) BroadcastInChannel(channelName, message string) error {
+func (s *Server) BroadcastInChannel(channelName string, message string) error {
 	channel, err := s.GetChannel(channelName)
 	if err != nil {
 		return err
