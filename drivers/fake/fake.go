@@ -18,7 +18,6 @@ type (
 		LockIncoming *sync.Mutex
 
 		EnableLog bool
-		Lock      *sync.Mutex
 	}
 	// FakeNetwork is needed to implement the connection interface
 	FakeNetwork struct{}
@@ -32,7 +31,6 @@ func NewFakeConnection() *FakeConnection {
 		EnableLog:    false,
 		LockOutGoing: new(sync.Mutex),
 		LockIncoming: new(sync.Mutex),
-		Lock:         new(sync.Mutex),
 	}
 }
 
