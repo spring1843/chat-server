@@ -13,64 +13,62 @@ func Test_ParsingChatCommands(t *testing.T) {
 	cmd4 := `foo bar baz`
 	cmd5 := `#channel`
 
-	chatCommand := new(command.Command)
-
-	if output, _ := chatCommand.ParseCommandFromInput(cmd1); output != `msg` {
+	if output, _ := command.ParseCommandFromInput(cmd1); output != `msg` {
 		t.Errorf("Could not parse command name properly, got %s", output)
 	}
 
-	if output, _ := chatCommand.ParseCommandFromInput(cmd2); output != `foo` {
+	if output, _ := command.ParseCommandFromInput(cmd2); output != `foo` {
 		t.Errorf("Could not parse command name properly, got %s", output)
 	}
 
-	if output, _ := chatCommand.ParseCommandFromInput(cmd4); output != `` {
+	if output, _ := command.ParseCommandFromInput(cmd4); output != `` {
 		t.Errorf("Did not parse empty when there's no command, got %s", output)
 	}
 
-	if output, _ := chatCommand.ParseChannelFromInput(cmd1); output != `channel` {
+	if output, _ := command.ParseChannelFromInput(cmd1); output != `channel` {
 		t.Errorf("Could not parse channel name properly, got %s", output)
 	}
 
-	if output, _ := chatCommand.ParseChannelFromInput(cmd2); output != `channel` {
+	if output, _ := command.ParseChannelFromInput(cmd2); output != `channel` {
 		t.Errorf("Could not parse channel name properly, got %s", output)
 	}
 
-	if output, _ := chatCommand.ParseChannelFromInput(cmd3); output != `channel` {
+	if output, _ := command.ParseChannelFromInput(cmd3); output != `channel` {
 		t.Errorf("Could not parse channel name properly, got %s", output)
 	}
 
-	if output, _ := chatCommand.ParseNickNameFomInput(cmd1); output != `nickname` {
+	if output, _ := command.ParseNickNameFomInput(cmd1); output != `nickname` {
 		t.Errorf("Could not parse channel name properly, got %s", output)
 	}
 
-	if output, _ := chatCommand.ParseNickNameFomInput(cmd2); output != `nickname` {
+	if output, _ := command.ParseNickNameFomInput(cmd2); output != `nickname` {
 		t.Errorf("Could not parse channel name properly, got %s", output)
 	}
 
-	if output, _ := chatCommand.ParseNickNameFomInput(cmd3); output != `nickname` {
+	if output, _ := command.ParseNickNameFomInput(cmd3); output != `nickname` {
 		t.Errorf("Could not parse channel name properly, got %s", output)
 	}
 
-	if output, _ := chatCommand.ParseMessageFromInput(cmd1); output != `foo bar baz` {
+	if output, _ := command.ParseMessageFromInput(cmd1); output != `foo bar baz` {
 		t.Errorf("Could not parse message name properly, got %s", output)
 	}
 
-	if output, _ := chatCommand.ParseMessageFromInput(cmd2); output != `foo bar baz` {
+	if output, _ := command.ParseMessageFromInput(cmd2); output != `foo bar baz` {
 		t.Errorf("Could not parse message name properly, got %s", output)
 	}
 
-	if output, _ := chatCommand.ParseMessageFromInput(cmd3); output != `foo bar baz` {
+	if output, _ := command.ParseMessageFromInput(cmd3); output != `foo bar baz` {
 		t.Errorf("Could not parse message name properly, got %s", output)
 	}
 
-	if output, _ := chatCommand.ParseNickNameFomInput(cmd4); output != `` {
+	if output, _ := command.ParseNickNameFomInput(cmd4); output != `` {
 		t.Errorf("Did not parse empty when there's no nickname, got %s", output)
 	}
 
-	if output, _ := chatCommand.ParseChannelFromInput(cmd4); output != `` {
+	if output, _ := command.ParseChannelFromInput(cmd4); output != `` {
 		t.Errorf("Did not parse empty when there's no channel, got %s", output)
 	}
-	if output, _ := chatCommand.ParseMessageFromInput(cmd5); output != `` {
+	if output, _ := command.ParseMessageFromInput(cmd5); output != `` {
 		t.Errorf("Did not parse empty when there's no message, got %s", output)
 	}
 

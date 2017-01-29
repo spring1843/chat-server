@@ -5,7 +5,6 @@ import (
 
 	"github.com/spring1843/chat-server/chat"
 	"github.com/spring1843/chat-server/drivers/fake"
-	"github.com/spring1843/chat-server/plugins/command"
 )
 
 func Test_QuitCommand(t *testing.T) {
@@ -21,8 +20,9 @@ func Test_QuitCommand(t *testing.T) {
 	}
 
 	input := `/quit`
-	quitCommand, _ := command.FromString(input)
-	user.ExecuteCommand(server, input, quitCommand)
+	if _, err := user.ExecuteCommand(server, input); err != nil {
+		t.Fatalf("Failed executing command. Error %s", err)
+	}
 
 	if server.IsUserConnected(`foo`) {
 		t.Errorf("User was not disconnected after running quit command")

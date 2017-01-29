@@ -1,6 +1,10 @@
 package command
 
-import "github.com/spring1843/chat-server/plugins/errs"
+import (
+	"strings"
+
+	"github.com/spring1843/chat-server/plugins/errs"
+)
 
 // Command is executed by a user on a server
 type Command struct {
@@ -38,13 +42,18 @@ func IsInputExecutable(input string) bool {
 }
 
 // ParseString gets a command if it can find it in a user input string
-func FromString(commandName string) (Executable, error) {
-	if !IsInputExecutable(commandName) {
-		return nil, errs.Wrapf(ErrNotACommand, "%s was not found in available comands.", commandName)
+func FromString(input string) (Executable, error) {
+	if !IsInputExecutable(input) {
+		return nil, errs.Wrapf(ErrNotACommand, "%s was not found in available comands.", input)
 	}
 
-	if command, ok := AllChatCommands[commandName]; ok {
+	commandPart := commandPart(input)
+	if command, ok := AllChatCommands[commandPart]; ok {
 		return command, nil
 	}
-	return nil, errs.Wrapf(ErrCommadNotFound, "%s was not found in available comands.", commandName)
+	return nil, errs.Wrapf(ErrCommadNotFound, "%s was not found in available comands.", commandPart)
+}
+
+func commandPart(input string) string {
+	return input[:strings.Index(input, " ")]
 }

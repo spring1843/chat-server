@@ -2,9 +2,9 @@ package command
 
 import (
 	"strings"
+
 	"github.com/spring1843/chat-server/plugins/errs"
 )
-
 
 // ParseNickNameFomInput parses a nickname starting with @ from string
 func ParseNickNameFomInput(input string) (string, error) {
@@ -21,7 +21,7 @@ func ParseNickNameFomInput(input string) (string, error) {
 }
 
 // ParseChannelFromInput parses a channel name starting with # from string
-func  ParseChannelFromInput(input string) (string, error) {
+func ParseChannelFromInput(input string) (string, error) {
 	subStrings := Filter(input, func(x string) bool {
 		return strings.Index(x, "#") >= 0
 	})

@@ -6,7 +6,6 @@ import (
 
 	"github.com/spring1843/chat-server/chat"
 	"github.com/spring1843/chat-server/drivers/fake"
-	"github.com/spring1843/chat-server/plugins/command"
 )
 
 func Test_ListCommand(t *testing.T) {
@@ -16,12 +15,6 @@ func Test_ListCommand(t *testing.T) {
 
 	server := chat.NewServer()
 	server.AddChannel(`foo`)
-
-	input := `/join #foo`
-	joinCommand, err := command.FromString(input)
-	if err != nil {
-		t.Errorf("Could not get an instance of list command")
-	}
 
 	user1 := chat.NewConnectedUser(server, fakeConnection1)
 	user1.SetNickName(`u1`)
@@ -36,16 +29,13 @@ func Test_ListCommand(t *testing.T) {
 	server.AddUser(user2)
 	server.AddUser(user3)
 
-	user1.ExecuteCommand(server, input, joinCommand)
-	user2.ExecuteCommand(server, input, joinCommand)
-	user3.ExecuteCommand(server, input, joinCommand)
+	input := `/join #foo`
+	user1.ExecuteCommand(server, input)
+	user2.ExecuteCommand(server, input)
+	user3.ExecuteCommand(server, input)
 
 	input = "/list \n"
-	listCommand, err := command.FromString(input)
-	if err != nil {
-		t.Errorf("Could not get an instance of list command")
-	}
-	user1.ExecuteCommand(server, input, listCommand)
+	user1.ExecuteCommand(server, input)
 	msg := user1.GetOutgoing()
 
 	if strings.Contains(msg, "@u1") != true && strings.Contains(msg, "@u2") != true && strings.Contains(msg, "@u3") != true {

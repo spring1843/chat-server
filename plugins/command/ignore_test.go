@@ -5,7 +5,6 @@ import (
 
 	"github.com/spring1843/chat-server/chat"
 	"github.com/spring1843/chat-server/drivers/fake"
-	"github.com/spring1843/chat-server/plugins/command"
 )
 
 func Test_IgnoreCommand(t *testing.T) {
@@ -21,9 +20,7 @@ func Test_IgnoreCommand(t *testing.T) {
 	server.AddUser(user1)
 	server.AddUser(user2)
 
-	input := `/ignore @u2`
-	ignoreCommand, _ := command.FromString(input)
-	user1.ExecuteCommand(server, input, ignoreCommand)
+	user1.ExecuteCommand(server, `/ignore @u2`)
 	if user1.HasIgnored(user2.GetNickName()) != true {
 		t.Errorf("User was not ignored after ignore command executed")
 	}

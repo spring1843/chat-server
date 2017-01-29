@@ -94,7 +94,7 @@ func (u *User) Disconnect(chatServer *Server) error {
 // handleNewInput looks at user input and reacts to it
 func (u *User) handleNewInput(chatServer *Server, input string) (bool, error) {
 	if command.IsInputExecutable(input) {
-		return u.handleCommandInput(chatServer, input)
+		return u.ExecuteCommand(chatServer, input)
 	}
 
 	// If it's not a command it's a chat message to broadcast into the channel
@@ -115,39 +115,44 @@ func (u *User) handleBroadcastInput(chatServer *Server, input string) (bool, err
 	return true, nil
 }
 
-func (u *User) handleCommandInput(chatServer *Server, input string) (bool, error) {
+func (u *User) ExecuteCommand(chatServer *Server, input string) (bool, error) {
 	userCommand, err := command.FromString(input)
 	if err != nil {
 		u.SetOutgoing("Invalid command, use /help for more info. Error:" + err.Error())
 		logs.Errf(err, "Failed executing %s command by @s", input, u.nickName)
 		return false, errs.Wrap(err, "Error getting command from user input.")
 	}
-	if err = u.ExecuteCommand(chatServer, input, userCommand); err != nil {
-		u.SetOutgoing(`Could not execute command. Error:` + err.Error())
-		return false, errs.Wrap(err, "error handling input")
+
+	commandParams, err := u.GetCommandParams(chatServer, input, userCommand)
+	if err != nil {
+		return false, errs.Wrap(err, "Couldn't get command params")
 	}
+
+	if err = userCommand.Execute(*commandParams); err != nil {
+		logs.Errf(err, "error \t @%s command=%s error=%s", u.nickName, input)
+		return false, errs.Wrapf(err, "Couldn't execute command %s", input)
+	}
+
+	logs.Infof("command \t @%s command=%s", u.nickName, input)
 	return true, nil
 }
 
-// ExecuteCommand Executes a given command
-// First it finds all the required parameters from the input and populates them
-func (u *User) ExecuteCommand(chatServer *Server, input string, executable command.Executable) error {
-	commandParams := command.Params{
+func (u *User) GetCommandParams(chatServer *Server, input string, executable command.Executable) (*command.Params, error) {
+	commandParams := &command.Params{
 		User1:    u,
 		RawInput: input,
 		Server:   chatServer,
 	}
 
-
 	if executable.RequiresParam(`user2`) {
 		nickname, err := command.ParseNickNameFomInput(input)
 		if err != nil {
-			return errs.Wrap(err, "Could not find the required @nickname in the input")
+			return nil, errs.Wrap(err, "Could not find the required @nickname in the input")
 		}
 
 		user2, err := chatServer.GetUser(nickname)
 		if err != nil {
-			return errs.Wrap(err, "User "+nickname+" + is not connected to this server")
+			return nil, errs.Wrap(err, "User "+nickname+" + is not connected to this server")
 		}
 		commandParams.User2 = user2
 	}
@@ -155,7 +160,7 @@ func (u *User) ExecuteCommand(chatServer *Server, input string, executable comma
 	if executable.RequiresParam(`channel`) {
 		channelName, err := command.ParseChannelFromInput(input)
 		if err != nil {
-			return errs.Wrap(err, "Could not find the required #channel in the input")
+			return nil, errs.Wrap(err, "Could not find the required #channel in the input")
 		}
 		channel, err := chatServer.GetChannel(channelName)
 		if err == nil {
@@ -166,18 +171,9 @@ func (u *User) ExecuteCommand(chatServer *Server, input string, executable comma
 	if executable.RequiresParam(`message`) {
 		message, err := command.ParseMessageFromInput(input)
 		if err != nil {
-			return errs.Wrap(err, "Could not required message in the input")
+			return nil, errs.Wrap(err, "Could not required message in the input")
 		}
 		commandParams.Message = message
 	}
-
-	err := executable.Execute(commandParams)
-	if err != nil {
-		logs.Errf(err, "error \t @%s command=%s error=%s", u.nickName, input)
-		return err
-	}
-
-	logs.Infof("command \t @%s command=%s", u.nickName, input)
-
-	return nil
+	return commandParams, nil
 }

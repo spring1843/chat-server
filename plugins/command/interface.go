@@ -5,6 +5,7 @@ type (
 	Executable interface {
 		Execute(params Params) error
 		RequiresParam(param string) bool
+		GetChatCommand() Command
 	}
 	// Server hosts chats
 	Server interface {
