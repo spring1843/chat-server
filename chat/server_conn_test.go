@@ -16,12 +16,11 @@ func TestInterviewUser(t *testing.T) {
 	server.Listen()
 
 	connection.Lock.Lock()
-	connection.Incoming = []byte("foo\n")
+	connection.Incoming = []byte("newuser\n")
 	connection.Lock.Unlock()
 
 	server.InterviewUser(connection)
-
-	if len(server.Users) != 1 {
+	if server.ConnectedUsersCount() != 1 {
 		t.Errorf("User was not added to the server")
 	}
 }
