@@ -62,7 +62,7 @@ func (c *Channel) GetUserCount() int {
 func (c *Channel) GetUsers() map[string]bool {
 	c.lockUsers.Lock()
 	defer c.lockUsers.Unlock()
-	return c.Users
+	return cloneNickNames(c.Users)
 }
 
 // Broadcast sends a message to every user in a channel
@@ -70,9 +70,7 @@ func (c *Channel) Broadcast(chatServer *Server, message string) {
 	now := time.Now()
 	message = now.Format(time.Kitchen) + `-` + message
 
-	c.lockUsers.Lock()
-	users := c.Users
-	c.lockUsers.Unlock()
+	users := c.GetUsers()
 
 	for nickName := range users {
 		user, err := chatServer.GetUser(nickName)
@@ -83,4 +81,15 @@ func (c *Channel) Broadcast(chatServer *Server, message string) {
 		}
 		user.outgoing <- message
 	}
+}
+
+// getNickNames turns a map of nicknames to slice of strings
+// This copy is so that we can unlock faster and avoid race
+// Since we are looping again through nickNames next and making another blocking call
+func cloneNickNames(users map[string]bool) map[string]bool {
+	nickNames := make(map[string]bool)
+	for nickName := range users {
+		nickNames[nickName] = true
+	}
+	return nickNames
 }

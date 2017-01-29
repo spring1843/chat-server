@@ -12,7 +12,7 @@ import (
 	"github.com/spring1843/chat-server/plugins/logs"
 )
 
-const ReadConnectionLimitBytes = 256
+const ReadConnectionLimitBytes = 100000 // 100KB
 
 // NewConnectedUser returns a new User with a connection
 func NewConnectedUser(chatServer *Server, connection drivers.Connection) *User {

@@ -9,8 +9,6 @@ import (
 	"github.com/spring1843/chat-server/plugins/logs"
 )
 
-const maxDataLength = 255
-
 type (
 	// FakeConnection is a chat server compatible connection used for testing
 	FakeConnection struct {
@@ -71,7 +69,7 @@ func (conn *FakeConnection) Read(p []byte) (int, error) {
 
 	for i, bit := range data {
 		if i >= len(p) {
-			return 0, errs.Newf("Input too small. Length of data is %d", len(data))
+			return 0, errs.Newf("Input too small. Lengh of Input: %d, Length of data is: %d", len(p), len(data))
 		}
 		p[i] = bit
 	}
