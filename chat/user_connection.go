@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/spring1843/chat-server/plugins/command"
+	"fmt"
 )
 
 // NewConnectedUser returns a new User with a connection
@@ -20,6 +21,26 @@ func NewConnectedUser(chatServer *Server, connection Connection) *User {
 func (u *User) Listen(chatServer *Server) {
 	go u.ReadFrom(chatServer)
 	go u.WriteTo()
+}
+
+// GetOutgoing gets the outgoing message for a user
+func (u *User) GetOutgoing() string {
+	return <-u.outgoing
+}
+
+// SetOutgoing sets an outgoing message to the user
+func (u *User) SetOutgoing(message string) {
+	u.outgoing <- message
+}
+
+// GetIncoming gets the incoming message from the user
+func (u *User) GetIncoming() string {
+	return <-u.incoming
+}
+
+// SetIncoming sets an incoming message from the user
+func (u *User) SetIncoming(message string) {
+	u.incoming <- message
 }
 
 // ReadFrom reads data from users and lets chat server interpret it

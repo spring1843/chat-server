@@ -29,26 +29,6 @@ func NewUser(nickName string) *User {
 	}
 }
 
-// GetOutgoing gets the outgoing message for a user
-func (u *User) GetOutgoing() string {
-	return <-u.outgoing
-}
-
-// SetOutgoing sets an outgoing message to the user
-func (u *User) SetOutgoing(message string) {
-	u.outgoing <- message
-}
-
-// GetIncoming gets the incoming message from the user
-func (u *User) GetIncoming() string {
-	return <-u.incoming
-}
-
-// SetIncoming sets an incoming message from the user
-func (u *User) SetIncoming(message string) {
-	u.incoming <- message
-}
-
 // GetChannel gets the current channel name for the user
 func (u *User) GetChannel() string {
 	u.lock.Lock()
