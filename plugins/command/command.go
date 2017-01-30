@@ -6,13 +6,21 @@ import (
 	"github.com/spring1843/chat-server/plugins/errs"
 )
 
-// Command is executed by a user on a server
-type Command struct {
-	Name           string
-	Syntax         string
-	Description    string
-	RequiredParams []string
-}
+type (
+	// Command is executed by a user on a server
+	Command struct {
+		Name           string
+		Syntax         string
+		Description    string
+		RequiredParams []string
+	}
+	// Executable Is a what a command is
+	Executable interface {
+		Execute(params Params) error
+		RequiresParam(param string) bool
+		GetChatCommand() Command
+	}
+)
 
 // AllChatCommands all valid chat commands supported by this server
 var (

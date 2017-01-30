@@ -1,12 +1,7 @@
-package command
+package plugins
 
+// These are interfaces available from chat server for plugins to use
 type (
-	// Executable Is a what a command is
-	Executable interface {
-		Execute(params Params) error
-		RequiresParam(param string) bool
-		GetChatCommand() Command
-	}
 	// Server hosts chats
 	Server interface {
 		RemoveUser(nickName string) error

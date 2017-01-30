@@ -1,13 +1,15 @@
 package command
 
+import "github.com/spring1843/chat-server/plugins"
+
 // Params is all the params that are supported by chat commands, a chat command may use some or all of these params
 type Params struct {
-	User1    Chatter
-	User2    Chatter
-	Channel  Chan
+	User1    plugins.Chatter
+	User2    plugins.Chatter
+	Channel  plugins.Chan
 	Message  string
 	RawInput string
-	Server   Server
+	Server   plugins.Server
 }
 
 // RequiresParam checks to see if a command requires the given parameter
