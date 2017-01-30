@@ -34,30 +34,30 @@ func (c *Command) GetChatCommand() Command {
 }
 
 // IsInputExecutable checks if a user input is intended to be a command or not
-func IsInputExecutable(input string) bool {
-	if len(input) > 2 && input[0:1] == "/" {
+func IsInputExecutable(userInput string) bool {
+	if len(userInput) > 2 && userInput[0:1] == "/" {
 		return true
 	}
 	return false
 }
 
-// ParseString gets a command if it can find it in a user input string
-func FromString(input string) (Executable, error) {
-	if !IsInputExecutable(input) {
-		return nil, errs.Wrapf(ErrNotACommand, "%s was not found in available comands.", input)
+// FromString finds command from user input
+func FromString(userInput string) (Executable, error) {
+	if !IsInputExecutable(userInput) {
+		return nil, errs.Wrapf(ErrNotACommand, "%s was not found in available comands.", userInput)
 	}
 
-	commandPart := commandPart(input)
+	commandPart := commandPart(userInput)
 	if command, ok := AllChatCommands[commandPart]; ok {
 		return command, nil
 	}
 	return nil, errs.Wrapf(ErrCommadNotFound, "%s was not found in available comands.", commandPart)
 }
 
-func commandPart(input string) string {
-	spaceIndex := strings.Index(input, " ")
+func commandPart(userInput string) string {
+	spaceIndex := strings.Index(userInput, " ")
 	if spaceIndex > 0 {
-		return input[:strings.Index(input, " ")]
+		return userInput[:strings.Index(userInput, " ")]
 	}
-	return input
+	return userInput
 }

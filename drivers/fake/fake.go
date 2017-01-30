@@ -10,19 +10,19 @@ import (
 )
 
 type (
-	// FakeConnection is a chat server compatible connection used for testing
-	FakeConnection struct {
+	// MockedConnection is a chat server compatible connection used for testing
+	MockedConnection struct {
 		data      []byte
 		lock      *sync.Mutex
 		EnableLog bool
 	}
-	// FakeNetwork is needed to implement the connection interface
-	FakeNetwork struct{}
+	// MockedNetwork is needed to implement the connection interface
+	MockedNetwork struct{}
 )
 
 // NewFakeConnection returns a new fake connection
-func NewFakeConnection() *FakeConnection {
-	return &FakeConnection{
+func NewFakeConnection() *MockedConnection {
+	return &MockedConnection{
 		data:      make([]byte, 0),
 		EnableLog: false,
 		lock:      new(sync.Mutex),
@@ -31,14 +31,14 @@ func NewFakeConnection() *FakeConnection {
 
 const logPrefix = "Fake Connection"
 
-func (m *FakeConnection) log(message string) {
-	if m.EnableLog {
+func (conn *MockedConnection) log(message string) {
+	if conn.EnableLog {
 		logs.Infof("%s - %s", logPrefix, message)
 	}
 }
 
 // Write writes to connection
-func (conn *FakeConnection) Write(p []byte) (int, error) {
+func (conn *MockedConnection) Write(p []byte) (int, error) {
 	conn.log("Lock\n")
 	conn.lock.Lock()
 	conn.log("Start - Writing data to connection\n")
@@ -54,7 +54,7 @@ func (conn *FakeConnection) Write(p []byte) (int, error) {
 }
 
 // Read reads from the connection
-func (conn *FakeConnection) Read(p []byte) (int, error) {
+func (conn *MockedConnection) Read(p []byte) (int, error) {
 	conn.log("Lock\n")
 	conn.lock.Lock()
 	data := conn.data
@@ -79,7 +79,7 @@ func (conn *FakeConnection) Read(p []byte) (int, error) {
 }
 
 // ReadString convenient method for reading
-func (conn *FakeConnection) ReadString(length int) (string, error) {
+func (conn *MockedConnection) ReadString(length int) (string, error) {
 	data := make([]byte, length, length)
 	n, err := conn.Read(data)
 	if err != nil {
@@ -92,28 +92,28 @@ func (conn *FakeConnection) ReadString(length int) (string, error) {
 }
 
 // WriteString convenient method for writing
-func (conn *FakeConnection) WriteString(message string) (int, error) {
+func (conn *MockedConnection) WriteString(message string) (int, error) {
 	return conn.Write([]byte(message))
 }
 
 // Close closes the connection
-func (conn *FakeConnection) Close() error {
+func (conn *MockedConnection) Close() error {
 	conn.log("Closing connection\n")
 	return nil
 }
 
 // RemoteAddr will return IP of client
-func (conn *FakeConnection) RemoteAddr() net.Addr {
+func (conn *MockedConnection) RemoteAddr() net.Addr {
 	conn.log("Reading remote address\n")
-	return new(FakeNetwork)
+	return new(MockedNetwork)
 }
 
 // Network returns connection's origin network as string
-func (f *FakeNetwork) Network() string {
+func (f *MockedNetwork) Network() string {
 	return ``
 }
 
 // String returns network name as string
-func (f *FakeNetwork) String() string {
+func (f *MockedNetwork) String() string {
 	return ``
 }

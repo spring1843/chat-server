@@ -12,7 +12,9 @@ import (
 	"github.com/spring1843/chat-server/plugins/logs"
 )
 
-const ReadConnectionLimitBytes = 100000 // 100KB
+// ReadConnectionLimitBytes is the maximum size of input we accept from user
+// This is important to defend against DOS attacks
+var ReadConnectionLimitBytes = 100000 // 100KB
 
 // NewConnectedUser returns a new User with a connection
 func NewConnectedUser(chatServer *Server, connection drivers.Connection) *User {
@@ -99,7 +101,7 @@ func (u *User) Disconnect() error {
 	return u.conn.Close()
 }
 
-// handleNewInput looks at user input and reacts to it
+// HandleNewInput interprets user input and lets chatServer handle it
 func (u *User) HandleNewInput(chatServer *Server, userInput string) (bool, error) {
 	if u.GetNickName() == "" {
 		// This is from a user who is not identified yet, we do not do anything
@@ -152,15 +154,16 @@ func (u *User) handleCommandInput(chatServer *Server, input string) (bool, error
 	return true, nil
 }
 
-func (u *User) GetCommandParams(chatServer *Server, input string, executable command.Executable) (*command.Params, error) {
+// GetCommandParams looks at command parameters in userInput and populates the parameters for command execution
+func (u *User) GetCommandParams(chatServer *Server, userInput string, executable command.Executable) (*command.Params, error) {
 	commandParams := &command.Params{
 		User1:    u,
-		RawInput: input,
+		RawInput: userInput,
 		Server:   chatServer,
 	}
 
 	if executable.RequiresParam(`user2`) {
-		nickname, err := command.ParseNickNameFomInput(input)
+		nickname, err := command.ParseNickNameFomInput(userInput)
 		if err != nil {
 			return nil, errs.Wrap(err, "Could not find the required @nickname in the input")
 		}
@@ -173,9 +176,9 @@ func (u *User) GetCommandParams(chatServer *Server, input string, executable com
 	}
 
 	if executable.RequiresParam(`channel`) {
-		channelName, err := command.ParseChannelFromInput(input)
+		channelName, err := command.ParseChannelFromInput(userInput)
 		if err != nil {
-			return nil, errs.Wrapf(err, "Could not find the required #channel in the input. Input %s", input)
+			return nil, errs.Wrapf(err, "Could not find the required #channel in the input. Input %s", userInput)
 		}
 		channel, err := chatServer.GetChannel(channelName)
 		if err != nil {
@@ -185,7 +188,7 @@ func (u *User) GetCommandParams(chatServer *Server, input string, executable com
 	}
 
 	if executable.RequiresParam(`message`) {
-		message, err := command.ParseMessageFromInput(input)
+		message, err := command.ParseMessageFromInput(userInput)
 		if err != nil {
 			return nil, errs.Wrap(err, "Could not required message in the input")
 		}

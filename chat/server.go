@@ -154,7 +154,7 @@ func (s *Server) BroadcastInChannel(channelName string, message string) error {
 	return nil
 }
 
-// BroadcastInChannel broadcasts a message to all the users in a channel
+// GetChannelUsers returns list of nicknames of the users connected to this server
 func (s *Server) GetChannelUsers(channelName string) (map[string]bool, error) {
 	channel, err := s.GetChannel(channelName)
 	if err != nil {
