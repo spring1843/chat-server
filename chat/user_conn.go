@@ -198,19 +198,22 @@ func (u *User) GetCommandParams(chatServer *Server, userInput string, executable
 	return commandParams, nil
 }
 
-// ExpectOutgoing because a user may receive many messages this finds a message in a set of messages that the user receives
-// It's useful for testing. For example you may expect "/help" to return help message but there's a welcome message before it.
+// ExpectOutgoing can be used in testing that a certain message is sent out to user from the server or not
+// since users can receive many messages during a test it is hard to test for one message
+// for example a test may want to see if a user receives the help message after typing /help
+// but since the user has just joined the server in the test, the user is instead receiving a welcome message
+// the approach of this function is to compare expected value with multiple reads from user's outgoing channel
 func ExpectOutgoing(t *testing.T, user *User, attempts int, expected string) {
-	t.Skipf("Taking too long, probably racy")
-
+	t.Skipf("racy")
 	attempt := 0
-	received := ""
+	msg := ""
 	for attempt < attempts {
-		msg := user.GetOutgoing()
+		msg = user.GetOutgoing()
 		if msg == expected {
 			return
 		}
+		t.Errorf("Received message %q which is not equal to %q", msg, expected)
 		attempt++
 	}
-	t.Fatalf("Did not get outcome after %d/%d attempts. Expected %s not found in %s", attempt, attempts, expected, received)
+	t.Fatalf("Did not get outcome after %d/%d attempts. Expected %s not found in %s", attempt, attempts, expected, msg)
 }
