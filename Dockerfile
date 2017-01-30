@@ -14,4 +14,4 @@ WORKDIR  $GOPATH/src/github.com/spring1843/chat-server
 ADD . $GOPATH/src/github.com/spring1843/chat-server
 
 EXPOSE 4000 4001 4004
-CMD ["/gopath/src/github.com/spring1843/chat-server/eb_run.sh"]
+CMD ["/gopath/src/github.com/spring1843/chat-server/src/srceb_run.sh"]

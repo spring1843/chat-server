@@ -19,7 +19,7 @@ Administrators can use the HTTP RESTful endpoints to broadcast a public announce
 
 ## How to Run Locally
 - Download and install dependencies by running ```go get github.com/emicklei/go-restful``` and ```go get github.com/gorilla/websocket```
-- Download and install by running  ```go get github.com/spring1843/chat-server/``` and then CD into the directory
+- Download and install by running  ```go get github.com/spring1843/chat-server/src/``` and then CD into the directory
 - Run all tests ```make test```
 - Modify or review default settings by editing ```config.json```
 - To start serving run ```make serve``` or ```go run main.go -c config.json``` or ```chat-server -c config.json```
