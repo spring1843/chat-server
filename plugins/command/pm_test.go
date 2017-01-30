@@ -1,7 +1,6 @@
 package command_test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/spring1843/chat-server/chat"
@@ -22,9 +21,5 @@ func TestMessageCommand(t *testing.T) {
 	if _, err := user1.HandleNewInput(server, input); err != nil {
 		t.Fatalf("Failed executing message. Error %s", err)
 	}
-	msg := user2.GetOutgoing()
-
-	if strings.Contains(msg, "- *Private from @u1: foo") != true {
-		t.Errorf("Private message was not received. Last message %s", msg)
-	}
+	chat.ExpectOutgoing(t, user2, 5, "- *Private from @u1: foo")
 }

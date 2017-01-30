@@ -8,20 +8,15 @@ import (
 )
 
 func TestCanWriteToUser(t *testing.T) {
-	t.Skipf("Racy!")
 	fakeWriter := fake.NewFakeConnection()
 	user1 := chat.NewConnectedUser(server, fakeWriter)
 
 	go user1.SetOutgoing(`foo`)
-	msg := user1.GetOutgoing()
-
-	if msg != "foo" {
-		t.Errorf("Message was not written to the user. Msg %s", msg)
-	}
+	chat.ExpectOutgoing(t, user1, 5, "foo")
 }
 
 func TestCanReadFromUser(t *testing.T) {
-	t.Skipf("Racy!")
+	t.Skipf("Racy")
 	fakeReader := fake.NewFakeConnection()
 	input := "foo\n"
 	n, err := fakeReader.WriteString(input)

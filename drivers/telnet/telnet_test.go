@@ -14,10 +14,9 @@ import (
 )
 
 func TestCanStartTelnetAndConnectToIt(t *testing.T) {
-	t.Skipf("Racy")
 	config := config.Config{
 		IP:         `0.0.0.0`,
-		TelnetPort: 4000,
+		TelnetPort: 4002,
 	}
 
 	chatServer := chat.NewServer()
@@ -25,18 +24,18 @@ func TestCanStartTelnetAndConnectToIt(t *testing.T) {
 
 	err := telnet.Start(chatServer, config)
 	if err != nil {
-		t.Errorf("Could not start telnet server")
+		t.Errorf("Could not start telnet server. Error %s", err)
 	}
 
 	conn, err := net.Dial("tcp", "127.0.0.1:"+strconv.Itoa(config.TelnetPort))
 	defer conn.Close()
 	if err != nil {
-		t.Errorf("Could not connect to the telnet server")
+		t.Errorf("Could not connect to the telnet server. Error %s", err)
 	}
 
 	welcomeMessage, err := bufio.NewReader(conn).ReadString('\n')
 	if err != nil {
-		t.Errorf("Could not read from the telnet server")
+		t.Errorf("Could not read from the telnet server. Error %s", err)
 	}
 
 	if !strings.Contains(welcomeMessage, `Welcome`) {

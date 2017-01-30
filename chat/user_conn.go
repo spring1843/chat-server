@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"strings"
+	"testing"
 	"time"
 
 	"github.com/spring1843/chat-server/drivers"
@@ -195,4 +196,21 @@ func (u *User) GetCommandParams(chatServer *Server, userInput string, executable
 		commandParams.Message = message
 	}
 	return commandParams, nil
+}
+
+// ExpectOutgoing because a user may receive many messages this finds a message in a set of messages that the user receives
+// It's useful for testing. For example you may expect "/help" to return help message but there's a welcome message before it.
+func ExpectOutgoing(t *testing.T, user *User, attempts int, expected string) {
+	t.Skipf("Taking too long, probably racy")
+
+	attempt := 0
+	received := ""
+	for attempt < attempts {
+		msg := user.GetOutgoing()
+		if msg == expected {
+			return
+		}
+		attempt++
+	}
+	t.Fatalf("Did not get outcome after %d/%d attempts. Expected %s not found in %s", attempt, attempts, expected, received)
 }

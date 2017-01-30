@@ -1,7 +1,6 @@
 package chat_test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/spring1843/chat-server/chat"
@@ -18,7 +17,6 @@ func TestCanAddUsers(t *testing.T) {
 }
 
 func TestCanBroadCast(t *testing.T) {
-	t.Skipf("Racy!")
 	channel.AddUser(user1.GetNickName())
 	channel.AddUser(user2.GetNickName())
 
@@ -26,12 +24,9 @@ func TestCanBroadCast(t *testing.T) {
 	chatServer.AddUser(user1)
 	chatServer.AddUser(user2)
 
-	go channel.Broadcast(chatServer, `foo`)
+	msg := "foo"
+	go channel.Broadcast(chatServer, msg)
 
-	msg1 := user1.GetOutgoing()
-	msg2 := user2.GetOutgoing()
-
-	if strings.Contains(msg1, `foo`) != true || msg1 != msg2 {
-		t.Errorf("Message wasn't broadcasted to the users in the channel")
-	}
+	chat.ExpectOutgoing(t, user1, 5, msg)
+	chat.ExpectOutgoing(t, user2, 5, msg)
 }
