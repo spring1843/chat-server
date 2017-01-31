@@ -1,0 +1,6 @@
+{
+  "telnet_port" : 4000,
+  "rest_port" : 4001,
+  "websocket_port" : 4004,
+  "ip" : "0.0.0.0"
+}
