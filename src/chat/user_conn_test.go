@@ -32,7 +32,7 @@ func TestCanReadFromUser(t *testing.T) {
 		t.Fatalf("Wrong length after write. Expected %d, got %d.", len(input), n)
 	}
 
-	user1 := chat.NewConnectedUser(server, fakeReader)
+	user1 := chat.NewConnectedUser(fakeReader)
 	msg := user1.GetIncoming()
 
 	if msg != "foo" {

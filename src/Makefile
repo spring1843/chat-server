@@ -30,8 +30,13 @@ install:
 test: install
 	@go test $(GOFLAGS) ./...
 
-commit : beautify audit
+mergecheck : beautify audit
+
+commit: mergecheck
 	@git add -p .
+
+virtuous:
+	@for i in {1..100}; do make beautify audit; sleep 1;done
 
 bench: install
 	@go test -run=NONE -bench=. $(GOFLAGS) ./...

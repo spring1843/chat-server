@@ -16,14 +16,17 @@ func TestListCommand(t *testing.T) {
 	server := chat.NewServer()
 	server.AddChannel(`foo`)
 
-	user1 := chat.NewConnectedUser(server, fakeConnection1)
+	user1 := chat.NewConnectedUser(fakeConnection1)
 	user1.SetNickName(`u1`)
+	user1.Listen(server)
 
-	user2 := chat.NewConnectedUser(server, fakeConnection2)
+	user2 := chat.NewConnectedUser(fakeConnection2)
 	user2.SetNickName(`u2`)
+	user2.Listen(server)
 
-	user3 := chat.NewConnectedUser(server, fakeConnection3)
+	user3 := chat.NewConnectedUser(fakeConnection3)
 	user3.SetNickName(`u3`)
+	user3.Listen(server)
 
 	server.AddUser(user1)
 	server.AddUser(user2)

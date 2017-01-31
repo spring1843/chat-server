@@ -20,7 +20,9 @@ func TestHelpCommand(t *testing.T) {
 	}
 
 	server := chat.NewServer()
-	user := chat.NewConnectedUser(server, fakeConnection)
+	user := chat.NewConnectedUser(fakeConnection)
+	user.Listen(server)
+
 	user.SetNickName("foo")
 	server.AddUser(user)
 

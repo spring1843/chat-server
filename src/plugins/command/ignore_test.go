@@ -13,8 +13,12 @@ func TestIgnoreCommand(t *testing.T) {
 
 	server := chat.NewServer()
 
-	user1 := chat.NewConnectedUser(server, fakeConnection1)
-	user2 := chat.NewConnectedUser(server, fakeConnection2)
+	user1 := chat.NewConnectedUser(fakeConnection1)
+	user2 := chat.NewConnectedUser(fakeConnection2)
+
+	user1.Listen(server)
+	user2.Listen(server)
+
 	user1.SetNickName(`u1`)
 	user2.SetNickName(`u2`)
 

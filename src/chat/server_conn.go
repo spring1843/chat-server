@@ -26,7 +26,9 @@ func (s *Server) ReceiveConnection(conn drivers.Connection) {
 
 // InterviewUser interviews user and allows him to connect after identification
 func (s *Server) InterviewUser(conn drivers.Connection) {
-	user := NewConnectedUser(s, conn)
+	user := NewConnectedUser(conn)
+	user.Listen(s)
+
 	user.SetOutgoing("Welcome to chat server. There are " + strconv.Itoa(s.ConnectedUsersCount()) + " other users on this server. please enter a nickname")
 
 	// wait for user to enter username

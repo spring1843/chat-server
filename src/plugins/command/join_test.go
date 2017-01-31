@@ -11,7 +11,9 @@ func TestJoinCommand(t *testing.T) {
 	fakeConnection := fake.NewFakeConnection()
 
 	server := chat.NewServer()
-	user1 := chat.NewConnectedUser(server, fakeConnection)
+	user1 := chat.NewConnectedUser(fakeConnection)
+	user1.Listen(server)
+
 	user1.SetNickName("u1")
 	server.AddUser(user1)
 

@@ -18,10 +18,9 @@ import (
 var ReadConnectionLimitBytes = 100000 // 100KB
 
 // NewConnectedUser returns a new User with a connection
-func NewConnectedUser(chatServer *Server, connection drivers.Connection) *User {
+func NewConnectedUser(connection drivers.Connection) *User {
 	user := NewUser("")
 	user.conn = connection
-	user.Listen(chatServer)
 	return user
 }
 
