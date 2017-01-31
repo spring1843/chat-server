@@ -8,11 +8,16 @@ import (
 )
 
 func TestCanWriteToUser(t *testing.T) {
-	fakeWriter := fake.NewFakeConnection()
-	user1 := chat.NewConnectedUser(server, fakeWriter)
+	user1 := chat.NewUser("bar")
 
-	go user1.SetOutgoing(`foo`)
-	chat.ExpectOutgoing(t, user1, 5, "foo")
+	msg := "foo"
+	go user1.SetOutgoing(msg)
+
+	outgoing := user1.GetOutgoing()
+	if outgoing != msg {
+		t.Errorf("Received message %q which is not equal to %q", outgoing, msg)
+
+	}
 }
 
 func TestCanReadFromUser(t *testing.T) {
