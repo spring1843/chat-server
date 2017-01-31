@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/spring1843/chat-server/src/plugins/errs"
+	"github.com/spring1843/chat-server/src/shared/errs"
 )
 
 // ListCommand list available users in a channel

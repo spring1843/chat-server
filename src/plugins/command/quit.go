@@ -1,6 +1,6 @@
 package command
 
-import "github.com/spring1843/chat-server/src/plugins/errs"
+import "github.com/spring1843/chat-server/src/shared/errs"
 
 // QuitCommand allows a user to disconnect from the server
 type QuitCommand struct {

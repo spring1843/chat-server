@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/spring1843/chat-server/src/drivers"
-	"github.com/spring1843/chat-server/src/plugins/logs"
+	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
 // Listen Makes this server start listening to connections, when a user is connected he or she is welcomed

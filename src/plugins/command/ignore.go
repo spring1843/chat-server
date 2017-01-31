@@ -1,6 +1,6 @@
 package command
 
-import "github.com/spring1843/chat-server/src/plugins/errs"
+import "github.com/spring1843/chat-server/src/shared/errs"
 
 // IgnoreCommand allows a user to ignore another user
 type IgnoreCommand struct {

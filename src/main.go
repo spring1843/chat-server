@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"github.com/spring1843/chat-server/src/config"
-	"github.com/spring1843/chat-server/src/plugins/logs"
+	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
 func main() {

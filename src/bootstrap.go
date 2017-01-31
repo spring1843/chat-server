@@ -8,7 +8,7 @@ import (
 	"github.com/spring1843/chat-server/src/drivers/rest"
 	"github.com/spring1843/chat-server/src/drivers/telnet"
 	"github.com/spring1843/chat-server/src/drivers/websocket"
-	"github.com/spring1843/chat-server/src/plugins/logs"
+	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
 func bootstrap(config config.Config) {

@@ -1,6 +1,6 @@
 package command
 
-import "github.com/spring1843/chat-server/src/plugins/errs"
+import "github.com/spring1843/chat-server/src/shared/errs"
 
 // HelpCommand Shows list of available commands
 type HelpCommand struct {

@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/go-restful"
-	"github.com/spring1843/chat-server/src/plugins/logs"
+	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
 // Register the message REST endpoints

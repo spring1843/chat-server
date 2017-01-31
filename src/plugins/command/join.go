@@ -3,7 +3,7 @@ package command
 import (
 	"strconv"
 
-	"github.com/spring1843/chat-server/src/plugins/errs"
+	"github.com/spring1843/chat-server/src/shared/errs"
 )
 
 // JoinCommand allows user to join a channel

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/spring1843/chat-server/src/drivers"
-	"github.com/spring1843/chat-server/src/plugins/errs"
+	"github.com/spring1843/chat-server/src/shared/errs"
 )
 
 // Server  keeps listening for connections, it contains users and channels

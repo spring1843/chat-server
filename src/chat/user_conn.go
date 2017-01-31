@@ -9,8 +9,8 @@ import (
 
 	"github.com/spring1843/chat-server/src/drivers"
 	"github.com/spring1843/chat-server/src/plugins/command"
-	"github.com/spring1843/chat-server/src/plugins/errs"
-	"github.com/spring1843/chat-server/src/plugins/logs"
+	"github.com/spring1843/chat-server/src/shared/errs"
+	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
 // ReadConnectionLimitBytes is the maximum size of input we accept from user
