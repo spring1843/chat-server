@@ -54,7 +54,7 @@ buildwindows:
 buildbin: buildlinux buildosx buildwindows
 
 deps:
-	@go list -json | jq ".Deps" | grep -E -o "tb+/[^\/]+" | sed 's|[\",[:space:]]||g' | sort -u
+	@go list -json | jq ".Deps" | grep -E -o "github.com+/[^\/]+" | sed 's|[\",[:space:]]||g' | sort -u
 
 fix:
 	@go fix $(GOFLAGS) ./...
