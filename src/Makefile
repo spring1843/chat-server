@@ -43,13 +43,13 @@ serve: build install
 	@chat-server -c config.json
 
 buildlinux:
-	@env GOOS=linux GOARCH=amd64 go build -o ../build/chat-server.linux.amd64 github.com/spring1843/chat-server/src/
+	@env GOOS=linux GOARCH=amd64 go build -o ../bin/chat-server.linux.amd64 github.com/spring1843/chat-server/src/
 
 buildosx:
-	@env GOOS=darwin GOARCH=amd64 go build -o ../build/chat-server.osx.amd64 github.com/spring1843/chat-server/src/
+	@env GOOS=darwin GOARCH=amd64 go build -o ../bin/chat-server.osx.amd64 github.com/spring1843/chat-server/src/
 
 buildwindows:
-	@env GOOS=windows GOARCH=amd64 go build -o ../build/chat-server.linux.amd64.exe github.com/spring1843/chat-server/src/
+	@env GOOS=windows GOARCH=amd64 go build -o ../bin/chat-server.linux.amd64.exe github.com/spring1843/chat-server/src/
 
 buildbin: buildlinux buildosx buildwindows
 
