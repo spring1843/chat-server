@@ -26,5 +26,9 @@ func TestHelpCommand(t *testing.T) {
 	user.SetNickName("foo")
 	server.AddUser(user)
 
-	chat.ExpectOutgoing(t, user, 5, "Shows the list of all available commands")
+	expected := "Shows the list of all available commands"
+	msg := user.GetOutgoing()
+	if msg == expected {
+		t.Errorf("Received message %q which is not equal to %q", msg, expected)
+	}
 }

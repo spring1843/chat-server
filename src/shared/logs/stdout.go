@@ -3,55 +3,47 @@ package logs
 import (
 	"fmt"
 	"log"
-
 	"time"
 
 	"github.com/fatih/color"
 )
 
 const (
-	infoLog       = "info"
-	warnLog       = "warn"
-	errLog        = "err"
-	errDetailsLog = "err_details"
-	fatalLog      = "fatal"
+	infoLog  = "info"
+	warnLog  = "warn"
+	errLog   = "err"
+	debug    = "debug"
+	fatalLog = "fatal"
 )
 
 var (
-	errColor        = color.New(color.FgRed)
-	errDetailsColor = color.New(color.FgRed)
-	warnColor       = color.New(color.FgYellow)
-	defaultColor    = color.New(color.FgWhite)
+	// PrefixFormat is the format of the prefix to every log display, includes things like time stamp and event type
+	PrefixFormat = "%s %s\t"
+
+	errColor     = color.New(color.FgRed)
+	debugColor   = color.New(color.FgRed)
+	warnColor    = color.New(color.FgYellow)
+	defaultColor = color.New(color.FgWhite)
 )
 
-func logFatal(err error) {
-	log.Fatalf("Fatal Error: %s", err)
-}
-
 func logErrDetails(err error) {
-	logPrintf(errDetailsLog, "Error Details: %s", err.Error())
-}
-
-func logPrintf(logType string, format string, a ...interface{}) {
-	logPrint(logType, fmt.Sprintf(format, a...))
+	logPrint(debug, fmt.Sprintf("Error Details: %s", err))
 }
 
 func logPrint(logType string, message string) {
-	logPrintln(logType, message)
-}
-
-func logPrintln(logType string, message string) {
 	prefix := getPrefix(logType)
 	switch logType {
 	case errLog:
 		errColor.Println(prefix + message)
 		break
-	case errDetailsLog:
-		errDetailsColor.Println(prefix + message)
+	case debug:
+		debugColor.Println(prefix + message)
 		break
 	case warnLog:
 		warnColor.Println(prefix + message)
 		break
+	case fatalLog:
+		log.Fatal(prefix + message)
 	default:
 		defaultColor.Println(prefix + message)
 	}

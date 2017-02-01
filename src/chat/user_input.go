@@ -41,7 +41,7 @@ func (u *User) handleCommandInput(chatServer *Server, input string) (bool, error
 	userCommand, err := command.FromString(input)
 	if err != nil {
 		u.SetOutgoing("Invalid command, use /help for more info. Error:" + err.Error())
-		logs.Errf(err, "Failed executing %s command by @s", input, u.nickName)
+		logs.ErrIfErrf(err, "Failed executing %s command by @s", input, u.nickName)
 		return false, errs.Wrap(err, "Error getting command from user input.")
 	}
 
@@ -51,7 +51,7 @@ func (u *User) handleCommandInput(chatServer *Server, input string) (bool, error
 	}
 
 	if err = userCommand.Execute(*commandParams); err != nil {
-		logs.Errf(err, "error \t @%s command=%s error=%s", u.nickName, input)
+		logs.ErrIfErrf(err, "error \t @%s command=%s error=%s", u.nickName, input)
 		return false, errs.Wrapf(err, "Couldn't execute command %q.", input)
 	}
 

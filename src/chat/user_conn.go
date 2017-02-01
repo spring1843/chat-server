@@ -56,7 +56,7 @@ func (u *User) ReadFrom(chatServer *Server) {
 			if err == io.EOF {
 				continue
 			}
-			logs.Errf(err, "Error reading from @%s.", u.GetNickName())
+			logs.ErrIfErrf(err, "Error reading from @%s.", u.GetNickName())
 		}
 
 		message = bytes.Trim(message, "\x00")
@@ -69,7 +69,7 @@ func (u *User) ReadFrom(chatServer *Server) {
 
 		handled, err := u.HandleNewInput(chatServer, input)
 		if err != nil {
-			logs.Errf(err, "Error reading input from user @%s.", u.nickName)
+			logs.ErrIfErrf(err, "Error reading input from user @%s.", u.nickName)
 		}
 		if handled {
 			//If handled then continue reading
@@ -105,7 +105,6 @@ func (u *User) Disconnect() error {
 // but since the user has just joined the server in the test, the user is instead receiving a welcome message
 // the approach of this function is to compare expected value with multiple reads from user's outgoing channel
 func ExpectOutgoing(t *testing.T, user *User, attempts int, expected string) {
-	t.Skipf("racy")
 	attempt := 0
 	msg := ""
 	for attempt < attempts {
