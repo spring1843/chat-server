@@ -77,7 +77,7 @@ func (c *Channel) Broadcast(chatServer *Server, message string) {
 			logs.Errf(err, "User %s is in channel %s but not on connected to the server", user.GetNickName(), c.GetName())
 			continue
 		}
-		user.SetOutgoing(message)
+		go user.SetOutgoing(message)
 	}
 }
 
