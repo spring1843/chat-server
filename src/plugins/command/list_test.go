@@ -43,6 +43,9 @@ func TestListCommand(t *testing.T) {
 	}(t)
 
 	incoming := user1.GetOutgoing()
+	if strings.Contains(incoming, `u1`) {
+		t.Errorf("Should not list the executing user in list command. %s should not contain %s", incoming, "u1")
+	}
 	if !strings.Contains(incoming, `u2`) {
 		t.Errorf("Did not get other user in list output. Expected %s got %s", `u2`, incoming)
 	}
@@ -55,4 +58,29 @@ func TestListCommand(t *testing.T) {
 	if !strings.Contains(incoming, `u5`) {
 		t.Errorf("Did not get other user in list output. Expected %s got %s", `u5`, incoming)
 	}
+
+	// Test list command with another user
+	go func(t *testing.T) {
+		if _, err := user2.HandleNewInput(server, `/list`); err != nil {
+			t.Fatalf("Failed executing message. Error %s", err)
+		}
+	}(t)
+
+	incoming = user2.GetOutgoing()
+	if strings.Contains(incoming, `u2`) {
+		t.Errorf("Should not list the executing user in list command. %s should not contain %s", incoming, "u2")
+	}
+	if !strings.Contains(incoming, `u1`) {
+		t.Errorf("Did not get other user in list output. Expected %s got %s", `u2`, incoming)
+	}
+	if !strings.Contains(incoming, `u3`) {
+		t.Errorf("Did not get other user in list output. Expected %s got %s", `u3`, incoming)
+	}
+	if !strings.Contains(incoming, `u4`) {
+		t.Errorf("Did not get other user in list output. Expected %s got %s", `u4`, incoming)
+	}
+	if !strings.Contains(incoming, `u5`) {
+		t.Errorf("Did not get other user in list output. Expected %s got %s", `u5`, incoming)
+	}
+
 }
