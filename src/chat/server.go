@@ -44,7 +44,8 @@ func NewServer() *Server {
 func (s *Server) AddUser(user *User) {
 	s.lockUsers.Lock()
 	defer s.lockUsers.Unlock()
-	s.Users[user.nickName] = user
+	nickname := user.GetNickName()
+	s.Users[nickname] = user
 }
 
 // RemoveUser from this server

@@ -47,5 +47,5 @@ func (s *Server) InterviewUser(conn drivers.Connection) {
 func (s *Server) connectUser(user *User, conn drivers.Connection) {
 	s.AddUser(user)
 	logs.Infof("connection address %s is now nicknamed %q", conn.RemoteAddr().String(), user.GetNickName())
-	user.SetOutgoing("Thanks " + user.nickName + ", now please type /join #channel to join a channel or /help to get all commands")
+	user.SetOutgoing("Thanks " + user.GetNickName() + ", now please type /join #channel to join a channel or /help to get all commands")
 }

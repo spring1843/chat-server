@@ -67,9 +67,7 @@ func (u *User) ReadFrom(chatServer *Server) {
 		}
 
 		handled, err := u.HandleNewInput(chatServer, input)
-		if err != nil {
-			logs.ErrIfErrf(err, "Error reading input from user @%s.", u.nickName)
-		}
+		logs.ErrIfErrf(err, "Error reading input from user @%s.", u.GetNickName())
 		if handled {
 			//If handled then continue reading
 			continue
@@ -90,7 +88,7 @@ func (u *User) WriteTo() {
 
 // Disconnect a user from this server
 func (u *User) Disconnect() error {
-	logs.Infof("disconnecting=@%s", u.nickName)
+	logs.Infof("disconnecting=@%s", u.GetNickName())
 	u.SetOutgoing("Good Bye, come back again.")
 
 	// Wait 1 second before actually disconnecting

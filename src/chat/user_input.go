@@ -33,7 +33,7 @@ func (u *User) handleBroadCastInput(chatServer *Server, userInput string) (bool,
 	if err != nil {
 		return false, errs.Wrap(err, "Error getting channel from server")
 	}
-	channel.Broadcast(chatServer, `@`+u.nickName+`: `+userInput)
+	channel.Broadcast(chatServer, `@`+u.GetNickName()+`: `+userInput)
 	return true, nil
 }
 
@@ -41,7 +41,7 @@ func (u *User) handleCommandInput(chatServer *Server, input string) (bool, error
 	userCommand, err := command.FromString(input)
 	if err != nil {
 		u.SetOutgoing("Invalid command, use /help for more info. Error:" + err.Error())
-		logs.ErrIfErrf(err, "Failed executing %s command by @s", input, u.nickName)
+		logs.ErrIfErrf(err, "Failed executing %s command by @s", input, u.GetNickName())
 		return false, errs.Wrap(err, "Error getting command from user input.")
 	}
 
@@ -51,11 +51,11 @@ func (u *User) handleCommandInput(chatServer *Server, input string) (bool, error
 	}
 
 	if err = userCommand.Execute(*commandParams); err != nil {
-		logs.ErrIfErrf(err, "error \t @%s command=%s error=%s", u.nickName, input)
+		logs.ErrIfErrf(err, "error \t @%s command=%s error=%s", u.GetNickName(), input)
 		return false, errs.Wrapf(err, "Couldn't execute command %q.", input)
 	}
 
-	logs.Infof("User @%s executed command: %s", u.nickName, input)
+	logs.Infof("User @%s executed command: %s", u.GetNickName(), input)
 	return true, nil
 }
 
