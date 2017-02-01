@@ -4,38 +4,25 @@ import (
 	"testing"
 
 	"github.com/spring1843/chat-server/src/chat"
-	"github.com/spring1843/chat-server/src/drivers/fake"
 )
 
-func TestCanWriteToUser(t *testing.T) {
+func TestCanReadWriteToFromUser(t *testing.T) {
 	user1 := chat.NewUser("bar")
 
-	msg := "foo"
-	go user1.SetOutgoing(msg)
+	input := "foo"
+	go user1.SetOutgoing(input)
 
 	outgoing := user1.GetOutgoing()
-	if outgoing != msg {
-		t.Errorf("Received message %q which is not equal to %q", outgoing, msg)
+	if outgoing != input {
+		t.Errorf("Received message %q which is not equal to %q", outgoing, input)
 
 	}
-}
 
-func TestCanReadFromUser(t *testing.T) {
-	t.Skipf("Racy")
-	fakeReader := fake.NewFakeConnection()
-	input := "foo\n"
-	n, err := fakeReader.WriteString(input)
-	if err != nil {
-		t.Fatalf("Failed writing to connection. Error %s", err)
-	}
-	if n != len(input) {
-		t.Fatalf("Wrong length after write. Expected %d, got %d.", len(input), n)
-	}
+	user1 = chat.NewUser("bar")
+	go user1.SetIncoming(input)
 
-	user1 := chat.NewConnectedUser(fakeReader)
-	msg := user1.GetIncoming()
-
-	if msg != "foo" {
-		t.Errorf("Message was not read from the user, got %s", msg)
+	incoming := user1.GetIncoming()
+	if incoming != input {
+		t.Errorf("Message was not read from the user, got %s", incoming)
 	}
 }
