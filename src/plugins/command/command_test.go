@@ -3,13 +3,7 @@ package command_test
 import (
 	"testing"
 
-	"github.com/spring1843/chat-server/src/chat"
 	"github.com/spring1843/chat-server/src/plugins/command"
-)
-
-var (
-	user1 = chat.NewUser("u1")
-	user2 = chat.NewUser("u2")
 )
 
 func TestCanGetCommand(t *testing.T) {

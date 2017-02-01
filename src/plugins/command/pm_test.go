@@ -1,14 +1,15 @@
 package command_test
 
 import (
-	"testing"
 	"strings"
+	"testing"
 
 	"github.com/spring1843/chat-server/src/chat"
 )
 
 func TestMessageCommand(t *testing.T) {
 	server := chat.NewServer()
+	user1, user2 := chat.NewUser("u1"), chat.NewUser("u2")
 
 	server.AddUser(user1)
 	server.AddUser(user2)
