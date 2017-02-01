@@ -2,7 +2,8 @@ package chat
 
 import (
 	"sync"
-	"time"
+
+	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
 // Channel users can be in a channel and chat with each other
@@ -67,19 +68,16 @@ func (c *Channel) GetUsers() map[string]bool {
 
 // Broadcast sends a message to every user in a channel
 func (c *Channel) Broadcast(chatServer *Server, message string) {
-	now := time.Now()
-	message = now.Format(time.Kitchen) + `-` + message
-
 	users := c.GetUsers()
-
 	for nickName := range users {
 		user, err := chatServer.GetUser(nickName)
 		// User may no longer be connected to the chat server
 		if err != nil {
 			c.RemoveUser(nickName)
+			logs.Errf(err, "User %s is in channel %s but not on connected to the server", user.GetNickName(), c.GetName())
 			continue
 		}
-		user.outgoing <- message
+		user.SetOutgoing(message)
 	}
 }
 
