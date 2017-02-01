@@ -5,54 +5,36 @@ import (
 	"testing"
 
 	"github.com/spring1843/chat-server/src/chat"
-	"github.com/spring1843/chat-server/src/drivers/fake"
 )
 
 func TestListCommand(t *testing.T) {
-	t.Skipf("Racy!")
-	fakeConnection1 := fake.NewFakeConnection()
-	fakeConnection2 := fake.NewFakeConnection()
-	fakeConnection3 := fake.NewFakeConnection()
-
 	server := chat.NewServer()
-	server.AddChannel(`foo`)
-
-	user1 := chat.NewConnectedUser(fakeConnection1)
-	user1.SetNickName(`u1`)
-	user1.Listen(server)
-
-	user2 := chat.NewConnectedUser(fakeConnection2)
-	user2.SetNickName(`u2`)
-	user2.Listen(server)
-
-	user3 := chat.NewConnectedUser(fakeConnection3)
-	user3.SetNickName(`u3`)
-	user3.Listen(server)
+	user1, user2 := chat.NewUser("u1"), chat.NewUser("u2")
 
 	server.AddUser(user1)
 	server.AddUser(user2)
-	server.AddUser(user3)
 
-	input := `/join #foo`
-	if _, err := user1.HandleNewInput(server, input); err != nil {
-		t.Fatalf("Failed joining. Error: %s", err)
-	}
-	if _, err := user2.HandleNewInput(server, input); err != nil {
-		t.Fatalf("Failed joining. Error: %s", err)
-	}
-	if _, err := user3.HandleNewInput(server, input); err != nil {
-		t.Fatalf("Failed joining. Error: %s", err)
-	}
-
-	if _, err := user1.HandleNewInput(server, "/list"); err != nil {
-		t.Fatalf("Failed running list command. Error: %s", err)
-	}
-
-	msg, err := fakeConnection1.ReadString(255)
+	channelName := "r"
+	server.AddChannel(channelName)
+	channel, err := server.GetChannel(channelName)
 	if err != nil {
-		t.Fatalf("Error reading from connection. Error %s", err)
+		t.Fatal("Couldn't get the channel just added")
 	}
-	if strings.Contains(msg, "@u1") != true && strings.Contains(msg, "@u2") != true && strings.Contains(msg, "@u3") != true {
-		t.Fatalf("List command did not show all users in the room")
+
+	channel.AddUser("u1")
+	channel.AddUser("u2")
+
+	user1.SetChannel(channelName)
+	user2.SetChannel(channelName)
+
+	go func(t *testing.T) {
+		if _, err := user1.HandleNewInput(server, `/list`); err != nil {
+			t.Fatalf("Failed executing message. Error %s", err)
+		}
+	}(t)
+
+	incoming := user1.GetOutgoing()
+	if !strings.Contains(incoming, `u2`) {
+		t.Errorf("Message was not read from the user, expected %s got %s", `u2`, incoming)
 	}
 }

@@ -14,10 +14,11 @@ func TestMessageCommand(t *testing.T) {
 	server.AddUser(user1)
 	server.AddUser(user2)
 
+	channelName := "r"
 	channel := chat.NewChannel()
-	channel.SetName(`r`)
-	user1.SetChannel(channel.Name)
-	user2.SetChannel(channel.Name)
+	channel.SetName(channelName)
+	user1.SetChannel(channelName)
+	user2.SetChannel(channelName)
 
 	msg := "foo"
 	input := `/msg @u2 ` + msg

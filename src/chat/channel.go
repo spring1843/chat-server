@@ -8,7 +8,7 @@ import (
 
 // Channel users can be in a channel and chat with each other
 type Channel struct {
-	Name     string
+	name     string
 	lockName *sync.Mutex
 
 	Users     map[string]bool
@@ -42,14 +42,14 @@ func (c *Channel) RemoveUser(nickName string) {
 func (c *Channel) GetName() string {
 	c.lockName.Lock()
 	defer c.lockName.Unlock()
-	return c.Name
+	return c.name
 }
 
 // SetName sets a channel's name
 func (c *Channel) SetName(channelName string) {
 	c.lockName.Lock()
 	defer c.lockName.Unlock()
-	c.Name = channelName
+	c.name = channelName
 }
 
 // GetUserCount returns the number of connected users to this channel
