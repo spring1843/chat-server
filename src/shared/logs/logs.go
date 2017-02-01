@@ -28,22 +28,22 @@ func Err(message string) {
 
 // Infof info logs if format
 func Infof(format string, a ...interface{}) {
-	Info(fmt.Sprintf(format, a))
+	Info(fmt.Sprintf(format, a...))
 }
 
 // Fatalf fatal logs with format
 func Fatalf(format string, a ...interface{}) {
-	Fatal(fmt.Sprintf(format, a))
+	Fatal(fmt.Sprintf(format, a...))
 }
 
 // Warnf warn logs with format
 func Warnf(format string, a ...interface{}) {
-	Warn(fmt.Sprintf(format, a))
+	Warn(fmt.Sprintf(format, a...))
 }
 
 // Errf error logs with format
 func Errf(format string, a ...interface{}) {
-	Err(fmt.Sprintf(format, a))
+	Err(fmt.Sprintf(format, a...))
 }
 
 // With error
