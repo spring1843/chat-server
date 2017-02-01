@@ -9,10 +9,13 @@ import (
 
 func TestListCommand(t *testing.T) {
 	server := chat.NewServer()
-	user1, user2 := chat.NewUser("u1"), chat.NewUser("u2")
+	user1, user2, user3, user4, user5 := chat.NewUser("u1"), chat.NewUser("u2"), chat.NewUser("u3"), chat.NewUser("u4"), chat.NewUser("u5")
 
 	server.AddUser(user1)
 	server.AddUser(user2)
+	server.AddUser(user3)
+	server.AddUser(user4)
+	server.AddUser(user5)
 
 	channelName := "r"
 	server.AddChannel(channelName)
@@ -23,9 +26,15 @@ func TestListCommand(t *testing.T) {
 
 	channel.AddUser("u1")
 	channel.AddUser("u2")
+	channel.AddUser("u3")
+	channel.AddUser("u4")
+	channel.AddUser("u5")
 
 	user1.SetChannel(channelName)
 	user2.SetChannel(channelName)
+	user3.SetChannel(channelName)
+	user4.SetChannel(channelName)
+	user5.SetChannel(channelName)
 
 	go func(t *testing.T) {
 		if _, err := user1.HandleNewInput(server, `/list`); err != nil {
@@ -35,6 +44,15 @@ func TestListCommand(t *testing.T) {
 
 	incoming := user1.GetOutgoing()
 	if !strings.Contains(incoming, `u2`) {
-		t.Errorf("Message was not read from the user, expected %s got %s", `u2`, incoming)
+		t.Errorf("Did not get other user in list output. Expected %s got %s", `u2`, incoming)
+	}
+	if !strings.Contains(incoming, `u3`) {
+		t.Errorf("Did not get other user in list output. Expected %s got %s", `u3`, incoming)
+	}
+	if !strings.Contains(incoming, `u4`) {
+		t.Errorf("Did not get other user in list output. Expected %s got %s", `u4`, incoming)
+	}
+	if !strings.Contains(incoming, `u5`) {
+		t.Errorf("Did not get other user in list output. Expected %s got %s", `u5`, incoming)
 	}
 }
