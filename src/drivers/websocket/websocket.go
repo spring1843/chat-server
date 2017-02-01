@@ -23,23 +23,22 @@ var (
 
 func readTemplate(templatePath string) {
 	cwd, err := os.Getwd()
-	logs.FatalIfErrf(err, "Failed getting CWD to render client for web socket")
-
+	logs.ErrIfErrf(err, "Failed getting CWD to render client for web socket")
 
 	templateFile := filepath.Join(cwd, templatePath)
 	if _, err := os.Stat(templateFile); os.IsNotExist(err) {
-		logs.FatalIfErrf(err, "Failed getting CWD to render client for web socket")
+		logs.ErrIfErrf(err, "Failed getting CWD to render client for web socket")
 	}
 
 	clientTemplate, err = template.ParseFiles(templateFile)
-	logs.FatalIfErrf(err, "Failed reading from %s", templateFile)
+	logs.ErrIfErrf(err, "Failed reading from %s", templateFile)
 
 	logs.Infof("Read template file for WebSocket client from %s", templatePath)
 }
 
 func serveClient(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/client" {
-		http.Error(w, "Not found", 404)
+		http.Redirect(w, r, "/client", 301)
 		return
 	}
 	if r.Method != "GET" {
@@ -67,8 +66,8 @@ func serveWebSocket(w http.ResponseWriter, r *http.Request) {
 func Start(chatServerParam *chat.Server, config config.Config) {
 	readTemplate(templatePath)
 	chatServerInstance = chatServerParam
-	http.HandleFunc("/client", serveClient)
 	http.HandleFunc("/ws", serveWebSocket)
+	http.HandleFunc("/", serveClient)
 
 	go func() {
 		err := http.ListenAndServe(config.IP+`:`+strconv.Itoa(config.WebsocketPort), nil)
@@ -78,5 +77,5 @@ func Start(chatServerParam *chat.Server, config config.Config) {
 	}()
 
 	logs.Infof("Websocket server listening=%s:%d", config.IP, config.WebsocketPort)
-	logs.Infof("Browse http://%s:%d/client/ for Websocket client", config.IP, config.WebsocketPort)
+	logs.Infof("Browse http://%s:%d/client for Websocket client", config.IP, config.WebsocketPort)
 }

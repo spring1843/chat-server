@@ -20,7 +20,7 @@ var (
 	// PrefixFormat is the format of the prefix to every log display, includes things like time stamp and event type
 	PrefixFormat = "%s %s "
 
-	infoColor     = color.New(color.FgHiWhite)
+	infoColor    = color.New(color.FgHiWhite)
 	errColor     = color.New(color.FgRed)
 	debugColor   = color.New(color.FgCyan)
 	warnColor    = color.New(color.FgYellow)

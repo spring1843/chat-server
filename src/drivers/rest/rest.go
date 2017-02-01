@@ -11,10 +11,7 @@ import (
 	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
-
 const templatePath = "drivers/rest/docs-web-ui"
-
-
 
 // messageEndpoint an instance of the chat.Server
 type messageEndpoint struct {
@@ -50,7 +47,7 @@ func NewRESTfulAPI(config config.Config, chatServer *chat.Server) *http.Server {
 	swagger.RegisterSwaggerService(configureSwagger(wsContainer), wsContainer)
 
 	logs.Infof("Rest server listening=%s:%d", config.IP, config.RestPort)
-	logs.Infof("Browse http://%s:%d/docs/ for RESTful endpoint docs",config.IP, config.RestPort)
+	logs.Infof("Browse http://%s:%d/docs/ for RESTful endpoint docs", config.IP, config.RestPort)
 
 	return &http.Server{Addr: ":" + strconv.Itoa(config.RestPort), Handler: wsContainer}
 }
