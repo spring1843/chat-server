@@ -2,13 +2,13 @@ package chat
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"strings"
 	"time"
 
 	"github.com/spring1843/chat-server/src/drivers"
 	"github.com/spring1843/chat-server/src/shared/logs"
-	"fmt"
 )
 
 // ReadConnectionLimitBytes is the maximum size of input we accept from user
@@ -38,7 +38,7 @@ func (u *User) SetOutgoing(message string) {
 	u.outgoing <- message
 }
 
-// SetOutgoing sets an outgoing message to the user
+// SetOutgoingf sets an outgoing message to the user
 func (u *User) SetOutgoingf(format string, a ...interface{}) {
 	u.SetOutgoing(fmt.Sprintf(format, a...))
 }
@@ -94,8 +94,9 @@ func (u *User) WriteTo() {
 
 // Disconnect a user from this server
 func (u *User) Disconnect() error {
-	logs.Infof("disconnecting=@%s", u.GetNickName())
-	u.SetOutgoing("Good Bye, come back again.")
+	nickName := u.GetNickName()
+	logs.Infof("disconnecting=@%s", nickName)
+	u.SetOutgoingf("Good Bye %f, come back again.", nickName)
 
 	// Wait 1 second before actually disconnecting
 	<-time.After(time.Second * 1)

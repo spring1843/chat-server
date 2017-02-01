@@ -47,8 +47,10 @@ func TestCantStartAndConnect(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error while reading connection. Error %s", err.Error())
 	}
-	if !strings.Contains(string(message), "Thanks User1") {
-		t.Fatalf("Could not set user nickname, expected 'Thanks User1' got %s", string(message))
+
+	expect := "Welcome User1"
+	if !strings.Contains(string(message), expect) {
+		t.Fatalf("Could not set user nickname, expected 'Thanks User1' got %s", expect)
 	}
 
 	if err := conn.WriteMessage(1, []byte(`/quit`)); err != nil {

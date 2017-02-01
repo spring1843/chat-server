@@ -20,6 +20,7 @@ type (
 	// User is a connected user
 	User interface {
 		SetOutgoing(message string)
+		SetOutgoingf(format string, a ...interface{})
 		GetChannel() string
 		GetNickName() string
 		Ignore(nickName string)

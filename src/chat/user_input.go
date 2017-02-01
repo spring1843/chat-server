@@ -40,7 +40,7 @@ func (u *User) handleBroadCastInput(chatServer *Server, userInput string) (bool,
 func (u *User) handleCommandInput(chatServer *Server, input string) (bool, error) {
 	userCommand, err := command.FromString(input)
 	if err != nil {
-		u.SetOutgoing("Invalid command, use /help for more info. Error:" + err.Error())
+		u.SetOutgoingf("Invalid command, use /help for more info. Error: %s", err.Error())
 		logs.ErrIfErrf(err, "Failed executing %s command by @s", input, u.GetNickName())
 		return false, errs.Wrap(err, "Error getting command from user input.")
 	}
@@ -88,7 +88,17 @@ func (u *User) GetCommandParams(chatServer *Server, userInput string, executable
 		}
 		channel, err := chatServer.GetChannel(channelName)
 		if err != nil {
-			return nil, errs.Wrapf(err, "Could not get channel from the server. Channel Name %s", channelName)
+			// If channels don't exist on join command we create one so that channels can start
+			switch executable.GetChatCommand().Name {
+			case "join":
+				chatServer.AddChannel(channelName)
+				channel, err = chatServer.GetChannel(channelName)
+				if err != nil {
+					logs.ErrIfErrf(err, "Couldn't get the channel just created #%s", channelName)
+				}
+			default:
+				return nil, errs.Wrapf(err, "Could not get channel from the server. Channel Name %s", channelName)
+			}
 		}
 		commandParams.Channel = channel
 	}

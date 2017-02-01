@@ -41,6 +41,6 @@ func (c *PrivateMessageCommand) Execute(params Params) error {
 	logs.Infof("message \t @%s to @%s message=%s", params.User1.GetNickName(), params.User2.GetNickName(), params.Message)
 
 	now := time.Now()
-	go params.User2.SetOutgoing(now.Format(time.Kitchen) + ` - *Private from @` + params.User1.GetNickName() + `: ` + params.Message)
+	go params.User2.SetOutgoingf("%s -PM from @%s: %s", now.Format(time.Kitchen), params.User1.GetNickName(), params.Message)
 	return nil
 }

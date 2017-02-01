@@ -1,10 +1,6 @@
 package command
 
-import (
-	"strconv"
-
-	"github.com/spring1843/chat-server/src/shared/errs"
-)
+import "github.com/spring1843/chat-server/src/shared/errs"
 
 // JoinCommand allows user to join a channel
 type JoinCommand struct {
@@ -44,7 +40,7 @@ func (c *JoinCommand) Execute(params Params) error {
 	params.User1.SetChannel(channelName)
 
 	// Welcome user to channel
-	params.User1.SetOutgoing("There are " + strconv.Itoa(params.Channel.GetUserCount()) + " other users this channel.")
+	params.User1.SetOutgoingf("There are %d other users this channel.", params.Channel.GetUserCount())
 
 	//Tell others someone's joining
 	return params.Server.BroadcastInChannel(channelName, `@`+params.User1.GetNickName()+` just joined channel #`+params.Channel.GetName())

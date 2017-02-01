@@ -30,6 +30,6 @@ func (c *IgnoreCommand) Execute(params Params) error {
 	}
 
 	params.User1.Ignore(params.User2.GetNickName())
-	params.User1.SetOutgoing(params.User2.GetNickName() + " is now ignored.")
+	params.User1.SetOutgoingf("@%s is now ignored.", params.User2.GetNickName())
 	return nil
 }
