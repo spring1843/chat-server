@@ -8,17 +8,17 @@ import (
 
 // Channel users can be in a channel and chat with each other
 type Channel struct {
-	name     string
-	lockName *sync.Mutex
+	name      string
+	lockName  *sync.Mutex
 
-	Users     map[string]bool
+	users     map[string]bool
 	lockUsers *sync.Mutex
 }
 
 // NewChannel returns a channel
 func NewChannel() *Channel {
 	return &Channel{
-		Users:     make(map[string]bool),
+		users:     make(map[string]bool),
 		lockName:  new(sync.Mutex),
 		lockUsers: new(sync.Mutex),
 	}
@@ -28,14 +28,14 @@ func NewChannel() *Channel {
 func (c *Channel) AddUser(nickName string) {
 	c.lockUsers.Lock()
 	defer c.lockUsers.Unlock()
-	c.Users[nickName] = true
+	c.users[nickName] = true
 }
 
 // RemoveUser removes a user from this server
 func (c *Channel) RemoveUser(nickName string) {
 	c.lockUsers.Lock()
 	defer c.lockUsers.Unlock()
-	delete(c.Users, nickName)
+	delete(c.users, nickName)
 }
 
 // GetName gets a channel's name
@@ -56,14 +56,14 @@ func (c *Channel) SetName(channelName string) {
 func (c *Channel) GetUserCount() int {
 	c.lockUsers.Lock()
 	defer c.lockUsers.Unlock()
-	return len(c.Users)
+	return len(c.users)
 }
 
 // GetUsers returns nicknames of connected users
 func (c *Channel) GetUsers() map[string]bool {
 	c.lockUsers.Lock()
 	defer c.lockUsers.Unlock()
-	return cloneNickNames(c.Users)
+	return cloneNickNames(c.users)
 }
 
 // Broadcast sends a message to every user in a channel

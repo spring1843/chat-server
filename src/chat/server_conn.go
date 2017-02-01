@@ -11,7 +11,7 @@ import (
 func (s *Server) Listen() {
 	go func() {
 		for {
-			for connection := range s.Connection {
+			for connection := range s.conn {
 				logs.Infof("connection \t New connection from address=%s", connection.RemoteAddr().String())
 				go s.InterviewUser(connection)
 			}
@@ -21,7 +21,7 @@ func (s *Server) Listen() {
 
 // ReceiveConnection is used when there's a new connection
 func (s *Server) ReceiveConnection(conn drivers.Connection) {
-	s.Connection <- conn
+	s.conn <- conn
 }
 
 // InterviewUser interviews user and allows him to connect after identification
