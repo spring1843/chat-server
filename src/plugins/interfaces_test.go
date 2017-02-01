@@ -6,5 +6,5 @@ import (
 )
 
 var _ plugins.Server = chat.NewServer()
-var _ plugins.Chan = chat.NewChannel()
-var _ plugins.Chatter = chat.NewUser("foo")
+var _ plugins.Channel = chat.NewChannel()
+var _ plugins.User = chat.NewUser("foo")

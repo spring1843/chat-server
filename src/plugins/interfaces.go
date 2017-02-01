@@ -11,14 +11,14 @@ type (
 		BroadcastInChannel(channelName, message string) error
 		GetChannelUsers(channelName string) (map[string]bool, error)
 	}
-	// Chan is an interface for a chat channel
-	Chan interface {
+	// Channel is an interface for a chat channel
+	Channel interface {
 		AddUser(nickName string)
 		GetName() string
 		GetUserCount() int
 	}
-	// Chatter is a connected user
-	Chatter interface {
+	// User is a connected user
+	User interface {
 		SetOutgoing(message string)
 		GetChannel() string
 		GetNickName() string
