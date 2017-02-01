@@ -6,11 +6,9 @@ import (
 	"github.com/spring1843/chat-server/src/chat"
 )
 
-var (
-	server = chat.NewServer()
-)
-
 func TestCanAddUser(t *testing.T) {
+	server := chat.NewServer()
+	user1 := chat.NewUser("u1")
 	server.AddUser(user1)
 
 	user, err := server.GetUser(user1.GetNickName())
@@ -27,6 +25,10 @@ func TestCanAddUser(t *testing.T) {
 }
 
 func TestCanRemoveUser(t *testing.T) {
+	server := chat.NewServer()
+	user1 := chat.NewUser("u1")
+	user2 := chat.NewUser("u2")
+
 	server.AddUser(user1)
 	server.AddUser(user2)
 
@@ -42,6 +44,7 @@ func TestCanRemoveUser(t *testing.T) {
 }
 
 func TestAddChannel(t *testing.T) {
+	server := chat.NewServer()
 	server.AddChannel(`foo`)
 
 	if server.GetChannelCount() != 1 {
@@ -50,6 +53,7 @@ func TestAddChannel(t *testing.T) {
 }
 
 func TestGetSameChannel(t *testing.T) {
+	server := chat.NewServer()
 	server.AddChannel(`foo`)
 	sameChannel, err := server.GetChannel(`foo`)
 

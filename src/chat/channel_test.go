@@ -1,14 +1,11 @@
 package chat_test
 
 import (
-	"testing"
-
 	"strings"
+	"testing"
 
 	"github.com/spring1843/chat-server/src/chat"
 )
-
-var channel = chat.NewChannel()
 
 func TestCanAddUsers(t *testing.T) {
 	user1 := chat.NewUser("user1")

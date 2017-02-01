@@ -6,13 +6,12 @@ import (
 	"github.com/spring1843/chat-server/src/chat"
 )
 
-var (
-	user1 = chat.NewUser("u1")
-	user2 = chat.NewUser("u2")
-	user3 = chat.NewUser("u3")
-)
-
 func TestUserCanGettersAndSetters(t *testing.T) {
+
+	user1 := chat.NewUser("u1")
+	user2 := chat.NewUser("u2")
+	user3 := chat.NewUser("u3")
+
 	user1.Ignore(user2.GetNickName())
 	if user1.HasIgnored(user2.GetNickName()) != true {
 		t.Errorf("User was not ignored when he should have been")
