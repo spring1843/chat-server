@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io"
 	"strings"
-	"testing"
 	"time"
 
 	"github.com/spring1843/chat-server/src/drivers"
@@ -97,23 +96,4 @@ func (u *User) Disconnect() error {
 	// Wait 1 second before actually disconnecting
 	<-time.After(time.Second * 1)
 	return u.conn.Close()
-}
-
-// ExpectOutgoing can be used in testing that a certain message is sent out to user from the server or not
-// since users can receive many messages during a test it is hard to test for one message
-// for example a test may want to see if a user receives the help message after typing /help
-// but since the user has just joined the server in the test, the user is instead receiving a welcome message
-// the approach of this function is to compare expected value with multiple reads from user's outgoing channel
-func ExpectOutgoing(t *testing.T, user *User, attempts int, expected string) {
-	attempt := 0
-	msg := ""
-	for attempt < attempts {
-		msg = user.GetOutgoing()
-		if msg == expected {
-			return
-		}
-		t.Errorf("Received message %q which is not equal to %q", msg, expected)
-		attempt++
-	}
-	t.Fatalf("Did not get outcome after %d/%d attempts. Expected %s not found in %s", attempt, attempts, expected, msg)
 }
