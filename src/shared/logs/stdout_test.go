@@ -27,5 +27,5 @@ func TestFatalExitOnFatalError(t *testing.T) {
 		return
 	}
 
-	t.Fatalf("process ran with err %s, want exit status 1", err)
+	t.Fatal("Expected Fatalf to crash the process, expected exit status 1 got 0.")
 }
