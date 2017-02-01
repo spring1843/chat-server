@@ -8,8 +8,8 @@ import (
 
 // Channel users can be in a channel and chat with each other
 type Channel struct {
-	name      string
-	lockName  *sync.Mutex
+	name     string
+	lockName *sync.Mutex
 
 	users     map[string]bool
 	lockUsers *sync.Mutex

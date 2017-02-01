@@ -12,21 +12,21 @@ import (
 
 // Server  keeps listening for connections, it contains users and channels
 type Server struct {
-	conn         chan drivers.Connection
-	Incoming     chan string
-	Outgoing     chan string
+	conn     chan drivers.Connection
+	Incoming chan string
+	Outgoing chan string
 
 	channels     map[string]*Channel
 	lockChannels *sync.Mutex
 
-	users        map[string]*User
-	lockUsers    *sync.Mutex
+	users     map[string]*User
+	lockUsers *sync.Mutex
 }
 
 // NewServer returns a new instance of the chat server
 func NewServer() *Server {
 	server := &Server{
-		conn:   make(chan drivers.Connection),
+		conn:         make(chan drivers.Connection),
 		channels:     make(map[string]*Channel),
 		users:        make(map[string]*User),
 		Incoming:     make(chan string),
