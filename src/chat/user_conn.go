@@ -8,6 +8,7 @@ import (
 
 	"github.com/spring1843/chat-server/src/drivers"
 	"github.com/spring1843/chat-server/src/shared/logs"
+	"fmt"
 )
 
 // ReadConnectionLimitBytes is the maximum size of input we accept from user
@@ -35,6 +36,11 @@ func (u *User) GetOutgoing() string {
 // SetOutgoing sets an outgoing message to the user
 func (u *User) SetOutgoing(message string) {
 	u.outgoing <- message
+}
+
+// SetOutgoing sets an outgoing message to the user
+func (u *User) SetOutgoingf(format string, a ...interface{}) {
+	u.SetOutgoing(fmt.Sprintf(format, a...))
 }
 
 // GetIncoming gets the incoming message from the user

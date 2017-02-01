@@ -47,6 +47,7 @@ func (u *User) handleCommandInput(chatServer *Server, input string) (bool, error
 
 	commandParams, err := u.GetCommandParams(chatServer, input, userCommand)
 	if err != nil {
+		u.SetOutgoingf("Error executing your command. %s", err)
 		return false, errs.Wrap(err, "Couldn't get command params")
 	}
 
