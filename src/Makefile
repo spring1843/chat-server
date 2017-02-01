@@ -3,7 +3,7 @@ GOFLAGS ?= $(GOFLAGS:)
 all: install test
 
 build:
-	@go build $(GOFLAGS) ./...
+	@go build $(GOFLAGS) .
 
 format:
 	@gofmt -l -s -w .
@@ -31,6 +31,9 @@ test: install
 	@go test $(GOFLAGS) ./...
 
 mergecheck : beautify audit
+
+run: build
+	@./src -config config.json
 
 commit: mergecheck
 	@git add -p .

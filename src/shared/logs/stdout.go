@@ -18,10 +18,11 @@ const (
 
 var (
 	// PrefixFormat is the format of the prefix to every log display, includes things like time stamp and event type
-	PrefixFormat = "%s %s\t"
+	PrefixFormat = "%s %s "
 
+	infoColor     = color.New(color.FgHiWhite)
 	errColor     = color.New(color.FgRed)
-	debugColor   = color.New(color.FgRed)
+	debugColor   = color.New(color.FgCyan)
 	warnColor    = color.New(color.FgYellow)
 	defaultColor = color.New(color.FgWhite)
 )
@@ -33,6 +34,9 @@ func logErrDetails(err error) {
 func logPrint(logType string, message string) {
 	prefix := getPrefix(logType)
 	switch logType {
+	case infoLog:
+		infoColor.Println(prefix + message)
+		break
 	case errLog:
 		errColor.Println(prefix + message)
 		break
