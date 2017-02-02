@@ -40,7 +40,12 @@ func (c *JoinCommand) Execute(params Params) error {
 	params.User1.SetChannel(channelName)
 
 	// Welcome user to channel
-	params.User1.SetOutgoingf("There are %d other user(s) in this channel.", params.Channel.GetUserCount()-1)
+	userCount := params.Channel.GetUserCount()
+	if userCount == 1 {
+		params.User1.SetOutgoingf("You are the first in #%s.", channelName)
+	}else {
+		params.User1.SetOutgoingf("There are %d other user(s) in #%s.", params.Channel.GetUserCount()-1, channelName)
+	}
 
 	//Tell others someone's joining
 	return params.Server.BroadcastInChannel(channelName, `@`+params.User1.GetNickName()+` just joined channel #`+params.Channel.GetName())
