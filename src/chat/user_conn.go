@@ -3,7 +3,6 @@ package chat
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"strings"
 	"time"
 
@@ -58,31 +57,22 @@ func (u *User) ReadFrom(chatServer *Server) {
 	for {
 		message := make([]byte, ReadConnectionLimitBytes)
 		if _, err := u.conn.Read(message); err != nil {
-			if err == io.EOF {
-				continue
-			}
 			logs.ErrIfErrf(err, "Error reading from @%s.", u.GetNickName())
-		}
-
-		message = bytes.Trim(message, "\x00")
-
-		input := string(message)
-		//Remove new line
-		if strings.Contains(input, "\n") == true {
-			input = strings.TrimSpace(input)
-		}
-
-		handled, err := u.HandleNewInput(chatServer, input)
-		logs.ErrIfErrf(err, "Error reading input from user @%s.", u.GetNickName())
-		if handled {
-			//If handled then continue reading
 			continue
 		}
 
-		if input != "\n" && input != `` {
-			u.SetIncoming(input)
-		}
+		_, err := u.HandleNewInput(chatServer, sanitizeInput(message))
+		logs.ErrIfErrf(err, "Error reading input from user @%s.", u.GetNickName())
 	}
+}
+
+func sanitizeInput(message []byte) string {
+	message = bytes.Trim(message, "\x00")
+	input := string(message)
+	if strings.Contains(input, "\n") == true {
+		input = strings.TrimSpace(input)
+	}
+	return input
 }
 
 // WriteTo to the user's connection and remembers the last message that was sent out
