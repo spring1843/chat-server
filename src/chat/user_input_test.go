@@ -14,15 +14,15 @@ func TestHandleCommandInput(t *testing.T) {
 	server.AddUser(user1)
 
 	go func(t *testing.T) {
-		input := `/help`
+		input := `/join #p`
 		if _, err := user1.HandleNewInput(server, input); err != nil {
 			t.Fatalf("Failed executing help command. Error %s", err)
 		}
 	}(t)
 
 	incoming := user1.GetOutgoing()
-	if !strings.Contains(incoming, "quit") {
-		t.Errorf("Message was not sent to the user, expected quit to be part of %s", incoming)
+	if !strings.Contains(incoming, "in this channel") {
+		t.Errorf("Message was not sent to the user, expected channel welcome message to be part of %s", incoming)
 	}
 }
 
