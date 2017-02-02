@@ -1,6 +1,8 @@
 package command
 
 import (
+	"strings"
+
 	"github.com/spring1843/chat-server/src/shared/errs"
 )
 
@@ -19,8 +21,6 @@ var listCommand = &ListCommand{
 
 // Execute lists all the users in a channel to a user
 func (c *ListCommand) Execute(params Params) error {
-	listMessage := "Here is the list of all users in this channel\n"
-
 	if params.User1 == nil {
 		return errs.New("User param is not set")
 	}
@@ -30,19 +30,15 @@ func (c *ListCommand) Execute(params Params) error {
 		return errs.New("User is not in a channel")
 	}
 
-	userNickName := params.User1.GetNickName()
-
 	channelUsers, err := params.Server.GetChannelUsers(channelName)
 	if err != nil {
 		return errs.Wrapf(err, "Error getting channel users")
 	}
 
+	users := make([]string, len(channelUsers), len(channelUsers))
 	for nickName := range channelUsers {
-		if nickName == userNickName {
-			continue
-		}
-		listMessage += "@" + nickName + ".\n"
+		users = append(users, "@"+nickName)
 	}
-	params.User1.SetOutgoing(listMessage)
+	params.User1.SetOutgoingf("User(s) in #%s: %s", channelName, strings.Join(users, ","))
 	return nil
 }

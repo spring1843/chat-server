@@ -21,7 +21,7 @@ func TestHandleCommandInput(t *testing.T) {
 	}(t)
 
 	incoming := user1.GetOutgoing()
-	if !strings.Contains(incoming, "in this channel") {
+	if !strings.Contains(incoming, "You are the first") {
 		t.Errorf("Message was not sent to the user, expected channel welcome message to be part of %s", incoming)
 	}
 }

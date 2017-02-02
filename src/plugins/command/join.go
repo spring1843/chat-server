@@ -43,7 +43,7 @@ func (c *JoinCommand) Execute(params Params) error {
 	userCount := params.Channel.GetUserCount()
 	if userCount == 1 {
 		params.User1.SetOutgoingf("You are the first in #%s.", channelName)
-	}else {
+	} else {
 		params.User1.SetOutgoingf("There are %d other user(s) in #%s.", params.Channel.GetUserCount()-1, channelName)
 	}
 
