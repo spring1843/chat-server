@@ -4,7 +4,8 @@ $(function() {
     var conn;
     var msg = $("#msg");
     var log = $("#log");
-    var webSocketAddr = "ws://0.0.0.0:4001/ws"
+    var hostAndPort = location.hostname+(location.port ? ':'+location.port: '');
+    var webSocketAddr = "ws://" + hostAndPort + "/ws";
 
     function appendLog(msg) {
         var d = log[0]
