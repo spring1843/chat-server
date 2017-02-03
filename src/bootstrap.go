@@ -29,6 +29,7 @@ func bootstrap(config config.Config) {
 	http.Handle("/", fs)
 
 	go func() {
+		logs.Infof("Serving static files, Rest, WebSocket on http:/%s/", config.WebAddress)
 		logs.FatalIfErrf(http.ListenAndServe(config.WebAddress, nil), "Could not start Rest server.")
 	}()
 }
