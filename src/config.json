@@ -1,4 +1,4 @@
 {
-  "telnet_address" : "0.0.0.0:4000",
-  "web_address" : "0.0.0.0:4001"
+  "telnet_address" : "chatserver.local:4000",
+  "web_address" : "chatserver.local:4001"
 }
