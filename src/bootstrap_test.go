@@ -32,7 +32,7 @@ func TestCanCrashOnBadConfig(t *testing.T) {
 		config := config.FromFile("./config.json")
 
 		// Make config invalid
-		config.TelnetPort = -1
+		config.TelnetAddress = "-1"
 
 		bootstrap(config)
 		return

@@ -8,10 +8,8 @@ import (
 
 // Config holds the values ChatServer needs in order to run
 type Config struct {
-	TelnetPort    int    `json:"telnet_port"`
-	RestPort      int    `json:"rest_port"`
-	WebsocketPort int    `json:"websocket_port"`
-	IP            string `json:"ip"`
+	TelnetAddress string `json:"telnet_address"`
+	WebAddress    string `json:"web_address"`
 }
 
 // FromFile parses Config from a .json file

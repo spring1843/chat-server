@@ -2,16 +2,11 @@ package rest
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/emicklei/go-restful"
 	"github.com/emicklei/go-restful/swagger"
 	"github.com/spring1843/chat-server/src/chat"
-	"github.com/spring1843/chat-server/src/config"
-	"github.com/spring1843/chat-server/src/shared/logs"
 )
-
-const templatePath = "drivers/rest/docs-web-ui"
 
 // messageEndpoint an instance of the chat.Server
 type messageEndpoint struct {
@@ -32,22 +27,16 @@ func registerAllEndpoints(chatServer *chat.Server, container *restful.Container)
 
 func configureSwagger(wsContainer *restful.Container) swagger.Config {
 	return swagger.Config{
-		WebServices:     wsContainer.RegisteredWebServices(),
-		WebServicesUrl:  ``,
-		ApiPath:         "/docs.json",
-		SwaggerPath:     "/docs/",
-		SwaggerFilePath: templatePath,
+		WebServices:    wsContainer.RegisteredWebServices(),
+		WebServicesUrl: ``,
+		ApiPath:        "/api/docs.json",
 	}
 }
 
-// NewRESTfulAPI the rest server and configures it
-func NewRESTfulAPI(config config.Config, chatServer *chat.Server) *http.Server {
-	wsContainer := restful.NewContainer()
-	registerAllEndpoints(chatServer, wsContainer)
-	swagger.RegisterSwaggerService(configureSwagger(wsContainer), wsContainer)
-
-	logs.Infof("Rest server listening=%s:%d", config.IP, config.RestPort)
-	logs.Infof("Browse http://%s:%d/docs/ for RESTful endpoint docs", config.IP, config.RestPort)
-
-	return &http.Server{Addr: ":" + strconv.Itoa(config.RestPort), Handler: wsContainer}
+// GetHandler returns a handler that includes all API endpoins
+func GetHandler(chatServer *chat.Server) http.Handler {
+	handler := restful.NewContainer()
+	registerAllEndpoints(chatServer, handler)
+	swagger.RegisterSwaggerService(configureSwagger(handler), handler)
+	return handler
 }

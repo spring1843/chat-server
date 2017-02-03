@@ -4,7 +4,6 @@ package telnet
 
 import (
 	"net"
-	"strconv"
 
 	"github.com/spring1843/chat-server/src/chat"
 	"github.com/spring1843/chat-server/src/config"
@@ -14,10 +13,10 @@ import (
 
 // Start starts the telnet server and configures it
 func Start(chatServer *chat.Server, config config.Config) error {
-	listener, err := net.Listen("tcp", config.IP+`:`+strconv.Itoa(config.TelnetPort))
+	listener, err := net.Listen("tcp", config.TelnetAddress)
 
 	if err != nil {
-		logs.Infof("error \t port in use? Error while listening for telnet connections on %s:%d : %v\n", config.IP, config.TelnetPort, err)
+		logs.ErrIfErrf(err, "error port in use? Error while listening for telnet connections on %s.", config.TelnetAddress)
 		return errs.Wrap(err, "Could not open telnet connection")
 	}
 

@@ -3,7 +3,6 @@ package telnet_test
 import (
 	"bufio"
 	"net"
-	"strconv"
 	"testing"
 
 	"strings"
@@ -15,8 +14,7 @@ import (
 
 func TestCanStartTelnetAndConnectToIt(t *testing.T) {
 	config := config.Config{
-		IP:         `0.0.0.0`,
-		TelnetPort: 4002,
+		TelnetAddress: `0.0.0.0:4002`,
 	}
 
 	chatServer := chat.NewServer()
@@ -27,7 +25,7 @@ func TestCanStartTelnetAndConnectToIt(t *testing.T) {
 		t.Errorf("Could not start telnet server. Error %s", err)
 	}
 
-	conn, err := net.Dial("tcp", "127.0.0.1:"+strconv.Itoa(config.TelnetPort))
+	conn, err := net.Dial("tcp", config.TelnetAddress)
 	defer conn.Close()
 	if err != nil {
 		t.Errorf("Could not connect to the telnet server. Error %s", err)
@@ -45,8 +43,7 @@ func TestCanStartTelnetAndConnectToIt(t *testing.T) {
 
 func TestOutputErrorWhenCantStart(t *testing.T) {
 	config := config.Config{
-		IP:         `0.0.0.0`,
-		TelnetPort: -1,
+		TelnetAddress: `0.0.0.0:-1`,
 	}
 
 	chatServer := chat.NewServer()

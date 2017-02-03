@@ -13,17 +13,18 @@ import (
 
 func TestCanStartAndGetStatus(t *testing.T) {
 	config := config.Config{
-		IP:       `0.0.0.0`,
-		RestPort: 4001,
+		WebAddress: `0.0.0.0:4001`,
 	}
 
 	chatServer := chat.NewServer()
 	chatServer.Listen()
 
-	restfulAPI := rest.NewRESTfulAPI(config, chatServer)
-	go restfulAPI.ListenAndServe()
+	restHandler := rest.GetHandler(chatServer)
 
-	response, err := http.Get("http://localhost:4001/status")
+	server := &http.Server{Addr: config.WebAddress, Handler: restHandler}
+	go server.ListenAndServe()
+
+	response, err := http.Get("http://localhost:4001/api/status")
 	if err != nil {
 		t.Errorf("Error making http call to status")
 	}

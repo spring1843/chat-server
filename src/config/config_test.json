@@ -1,6 +1,4 @@
 {
-  "telnet_port" : 4000,
-  "rest_port" : 4001,
-  "websocket_port" : 4004,
-  "ip" : "6.6.6.6"
+  "telnet_address" : "6.6.6.6:4000",
+  "web_address" : "6.6.6.6:4004"
 }

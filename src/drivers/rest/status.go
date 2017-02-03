@@ -7,7 +7,7 @@ import (
 // Register the status endpoint
 func (g statusEndpoint) Register(container *restful.Container) {
 	ws := new(restful.WebService)
-	ws.Path("/status").
+	ws.Path("/api/status").
 		Doc("Returns the status").
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)

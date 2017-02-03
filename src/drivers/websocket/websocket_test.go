@@ -1,8 +1,9 @@
 package websocket_test
 
 import (
+	"log"
+	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 	"testing"
 
@@ -14,16 +15,20 @@ import (
 
 func TestCantStartAndConnect(t *testing.T) {
 	config := config.Config{
-		IP:            `0.0.0.0`,
-		WebsocketPort: 4008,
+		WebAddress: "127.0.0.1:4008",
 	}
 
 	chatServer := chat.NewServer()
 	chatServer.Listen()
+	websocket.Start(chatServer)
 
-	websocket.Start(chatServer, config)
-
-	u := url.URL{Scheme: "ws", Host: "127.0.0.1:" + strconv.Itoa(config.WebsocketPort), Path: "/ws"}
+	go func() {
+		err := http.ListenAndServe(config.WebAddress, nil)
+		if err != nil {
+			log.Fatalf("Could not open websocket connection. Error %s", err)
+		}
+	}()
+	u := url.URL{Scheme: "ws", Host: config.WebAddress, Path: "/ws"}
 
 	conn, _, err := gorilla.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {

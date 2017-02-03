@@ -13,17 +13,17 @@ import (
 // Register the message REST endpoints
 func (r messageEndpoint) Register(container *restful.Container) {
 	ws := new(restful.WebService)
-	ws.Path("/v1/api").
+	ws.Path("/api/message").
 		Doc("Interact with chat server").
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 
-	ws.Route(ws.POST("message").To(r.broadCastMessage).
+	ws.Route(ws.POST("").To(r.broadCastMessage).
 		Doc("Broadcasts a public announcement to all users connected to the server").
 		Reads(messageReq{}).
 		Writes(messageResp{}))
 
-	ws.Route(ws.GET("message").To(r.searchLogForMessages).
+	ws.Route(ws.GET("").To(r.searchLogForMessages).
 		Doc("Searches private and public messages Returns only up to " + string(maxQueryResults) + " messages").
 		Param(ws.QueryParameter("pattern", `Optional RE2 Regex pattern to query messages. Examples: '.*' for all logs`).DataType("string")).
 		Writes(searchLogResp{}))

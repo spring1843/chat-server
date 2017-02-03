@@ -9,8 +9,8 @@ import (
 func TestCanReadTestConfig(t *testing.T) {
 	config := config.FromFile("./config_test.json")
 
-	expectedIP := "6.6.6.6"
-	if config.IP != expectedIP {
-		t.Fatalf("Could not read from file, expected config value IP to be %s, got %s instead", expectedIP, config.IP)
+	expectedAddress := "6.6.6.6:4004"
+	if config.WebAddress != expectedAddress {
+		t.Fatalf("Could not read from file, expected config value IP to be %s, got %s instead", expectedAddress, config.WebAddress)
 	}
 }

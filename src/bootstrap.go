@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/spring1843/chat-server/src/chat"
 	"github.com/spring1843/chat-server/src/config"
 	"github.com/spring1843/chat-server/src/drivers/rest"
@@ -9,6 +11,8 @@ import (
 	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
+const staticWebContentDir = "../bin/web"
+
 func bootstrap(config config.Config) {
 	chatServer := chat.NewServer()
 	chatServer.Listen()
@@ -16,9 +20,17 @@ func bootstrap(config config.Config) {
 
 	logs.FatalIfErrf(startTelnet(config, chatServer), "Could not start telnet server.")
 
-	startWebSocket(config, chatServer)
+	restHandler := rest.GetHandler(chatServer)
+	websocket.Start(chatServer)
+	fs := http.FileServer(http.Dir(staticWebContentDir))
 
-	startRESTFulAPI(config, chatServer)
+	http.Handle("/api/", restHandler)
+	http.HandleFunc("/ws", websocket.WebSocketHandler)
+	http.Handle("/", fs)
+
+	go func() {
+		logs.FatalIfErrf(http.ListenAndServe(config.WebAddress, nil), "Could not start Rest server.")
+	}()
 }
 
 func startTelnet(config config.Config, chatServer *chat.Server) error {
@@ -29,18 +41,4 @@ func startTelnet(config config.Config, chatServer *chat.Server) error {
 	}
 	logs.Info("Telnet server started")
 	return nil
-}
-
-func startWebSocket(config config.Config, chatServer *chat.Server) {
-	websocket.Start(chatServer, config)
-	logs.Info("WebSocket server started")
-}
-
-// startRESTFulAPI starts the restful API
-func startRESTFulAPI(config config.Config, chatServer *chat.Server) {
-	server := rest.NewRESTfulAPI(config, chatServer)
-	go func() {
-		logs.FatalIfErrf(server.ListenAndServe(), "Could not start Rest server.")
-	}()
-	logs.Infof("RESTful API started")
 }
