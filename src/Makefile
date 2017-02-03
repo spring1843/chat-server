@@ -47,6 +47,9 @@ bench: install
 clean:
 	@go clean $(GOFLAGS) -i ./...
 
+certs:
+	@openssl req -x509 -nodes -newkey rsa:2048 -keyout tls.key -out tls.crt -days 9650
+
 serve: build install
 	@chat-server -c config.json
 
