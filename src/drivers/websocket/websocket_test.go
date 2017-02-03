@@ -1,7 +1,6 @@
 package websocket_test
 
 import (
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -20,12 +19,13 @@ func TestCantStartAndConnect(t *testing.T) {
 
 	chatServer := chat.NewServer()
 	chatServer.Listen()
-	websocket.Start(chatServer)
+	websocket.SetWebSocket(chatServer)
+
+	http.HandleFunc("/ws", websocket.Handler)
 
 	go func() {
-		err := http.ListenAndServe(config.WebAddress, nil)
-		if err != nil {
-			log.Fatalf("Could not open websocket connection. Error %s", err)
+		if err := http.ListenAndServe(config.WebAddress, nil); err != nil {
+			t.Fatalf("Failed listening to Websocet on %s. Error: %s", config.WebAddress, err)
 		}
 	}()
 	u := url.URL{Scheme: "ws", Host: config.WebAddress, Path: "/ws"}

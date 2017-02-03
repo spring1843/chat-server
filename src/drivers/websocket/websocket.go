@@ -9,7 +9,8 @@ import (
 
 var chatServerInstance *chat.Server
 
-func WebSocketHandler(w http.ResponseWriter, r *http.Request) {
+// Handler is a http handler function that implements WebSocket
+func Handler(w http.ResponseWriter, r *http.Request) {
 	var upgrader = new(websocket.Upgrader)
 	chatConnection := NewChatConnection()
 
@@ -22,7 +23,7 @@ func WebSocketHandler(w http.ResponseWriter, r *http.Request) {
 	chatServerInstance.ReceiveConnection(chatConnection)
 }
 
-// Start starts chat server
-func Start(chatServerParam *chat.Server) {
+// SetWebSocket sets the chat server instance
+func SetWebSocket(chatServerParam *chat.Server) {
 	chatServerInstance = chatServerParam
 }

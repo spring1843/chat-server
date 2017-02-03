@@ -21,11 +21,11 @@ func bootstrap(config config.Config) {
 	logs.FatalIfErrf(startTelnet(config, chatServer), "Could not start telnet server.")
 
 	restHandler := rest.GetHandler(chatServer)
-	websocket.Start(chatServer)
+	websocket.SetWebSocket(chatServer)
 	fs := http.FileServer(http.Dir(staticWebContentDir))
 
 	http.Handle("/api/", restHandler)
-	http.HandleFunc("/ws", websocket.WebSocketHandler)
+	http.HandleFunc("/ws", websocket.Handler)
 	http.Handle("/", fs)
 
 	go func() {
