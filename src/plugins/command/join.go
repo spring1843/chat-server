@@ -43,7 +43,7 @@ func (c *JoinCommand) Execute(params Params) error {
 	params.User1.SetChannel(channelName)
 
 	params.User1.SetOutgoingf(plugins.UserOutPutTUserCommandOutput, "You are now in #%s.", channelName)
-	params.User1.SetOutgoingf(plugins.UserOutPutTypeFERunFunction, "setchannel=%q.", channelName)
+	params.User1.SetOutgoingf(plugins.UserOutPutTypeFERunFunction, "{setChannel}{%s}.", channelName)
 
 	// Welcome user to channel
 	userCount := params.Channel.GetUserCount()

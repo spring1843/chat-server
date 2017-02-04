@@ -1,7 +1,7 @@
  'use strict';
 
  // grab the room from the URL
- var room = "someroom"; location.search && location.search.split('?')[1];
+ var room = null;
 
  // create our webrtc connection
  var webrtc = new SimpleWebRTC({
@@ -10,32 +10,19 @@
      // the id/element dom element that will hold remote videos
      remoteVideosEl: '',
      // immediately ask for camera access
-     autoRequestMedia: true,
+//     autoRequestMedia: true,
      debug: false,
      detectSpeakingEvents: true
  });
 
- // when it's ready, join if we got a room from the URL
- webrtc.on('readyToCall', function () {
-     // you can name it anything
-     if (room) webrtc.joinRoom(room);
- });
 
- function showVolume(el, volume) {
-     if (!el) return;
-     if (volume < -45) { // vary between -45 and -20
-         el.style.height = '0px';
-     } else if (volume > -20) {
-         el.style.height = '100%';
-     } else {
-         el.style.height = '' + Math.floor((volume + 100) * 100 / 25 - 220) + '%';
-     }
- }
+
  webrtc.on('channelMessage', function (peer, label, data) {
      if (data.type == 'volume') {
          showVolume(document.getElementById('volume_' + peer.id), data.volume);
      }
  });
+
  webrtc.on('videoAdded', function (video, peer) {
      console.log('video added', peer);
      var remotes = document.getElementById('remotes');
@@ -55,6 +42,7 @@
          remotes.appendChild(d);
      }
  });
+
  webrtc.on('videoRemoved', function (video, peer) {
      console.log('video removed ', peer);
      var remotes = document.getElementById('remotes');
@@ -63,14 +51,19 @@
          remotes.removeChild(el);
      }
  });
- webrtc.on('volumeChange', function (volume, treshold) {
-     //console.log('own volume', volume);
-     showVolume(document.getElementById('localVolume'), volume);
- });
 
  // Since we use this twice we put it here
  function setRoom(name) {
      $('body').addClass('active');
+     room = name;
+
+     webrtc.startLocalVideo();
+      // when it's ready, join if we got a room from the URL
+      webrtc.on('readyToCall', function () {
+          // you can name it anything
+          if (room) webrtc.joinRoom(room);
+      });
+
  }
 
  if (room) {
