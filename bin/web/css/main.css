@@ -11,12 +11,23 @@ body {
     background: gray;
 }
 
+#cams {
+    background: red;
+    margin: 0;
+    padding: 0.5em 0.5em 0.5em 0.5em;
+    position: absolute;
+    top: 0.5em;
+    left: 0.5em;
+    right: 0.5em;
+    overflow: auto;
+}
+
 #log {
     background: white;
     margin: 0;
     padding: 0.5em 0.5em 0.5em 0.5em;
     position: absolute;
-    top: 0.5em;
+    top: 5.5em;
     left: 0.5em;
     right: 0.5em;
     bottom: 3em;
