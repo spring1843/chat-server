@@ -16,12 +16,23 @@ $(function() {
         }
     }
 
+    function connect(host){
+       conn = new WebSocket(host);
+            conn.onclose = function(evt) {
+                appendLog($("<div><b>Connection closed. Type anything and enter to reconnect.</b></div>"))
+            }
+            conn.onmessage = function(evt) {
+                appendLog($("<div/>").text(evt.data))
+            }
+    }
+
     $("#userInput").keypress(function(event) {
         if (event.which != 13) {
             return true;
         }
         event.preventDefault();
-        if (!conn) {
+        if (!conn || conn.readyState != 1) {
+            connect(webSocketAddr);
             return false;
         }
         if (!msg.val()) {
@@ -33,13 +44,7 @@ $(function() {
     });
 
     if (window["WebSocket"]) {
-        conn = new WebSocket(webSocketAddr);
-        conn.onclose = function(evt) {
-            appendLog($("<div><b>Connection closed.</b></div>"))
-        }
-        conn.onmessage = function(evt) {
-            appendLog($("<div/>").text(evt.data))
-        }
+        connect(webSocketAddr);
     } else {
         appendLog($("<div><b>Your browser does not support WebSockets.</b></div>"))
     }
