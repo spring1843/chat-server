@@ -16,7 +16,7 @@ $(function() {
         }
     }
 
-    $("#form").submit(function() {
+    $("#userInputForm").submit(function() {
         if (!conn) {
             return false;
         }

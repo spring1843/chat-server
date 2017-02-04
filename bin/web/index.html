@@ -9,25 +9,21 @@
 </head>
 
 <body>
-<div id="cams">
-    <!--<button id="screenShareButton"></button>-->
-    <!--<p id="subTitle"></p>-->
-    <!--<form id="createRoom">-->
-        <!--<input id="sessionInput" />-->
-        <!--<button type="submit">Create it!</button>-->
-    <!--</form>-->
-    <div class="videoContainer">
-        <video id="localVideo" style="height: 150px;float:left;" oncontextmenu="return false;"></video>
+    <div id="cams">
+        <div id="videoContainer">
+            <video id="localVideo"></video>
+        </div>
+        <div id="remotes"></div>
     </div>
-    <div id="remotes"></div>
-</div>
-<div id="log"></div>
-<form id="form">
-    <input type="submit" value="Send" />
-    <input type="text" id="msg" size="64" />
-</form>
-<script src="/js/webcosket.js"></script>
-<script src="/js/webrtc.js"></script>
+    <div id="log"></div>
+
+    <form id="userInputForm">
+        <input type="submit" value="Send" />
+        <input type="text" id="msg" size="64" />
+    </form>
+
+    <script src="/js/webcosket.js"></script>
+    <script src="/js/webrtc.js"></script>
 </body>
 
 </html>

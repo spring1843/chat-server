@@ -70,32 +70,11 @@
 
  // Since we use this twice we put it here
  function setRoom(name) {
-     $('form').remove();
-     $('h1').text(name);
-     $('#subTitle').text('Link to join: ' + location.href);
      $('body').addClass('active');
  }
 
  if (room) {
      setRoom(room);
- } else {
-     $('form').submit(function () {
-         var val = $('#sessionInput').val().toLowerCase().replace(/\s/g, '-').replace(/[^A-Za-z0-9_\-]/g, '');
-         webrtc.createRoom(val, function (err, name) {
-             console.log(' create room cb', arguments);
-
-             var newUrl = location.pathname + '?' + name;
-             if (!err) {
-                 history.replaceState({
-                     foo: 'bar'
-                 }, null, newUrl);
-                 setRoom(name);
-             } else {
-                 console.log(err);
-             }
-         });
-         return false;
-     });
  }
 
  var button = $('#screenShareButton'),

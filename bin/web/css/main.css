@@ -11,6 +11,18 @@ body {
     background: gray;
 }
 
+video {
+    max-height: 100%;
+    height: 120px;
+    float:left;
+}
+
+#localVideo {
+    max-height: 100%;
+    height: 120px;
+
+}
+
 #cams {
     margin: 0;
     position: absolute;
@@ -20,15 +32,9 @@ body {
     overflow:scroll;
 }
 
-.videoContainer {
+#videoContainer {
     width: 200px;
     height: 150px;
-    float:left;
-}
-
-.videoContainer video {
-    width: 100%;
-    height: 100%;
     float:left;
 }
 
@@ -37,19 +43,19 @@ body {
     margin: 0;
     padding: 0.5em 0.5em 0.5em 0.5em;
     position: absolute;
-    top: 10.0em;
+    top: 10em;
     left: 0.5em;
     right: 0.5em;
     bottom: 3em;
     overflow: auto;
 }
 
-#form {
+#userInputForm {
     padding: 0 0.5em 0 0.5em;
     margin: 0;
     position: absolute;
-    bottom: 1em;
-    left: 0px;
+    bottom: 0em;
+    left: 0.0em;
     width: 100%;
     overflow: hidden;
 }
