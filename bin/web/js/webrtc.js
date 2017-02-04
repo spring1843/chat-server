@@ -16,7 +16,7 @@
  });
 
  // when it's ready, join if we got a room from the URL
- webrtc.on('readyToCall', function() {
+ webrtc.on('readyToCall', function () {
      // you can name it anything
      if (room) webrtc.joinRoom(room);
  });
@@ -31,12 +31,12 @@
          el.style.height = '' + Math.floor((volume + 100) * 100 / 25 - 220) + '%';
      }
  }
- webrtc.on('channelMessage', function(peer, label, data) {
+ webrtc.on('channelMessage', function (peer, label, data) {
      if (data.type == 'volume') {
          showVolume(document.getElementById('volume_' + peer.id), data.volume);
      }
  });
- webrtc.on('videoAdded', function(video, peer) {
+ webrtc.on('videoAdded', function (video, peer) {
      console.log('video added', peer);
      var remotes = document.getElementById('remotes');
      if (remotes) {
@@ -47,7 +47,7 @@
          var vol = document.createElement('div');
          vol.id = 'volume_' + peer.id;
          vol.className = 'volume_bar';
-         video.onclick = function() {
+         video.onclick = function () {
              video.style.width = video.videoWidth + 'px';
              video.style.height = video.videoHeight + 'px';
          };
@@ -55,7 +55,7 @@
          remotes.appendChild(d);
      }
  });
- webrtc.on('videoRemoved', function(video, peer) {
+ webrtc.on('videoRemoved', function (video, peer) {
      console.log('video removed ', peer);
      var remotes = document.getElementById('remotes');
      var el = document.getElementById('container_' + webrtc.getDomId(peer));
@@ -63,7 +63,7 @@
          remotes.removeChild(el);
      }
  });
- webrtc.on('volumeChange', function(volume, treshold) {
+ webrtc.on('volumeChange', function (volume, treshold) {
      //console.log('own volume', volume);
      showVolume(document.getElementById('localVolume'), volume);
  });
@@ -79,9 +79,9 @@
  if (room) {
      setRoom(room);
  } else {
-     $('form').submit(function() {
+     $('form').submit(function () {
          var val = $('#sessionInput').val().toLowerCase().replace(/\s/g, '-').replace(/[^A-Za-z0-9_\-]/g, '');
-         webrtc.createRoom(val, function(err, name) {
+         webrtc.createRoom(val, function (err, name) {
              console.log(' create room cb', arguments);
 
              var newUrl = location.pathname + '?' + name;
@@ -99,21 +99,21 @@
  }
 
  var button = $('#screenShareButton'),
-     setButton = function(bool) {
+     setButton = function (bool) {
          button.text(bool ? 'share screen' : 'stop sharing');
      };
- webrtc.on('localScreenStopped', function() {
+ webrtc.on('localScreenStopped', function () {
      setButton(true);
  });
 
  setButton(true);
 
- button.click(function() {
+ button.click(function () {
      if (webrtc.getLocalScreen()) {
          webrtc.stopScreenShare();
          setButton(true);
      } else {
-         webrtc.shareScreen(function(err) {
+         webrtc.shareScreen(function (err) {
              if (err) {
                  setButton(true);
              } else {
