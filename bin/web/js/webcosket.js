@@ -3,6 +3,9 @@
 $(function() {
     var conn;
     var msg = $("#userInput");
+
+    $(msg).focus();
+
     var log = $("#log");
     var hostAndPort = location.hostname+(location.port ? ':'+location.port: '');
     var webSocketAddr = "wss://" + hostAndPort + "/ws";
@@ -50,7 +53,7 @@ $(function() {
     function connect(host){
        conn = new WebSocket(host);
             conn.onclose = function(evt) {
-                appendLog($("<div><b>Connection closed. Type anything and enter to reconnect.</b></div>"))
+                appendLog($("<div><b>Connection Error. Press Enter or return to try again.</b></div>"))
             }
             conn.onmessage = function(evt) {
                 var dataString = evt.data;
@@ -66,8 +69,10 @@ $(function() {
         event.preventDefault();
         if (!conn || conn.readyState != 1) {
             connect(webSocketAddr);
+            msg.val("");
             return false;
         }
+
         if (!msg.val()) {
             return false;
         }
