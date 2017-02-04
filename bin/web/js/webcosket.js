@@ -2,7 +2,7 @@
 
 $(function() {
     var conn;
-    var msg = $("#msg");
+    var msg = $("#userInput");
     var log = $("#log");
     var hostAndPort = location.hostname+(location.port ? ':'+location.port: '');
     var webSocketAddr = "wss://" + hostAndPort + "/ws";
@@ -16,7 +16,11 @@ $(function() {
         }
     }
 
-    $("#userInputForm").submit(function() {
+    $("#userInput").keypress(function(event) {
+        if (event.which != 13) {
+            return true;
+        }
+        event.preventDefault();
         if (!conn) {
             return false;
         }
