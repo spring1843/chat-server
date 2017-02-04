@@ -2,11 +2,11 @@ package chat
 
 import (
 	"bytes"
-	"fmt"
 	"strings"
 	"time"
 
 	"github.com/spring1843/chat-server/src/drivers"
+	"github.com/spring1843/chat-server/src/plugins"
 	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
@@ -25,31 +25,6 @@ func NewConnectedUser(connection drivers.Connection) *User {
 func (u *User) Listen(chatServer *Server) {
 	go u.ReadFrom(chatServer)
 	go u.WriteTo()
-}
-
-// GetOutgoing gets the outgoing message for a user
-func (u *User) GetOutgoing() string {
-	return <-u.outgoing
-}
-
-// SetOutgoing sets an outgoing message to the user
-func (u *User) SetOutgoing(message string) {
-	u.outgoing <- message
-}
-
-// SetOutgoingf sets an outgoing message to the user
-func (u *User) SetOutgoingf(format string, a ...interface{}) {
-	u.SetOutgoing(fmt.Sprintf(format, a...))
-}
-
-// GetIncoming gets the incoming message from the user
-func (u *User) GetIncoming() string {
-	return <-u.incoming
-}
-
-// SetIncoming sets an incoming message from the user
-func (u *User) SetIncoming(message string) {
-	u.incoming <- message
 }
 
 // ReadFrom reads data from users and lets chat server interpret it
@@ -86,7 +61,7 @@ func (u *User) WriteTo() {
 func (u *User) Disconnect() error {
 	nickName := u.GetNickName()
 	logs.Infof("disconnecting=@%s", nickName)
-	u.SetOutgoingf("Good Bye %f, come back again.", nickName)
+	u.SetOutgoingf(plugins.UserOutPutTUserServerMessage, "Good Bye %f, come back again.", nickName)
 
 	// Wait 1 second before actually disconnecting
 	<-time.After(time.Second * 1)

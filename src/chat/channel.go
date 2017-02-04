@@ -3,6 +3,7 @@ package chat
 import (
 	"sync"
 
+	"github.com/spring1843/chat-server/src/plugins"
 	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
@@ -77,7 +78,7 @@ func (c *Channel) Broadcast(chatServer *Server, message string) {
 			logs.ErrIfErrf(err, "User %s is in channel %s but not on connected to the server", user.GetNickName(), c.GetName())
 			continue
 		}
-		go user.SetOutgoing(message)
+		go user.SetOutgoing(plugins.UserOutPutTChannel, message)
 	}
 }
 

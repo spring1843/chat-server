@@ -1,6 +1,9 @@
 package command
 
-import "github.com/spring1843/chat-server/src/shared/errs"
+import (
+	"github.com/spring1843/chat-server/src/plugins"
+	"github.com/spring1843/chat-server/src/shared/errs"
+)
 
 // IgnoreCommand allows a user to ignore another user
 type IgnoreCommand struct {
@@ -30,6 +33,6 @@ func (c *IgnoreCommand) Execute(params Params) error {
 	}
 
 	params.User1.Ignore(params.User2.GetNickName())
-	params.User1.SetOutgoingf("@%s is now ignored.", params.User2.GetNickName())
+	params.User1.SetOutgoingf(plugins.UserOutPutTUserCommandOutput, "@%s is now ignored.", params.User2.GetNickName())
 	return nil
 }

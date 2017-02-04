@@ -3,6 +3,7 @@ package command
 import (
 	"strings"
 
+	"github.com/spring1843/chat-server/src/plugins"
 	"github.com/spring1843/chat-server/src/shared/errs"
 )
 
@@ -39,6 +40,6 @@ func (c *ListCommand) Execute(params Params) error {
 	for nickName := range channelUsers {
 		users = append(users, "@"+nickName)
 	}
-	params.User1.SetOutgoingf("User(s) in #%s: %s", channelName, strings.Join(users, ","))
+	params.User1.SetOutgoingf(plugins.UserOutPutTUserCommandOutput, "User(s) in #%s: %s", channelName, strings.Join(users, ","))
 	return nil
 }

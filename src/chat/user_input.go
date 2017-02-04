@@ -1,10 +1,21 @@
 package chat
 
 import (
+	"github.com/spring1843/chat-server/src/plugins"
 	"github.com/spring1843/chat-server/src/plugins/command"
 	"github.com/spring1843/chat-server/src/shared/logs"
 	"github.com/spring1843/pomain/src/shared/errs"
 )
+
+// GetIncoming gets the incoming message from the user
+func (u *User) GetIncoming() string {
+	return <-u.incoming
+}
+
+// SetIncoming sets an incoming message from the user
+func (u *User) SetIncoming(message string) {
+	u.incoming <- message
+}
 
 // HandleNewInput interprets user input and lets chatServer handle it
 func (u *User) HandleNewInput(chatServer *Server, userInput string) (bool, error) {
@@ -22,7 +33,7 @@ func (u *User) HandleNewInput(chatServer *Server, userInput string) (bool, error
 
 	// If it's not a command it's a chat message to broadcast into the channel
 	if u.GetChannel() == "" {
-		u.SetOutgoing("You need to join a channel, use /join #channel or use /help for more info.")
+		u.SetOutgoing(plugins.UserOutPutTypeLogErr, "You need to join a channel, use /join #channel or use /help for more info.")
 		return false, errs.New("User is not in a channel, and input is not a command")
 	}
 	return u.handleBroadCastInput(chatServer, userInput)
@@ -40,14 +51,14 @@ func (u *User) handleBroadCastInput(chatServer *Server, userInput string) (bool,
 func (u *User) handleCommandInput(chatServer *Server, input string) (bool, error) {
 	userCommand, err := command.FromString(input)
 	if err != nil {
-		u.SetOutgoingf("Invalid command, use /help for more info. Error: %s", err.Error())
+		u.SetOutgoingf(plugins.UserOutPutTypeLogErr, "Invalid command, use /help for more info. Error: %s", err.Error())
 		logs.ErrIfErrf(err, "Failed executing %s command by @%s", input, u.GetNickName())
 		return false, errs.Wrap(err, "Error getting command from user input.")
 	}
 
 	commandParams, err := u.GetCommandParams(chatServer, input, userCommand)
 	if err != nil {
-		u.SetOutgoingf("Error executing your command. %s", err)
+		u.SetOutgoingf(plugins.UserOutPutTypeLogErr, "Error executing your command. %s", err)
 		return false, errs.Wrap(err, "Couldn't get command params")
 	}
 

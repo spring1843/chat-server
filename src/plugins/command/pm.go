@@ -3,6 +3,7 @@ package command
 import (
 	"time"
 
+	"github.com/spring1843/chat-server/src/plugins"
 	"github.com/spring1843/chat-server/src/shared/errs"
 	"github.com/spring1843/chat-server/src/shared/logs"
 )
@@ -41,6 +42,6 @@ func (c *PrivateMessageCommand) Execute(params Params) error {
 	logs.Infof("message \t @%s to @%s message=%s", params.User1.GetNickName(), params.User2.GetNickName(), params.Message)
 
 	now := time.Now()
-	go params.User2.SetOutgoingf("%s -PM from @%s: %s", now.Format(time.Kitchen), params.User1.GetNickName(), params.Message)
+	go params.User2.SetOutgoingf(plugins.UserOutPutTPM, "%s -PM from @%s: %s", now.Format(time.Kitchen), params.User1.GetNickName(), params.Message)
 	return nil
 }

@@ -1,6 +1,9 @@
 package command
 
-import "github.com/spring1843/chat-server/src/shared/errs"
+import (
+	"github.com/spring1843/chat-server/src/plugins"
+	"github.com/spring1843/chat-server/src/shared/errs"
+)
 
 // HelpCommand Shows list of available commands
 type HelpCommand struct {
@@ -26,6 +29,6 @@ func (c *HelpCommand) Execute(params Params) error {
 		helpMessage += command.GetChatCommand().Syntax + "\t" + command.GetChatCommand().Description + ".\n"
 	}
 
-	params.User1.SetOutgoing(helpMessage)
+	params.User1.SetOutgoing(plugins.UserOutPutTUserCommandOutput, helpMessage)
 	return nil
 }
