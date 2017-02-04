@@ -10,8 +10,8 @@ $(function() {
     var hostAndPort = location.hostname+(location.port ? ':'+location.port: '');
     var webSocketAddr = "wss://" + hostAndPort + "/ws";
 
-    var validCommands = ["run-function"];
-    var timeStampLengh = 11
+    var validCommands = ["06"]; // UserOutPutTypeFERunFunction
+    var timeStampLentgh = 13
 
     function appendLog(msg) {
         var d = log[0]
@@ -28,10 +28,10 @@ $(function() {
 
     for (var i = 0; i < validCommands.length ; i++) {
         var commandLength = validCommands[i].length;
-        if (msg.length < commandLength + timeStampLengh ){
+        if (msg.length < commandLength + timeStampLentgh ){
             continue;
         }
-        var part = msg.substr(timeStampLengh,commandLength);
+        var part = msg.substr(timeStampLentgh,commandLength);
         if (part == validCommands[i]) {
              isCommand = true;
              command = validCommands[i];
@@ -42,7 +42,7 @@ $(function() {
         return;
     }
 
-    if (command == "run-function"){
+    if (command == "06"){
         var parts = msg.match(/[^{}]+(?=\})/g);
         if (parts[0] == "setChannel"){
             setRoom(parts[1]);
@@ -58,7 +58,7 @@ $(function() {
             conn.onmessage = function(evt) {
                 var dataString = evt.data;
                 runIfCommand(dataString);
-                appendLog($("<div/>").text(dataString.substr(timeStampLengh, dataString.length - timeStampLengh)))
+                appendLog($("<div/>").text(dataString.substr(timeStampLentgh, dataString.length - timeStampLentgh)))
             }
     }
 

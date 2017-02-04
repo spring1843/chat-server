@@ -5,15 +5,15 @@ import (
 	"time"
 )
 
-const outMessagePattern = "%d %s %s"
+const outMessagePattern = "%d %02d %s"
 
 // SetOutgoing sets an outgoing message to the user
-func (u *User) SetOutgoing(messageType string, message string) {
+func (u *User) SetOutgoing(messageType int, message string) {
 	u.outgoing <- fmt.Sprintf(outMessagePattern, time.Now().Unix(), messageType, message)
 }
 
 // SetOutgoingf sets an outgoing message to the user
-func (u *User) SetOutgoingf(messageType string, format string, a ...interface{}) {
+func (u *User) SetOutgoingf(messageType int, format string, a ...interface{}) {
 	u.SetOutgoing(messageType, fmt.Sprintf(format, a...))
 }
 

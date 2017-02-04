@@ -15,14 +15,6 @@
      detectSpeakingEvents: true
  });
 
-
-
- webrtc.on('channelMessage', function (peer, label, data) {
-     if (data.type == 'volume') {
-         showVolume(document.getElementById('volume_' + peer.id), data.volume);
-     }
- });
-
  webrtc.on('videoAdded', function (video, peer) {
      console.log('video added', peer);
      var remotes = document.getElementById('remotes');
