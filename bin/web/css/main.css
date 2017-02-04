@@ -12,33 +12,24 @@ body {
 }
 
 #cams {
-    background: red;
     margin: 0;
-    padding: 0.5em 0.5em 0.5em 0.5em;
     position: absolute;
     top: 0.5em;
     left: 0.5em;
     right: 0.5em;
-    overflow: auto;
+    overflow:scroll;
 }
 
 .videoContainer {
-    position: relative;
     width: 200px;
     height: 150px;
+    float:left;
 }
+
 .videoContainer video {
-    position: absolute;
     width: 100%;
     height: 100%;
-}
-.volume_bar {
-    position: absolute;
-    width: 5px;
-    height: 0px;
-    right: 0px;
-    bottom: 0px;
-    background-color: #12acef;
+    float:left;
 }
 
 #log {
@@ -46,7 +37,7 @@ body {
     margin: 0;
     padding: 0.5em 0.5em 0.5em 0.5em;
     position: absolute;
-    top: 5.5em;
+    top: 10.0em;
     left: 0.5em;
     right: 0.5em;
     bottom: 3em;
