@@ -1,17 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<title>Chat Server Websocket Client</title>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-<link rel="stylesheet" href="css/main.css" />
+    <title>Chat Server Client</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="https://simplewebrtc.com/latest-v2.js"></script>
+    <link rel="stylesheet" href="css/main.css" />
 </head>
+
 <body>
-<div id="cams">ddddd</div>
+<div id="cams">
+    <button id="screenShareButton"></button>
+    <p id="subTitle"></p>
+    <form id="createRoom">
+        <input id="sessionInput" />
+        <button type="submit">Create it!</button>
+    </form>
+    <div class="videoContainer">
+        <video id="localVideo" style="height: 150px;" oncontextmenu="return false;"></video>
+        <div id="localVolume" class="volume_bar"></div>
+    </div>
+    <div id="remotes"></div>
+</div>
 <div id="log"></div>
 <form id="form">
     <input type="submit" value="Send" />
-    <input type="text" id="msg" size="64"/>
+    <input type="text" id="msg" size="64" />
 </form>
-<script src="/js/main.js"></script>
+<script src="/js/webcosket.js"></script>
+<script src="/js/webrtc.js"></script>
 </body>
+
 </html>
