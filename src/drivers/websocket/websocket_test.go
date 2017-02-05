@@ -36,7 +36,7 @@ func TestCantStartTwoUsers(t *testing.T) {
 	i := 0
 	for i < tryouts {
 		nickName := fmt.Sprintf("user%d", i)
-		conns[i] = connectUser(t, nickName, "/ws1", config)
+		conns[i] = connectUser(nickName, "/ws1", config)
 		i++
 	}
 
@@ -46,7 +46,7 @@ func TestCantStartTwoUsers(t *testing.T) {
 
 	i = 0
 	for i < tryouts {
-		disconnectUser(t, conns[i], chatServer)
+		disconnectUser(conns[i], chatServer)
 		i++
 	}
 
@@ -81,7 +81,7 @@ func TestCantStartAndConnectManyUsers(t *testing.T) {
 	}
 }
 
-func connectUser(t *testing.T, nickname string, wsPath string, config config.Config) *gorilla.Conn {
+func connectUser(nickname string, wsPath string, config config.Config) *gorilla.Conn {
 	url := url.URL{Scheme: "ws", Host: config.WebAddress, Path: wsPath}
 
 	conn, _, err := gorilla.DefaultDialer.Dial(url.String(), nil)
@@ -95,7 +95,7 @@ func connectUser(t *testing.T, nickname string, wsPath string, config config.Con
 	}
 
 	if !strings.Contains(string(message), "Welcome") {
-		t.Error("Could not receive welcome message")
+		log.Fatalf("Could not receive welcome message. In %s", message)
 	}
 
 	if err := conn.WriteMessage(1, []byte(nickname)); err != nil {
@@ -115,7 +115,7 @@ func connectUser(t *testing.T, nickname string, wsPath string, config config.Con
 	return conn
 }
 
-func joinChannel(t *testing.T, conn *gorilla.Conn) {
+func joinChannel(conn *gorilla.Conn) {
 	if err := conn.WriteMessage(1, []byte("/join #r")); err != nil {
 		log.Fatalf("Error writing to connection. Error %s", err)
 	}
@@ -124,25 +124,37 @@ func joinChannel(t *testing.T, conn *gorilla.Conn) {
 	if err != nil {
 		log.Fatalf("Error while reading connection. Error %s", err.Error())
 	}
+	expect := "05"
+	if !strings.Contains(string(message), expect) {
+		log.Fatalf("Could not join channel #r. Expected %q got %q", expect, message)
+	}
 
-	expect := "setChannel"
-	expect2 := "You are now in #r"
-	if !strings.Contains(string(message), expect) && !strings.Contains(string(message), expect2) {
-		log.Fatalf("Could not join channel #r. Expected %q or %q got %q", expect, expect2, message)
+	_, message, err = conn.ReadMessage()
+	if err != nil {
+		log.Fatalf("Error while reading connection. Error %s", err.Error())
+	}
+	expect = "06"
+	if !strings.Contains(string(message), expect) {
+		log.Fatalf("Could not join channel #r. Expected %q got %q", expect, message)
+	}
+
+	_, message, err = conn.ReadMessage()
+	if err != nil {
+		log.Fatalf("Error while reading connection. Error %s", err.Error())
+	}
+	expect = "00"
+	if !strings.Contains(string(message), expect) {
+		log.Fatalf("Could not join channel #r. Expected %q got %q", expect, message)
 	}
 }
 
-func disconnectUser(t *testing.T, conn *gorilla.Conn, chatServer *chat.Server) {
+func disconnectUser(conn *gorilla.Conn, chatServer *chat.Server) {
 	if err := conn.WriteMessage(1, []byte(`/quit`)); err != nil {
 		log.Fatalf("Error writing to connection. Error %s", err)
 	}
 
-	_, message, err := conn.ReadMessage()
-	if err != nil {
+	if _, _, err := conn.ReadMessage(); err != nil {
 		log.Fatalf("Failed reading from WebSocket connection. Error %s", err)
-	}
-	if !strings.Contains(string(message), "Good Bye") {
-		log.Fatalf("Could not quit from server. Expected 'Good Bye' got %s", string(message))
 	}
 
 	if chatServer.IsUserConnected("User1") {
@@ -151,7 +163,7 @@ func disconnectUser(t *testing.T, conn *gorilla.Conn, chatServer *chat.Server) {
 }
 
 func connectAndDisconnect(t *testing.T, nickname string, wsPath string, config config.Config, chatServer *chat.Server) {
-	conn := connectUser(t, nickname, wsPath, config)
-	joinChannel(t, conn)
-	disconnectUser(t, conn, chatServer)
+	conn := connectUser(nickname, wsPath, config)
+	joinChannel(conn)
+	disconnectUser(conn, chatServer)
 }
