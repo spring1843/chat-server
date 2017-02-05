@@ -2,6 +2,7 @@ package websocket_test
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -13,7 +14,7 @@ import (
 	"github.com/spring1843/chat-server/src/drivers/websocket"
 )
 
-func TestCantStartAndConnect(t *testing.T) {
+func TestCantStartTwoUsers(t *testing.T) {
 	config := config.Config{
 		WebAddress: "127.0.0.1:4008",
 	}
@@ -22,25 +23,66 @@ func TestCantStartAndConnect(t *testing.T) {
 	chatServer.Listen()
 	websocket.SetWebSocket(chatServer)
 
-	http.HandleFunc("/ws", websocket.Handler)
+	http.HandleFunc("/ws1", websocket.Handler)
 
 	go func() {
 		if err := http.ListenAndServe(config.WebAddress, nil); err != nil {
-			t.Fatalf("Failed listening to Websocet on %s. Error: %s", config.WebAddress, err)
+			log.Fatalf("Failed listening to WebSocket on %s. Error %s.", config.WebAddress, err)
 		}
 	}()
 
-	tryouts := 10
+	tryouts := 2
+	conns := make([]*gorilla.Conn, tryouts, tryouts)
 	i := 0
 	for i < tryouts {
 		nickName := fmt.Sprintf("user%d", i)
-		go connectAndDisconnect(t, nickName, config, chatServer)
+		conns[i] = connectUser(t, nickName, "/ws1", config)
+		i++
+	}
+
+	if chatServer.ConnectedUsersCount() != tryouts {
+		t.Fatalf("Expected user count to be %d after disconnecting users, got %d", tryouts, chatServer.ConnectedUsersCount())
+	}
+
+	i = 0
+	for i < tryouts {
+		disconnectUser(t, conns[i], chatServer)
+		i++
+	}
+
+	if chatServer.ConnectedUsersCount() != 0 {
+		t.Fatalf("Expected user count to be %d after disconnecting users, got %d", 0, chatServer.ConnectedUsersCount())
+	}
+}
+
+func TestCantStartAndConnectManyUsers(t *testing.T) {
+	config := config.Config{
+		WebAddress: "127.0.0.1:4009",
+	}
+
+	chatServer := chat.NewServer()
+	chatServer.Listen()
+	websocket.SetWebSocket(chatServer)
+
+	http.HandleFunc("/ws2", websocket.Handler)
+
+	go func() {
+		if err := http.ListenAndServe(config.WebAddress, nil); err != nil {
+			log.Fatalf("Failed listening to WebSocket on %s. Error %s.", config.WebAddress, err)
+		}
+	}()
+
+	tryouts := 100
+	i := 0
+	for i < tryouts {
+		nickName := fmt.Sprintf("user%d", i)
+		go connectAndDisconnect(t, nickName, "/ws2", config, chatServer)
 		i++
 	}
 }
 
-func connectUser(t *testing.T, nickname string, config config.Config) *gorilla.Conn {
-	url := url.URL{Scheme: "ws", Host: config.WebAddress, Path: "/ws"}
+func connectUser(t *testing.T, nickname string, wsPath string, config config.Config) *gorilla.Conn {
+	url := url.URL{Scheme: "ws", Host: config.WebAddress, Path: wsPath}
 
 	conn, _, err := gorilla.DefaultDialer.Dial(url.String(), nil)
 	if err != nil {
@@ -91,7 +133,7 @@ func disconnectUser(t *testing.T, conn *gorilla.Conn, chatServer *chat.Server) {
 	}
 }
 
-func connectAndDisconnect(t *testing.T, nickname string, config config.Config, chatServer *chat.Server) {
-	conn := connectUser(t, nickname, config)
+func connectAndDisconnect(t *testing.T, nickname string, wsPath string, config config.Config, chatServer *chat.Server) {
+	conn := connectUser(t, nickname, wsPath, config)
 	disconnectUser(t, conn, chatServer)
 }
