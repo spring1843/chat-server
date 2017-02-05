@@ -27,7 +27,7 @@ func TestCantStartTwoUsers(t *testing.T) {
 
 	go func() {
 		if err := http.ListenAndServe(config.WebAddress, nil); err != nil {
-			log.Fatalf("Failed listening to WebSocket on %s. Error %s.", config.WebAddress, err)
+			t.Fatalf("Failed listening to WebSocket on %s. Error %s.", config.WebAddress, err)
 		}
 	}()
 
@@ -68,7 +68,7 @@ func TestCantStartAndConnectManyUsers(t *testing.T) {
 
 	go func() {
 		if err := http.ListenAndServe(config.WebAddress, nil); err != nil {
-			log.Fatalf("Failed listening to WebSocket on %s. Error %s.", config.WebAddress, err)
+			t.Fatalf("Failed listening to WebSocket on %s. Error %s.", config.WebAddress, err)
 		}
 	}()
 
@@ -86,12 +86,12 @@ func connectUser(t *testing.T, nickname string, wsPath string, config config.Con
 
 	conn, _, err := gorilla.DefaultDialer.Dial(url.String(), nil)
 	if err != nil {
-		t.Fatalf("Websocket Dial error: %s", err.Error())
+		log.Fatalf("Websocket Dial error: %s", err.Error())
 	}
 
 	_, message, err := conn.ReadMessage()
 	if err != nil {
-		t.Fatalf("Error while reading connection %s", err.Error())
+		log.Fatalf("Error while reading connection %s", err.Error())
 	}
 
 	if !strings.Contains(string(message), "Welcome") {
@@ -99,17 +99,17 @@ func connectUser(t *testing.T, nickname string, wsPath string, config config.Con
 	}
 
 	if err := conn.WriteMessage(1, []byte(nickname)); err != nil {
-		t.Fatalf("Error writing to connection. Error %s", err)
+		log.Fatalf("Error writing to connection. Error %s", err)
 	}
 
 	_, message, err = conn.ReadMessage()
 	if err != nil {
-		t.Fatalf("Error while reading connection. Error %s", err.Error())
+		log.Fatalf("Error while reading connection. Error %s", err.Error())
 	}
 
 	expect := "Welcome " + nickname
 	if !strings.Contains(string(message), expect) {
-		t.Fatalf("Could not set user %s, expected 'Thanks User1' got %s", nickname, expect)
+		log.Fatalf("Could not set user %s, expected 'Thanks User1' got %s", nickname, expect)
 	}
 
 	return conn
@@ -117,35 +117,35 @@ func connectUser(t *testing.T, nickname string, wsPath string, config config.Con
 
 func joinChannel(t *testing.T, conn *gorilla.Conn) {
 	if err := conn.WriteMessage(1, []byte("/join #r")); err != nil {
-		t.Fatalf("Error writing to connection. Error %s", err)
+		log.Fatalf("Error writing to connection. Error %s", err)
 	}
 
 	_, message, err := conn.ReadMessage()
 	if err != nil {
-		t.Fatalf("Error while reading connection. Error %s", err.Error())
+		log.Fatalf("Error while reading connection. Error %s", err.Error())
 	}
 
 	expect := "You are now in #r"
 	if !strings.Contains(string(message), expect) {
-		t.Fatalf("Could not join channel #r. Expected %s got %s", expect, message)
+		log.Fatalf("Could not join channel #r. Expected %s got %s", expect, message)
 	}
 }
 
 func disconnectUser(t *testing.T, conn *gorilla.Conn, chatServer *chat.Server) {
 	if err := conn.WriteMessage(1, []byte(`/quit`)); err != nil {
-		t.Fatalf("Error writing to connection. Error %s", err)
+		log.Fatalf("Error writing to connection. Error %s", err)
 	}
 
 	_, message, err := conn.ReadMessage()
 	if err != nil {
-		t.Fatalf("Failed reading from WebSocket connection. Error %s", err)
+		log.Fatalf("Failed reading from WebSocket connection. Error %s", err)
 	}
 	if !strings.Contains(string(message), "Good Bye") {
-		t.Fatalf("Could not quit from server. Expected 'Good Bye' got %s", string(message))
+		log.Fatalf("Could not quit from server. Expected 'Good Bye' got %s", string(message))
 	}
 
 	if chatServer.IsUserConnected("User1") {
-		t.Fatal("User is still connected to server after quiting")
+		log.Fatal("User is still connected to server after quiting")
 	}
 }
 
