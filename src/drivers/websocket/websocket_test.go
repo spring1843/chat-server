@@ -115,6 +115,22 @@ func connectUser(t *testing.T, nickname string, wsPath string, config config.Con
 	return conn
 }
 
+func joinChannel(t *testing.T, conn *gorilla.Conn) {
+	if err := conn.WriteMessage(1, []byte("/join #r")); err != nil {
+		t.Fatalf("Error writing to connection. Error %s", err)
+	}
+
+	_, message, err := conn.ReadMessage()
+	if err != nil {
+		t.Fatalf("Error while reading connection. Error %s", err.Error())
+	}
+
+	expect := "You are now in #r"
+	if !strings.Contains(string(message), expect) {
+		t.Fatalf("Could not join channel #r. Expected %s got %s", expect, message)
+	}
+}
+
 func disconnectUser(t *testing.T, conn *gorilla.Conn, chatServer *chat.Server) {
 	if err := conn.WriteMessage(1, []byte(`/quit`)); err != nil {
 		t.Fatalf("Error writing to connection. Error %s", err)
@@ -135,5 +151,6 @@ func disconnectUser(t *testing.T, conn *gorilla.Conn, chatServer *chat.Server) {
 
 func connectAndDisconnect(t *testing.T, nickname string, wsPath string, config config.Config, chatServer *chat.Server) {
 	conn := connectUser(t, nickname, wsPath, config)
+	joinChannel(t, conn)
 	disconnectUser(t, conn, chatServer)
 }
