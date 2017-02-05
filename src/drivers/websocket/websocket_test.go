@@ -125,9 +125,10 @@ func joinChannel(t *testing.T, conn *gorilla.Conn) {
 		log.Fatalf("Error while reading connection. Error %s", err.Error())
 	}
 
-	expect := "You are now in #r"
-	if !strings.Contains(string(message), expect) {
-		log.Fatalf("Could not join channel #r. Expected %s got %s", expect, message)
+	expect := "setChannel"
+	expect2 := "You are now in #r"
+	if !strings.Contains(string(message), expect) && !strings.Contains(string(message), expect2) {
+		log.Fatalf("Could not join channel #r. Expected %q or %q got %q", expect, expect2, message)
 	}
 }
 
