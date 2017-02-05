@@ -28,9 +28,16 @@ func TestCantStartAndConnect(t *testing.T) {
 			t.Fatalf("Failed listening to Websocet on %s. Error: %s", config.WebAddress, err)
 		}
 	}()
-	u := url.URL{Scheme: "ws", Host: config.WebAddress, Path: "/ws"}
 
-	conn, _, err := gorilla.DefaultDialer.Dial(u.String(), nil)
+	nickName := "User1"
+	conn := connectUsers(t, nickName, config)
+	disconnectUsers(t, conn, chatServer)
+}
+
+func connectUsers(t *testing.T, nickname string, config config.Config) *gorilla.Conn {
+	url := url.URL{Scheme: "ws", Host: config.WebAddress, Path: "/ws"}
+
+	conn, _, err := gorilla.DefaultDialer.Dial(url.String(), nil)
 	if err != nil {
 		t.Fatalf("Websocket Dial error: %s", err.Error())
 	}
@@ -44,7 +51,7 @@ func TestCantStartAndConnect(t *testing.T) {
 		t.Error("Could not receive welcome message")
 	}
 
-	if err := conn.WriteMessage(1, []byte(`User1`)); err != nil {
+	if err := conn.WriteMessage(1, []byte(nickname)); err != nil {
 		t.Fatalf("Error writing to connection. Error %s", err)
 	}
 
@@ -53,16 +60,23 @@ func TestCantStartAndConnect(t *testing.T) {
 		t.Fatalf("Error while reading connection. Error %s", err.Error())
 	}
 
-	expect := "Welcome User1"
+	expect := "Welcome " + nickname
 	if !strings.Contains(string(message), expect) {
-		t.Fatalf("Could not set user nickname, expected 'Thanks User1' got %s", expect)
+		t.Fatalf("Could not set user %s, expected 'Thanks User1' got %s", nickname, expect)
 	}
 
+	return conn
+}
+
+func disconnectUsers(t *testing.T, conn *gorilla.Conn, chatServer *chat.Server) {
 	if err := conn.WriteMessage(1, []byte(`/quit`)); err != nil {
 		t.Fatalf("Error writing to connection. Error %s", err)
 	}
 
-	_, message, err = conn.ReadMessage()
+	_, message, err := conn.ReadMessage()
+	if err != nil {
+		t.Fatalf("Failed reading from WebSocket connection. Error %s", err)
+	}
 	if !strings.Contains(string(message), "Good Bye") {
 		t.Fatalf("Could not quit from server. Expected 'Good Bye' got %s", string(message))
 	}
