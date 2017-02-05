@@ -1,6 +1,7 @@
 package websocket_test
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -29,12 +30,31 @@ func TestCantStartAndConnect(t *testing.T) {
 		}
 	}()
 
-	nickName := "User1"
-	conn := connectUsers(t, nickName, config)
-	disconnectUsers(t, conn, chatServer)
+	tryouts := 10
+	conns := make([]*gorilla.Conn, tryouts, tryouts)
+	i := 0
+	for i < tryouts {
+		nickName := fmt.Sprintf("user%d", i)
+		conns[i] = connectUser(t, nickName, config)
+		i++
+	}
+
+	if chatServer.ConnectedUsersCount() != tryouts {
+		t.Fatalf("Expected user count to be %d after disconnecting users, got %d", tryouts, chatServer.ConnectedUsersCount())
+	}
+
+	i = 0
+	for i < tryouts {
+		disconnectUser(t, conns[i], chatServer)
+		i++
+	}
+
+	if chatServer.ConnectedUsersCount() != 0 {
+		t.Fatalf("Expected user count to be %d after disconnecting users, got %d", 0, chatServer.ConnectedUsersCount())
+	}
 }
 
-func connectUsers(t *testing.T, nickname string, config config.Config) *gorilla.Conn {
+func connectUser(t *testing.T, nickname string, config config.Config) *gorilla.Conn {
 	url := url.URL{Scheme: "ws", Host: config.WebAddress, Path: "/ws"}
 
 	conn, _, err := gorilla.DefaultDialer.Dial(url.String(), nil)
@@ -68,7 +88,7 @@ func connectUsers(t *testing.T, nickname string, config config.Config) *gorilla.
 	return conn
 }
 
-func disconnectUsers(t *testing.T, conn *gorilla.Conn, chatServer *chat.Server) {
+func disconnectUser(t *testing.T, conn *gorilla.Conn, chatServer *chat.Server) {
 	if err := conn.WriteMessage(1, []byte(`/quit`)); err != nil {
 		t.Fatalf("Error writing to connection. Error %s", err)
 	}
