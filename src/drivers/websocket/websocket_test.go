@@ -31,26 +31,11 @@ func TestCantStartAndConnect(t *testing.T) {
 	}()
 
 	tryouts := 10
-	conns := make([]*gorilla.Conn, tryouts, tryouts)
 	i := 0
 	for i < tryouts {
 		nickName := fmt.Sprintf("user%d", i)
-		conns[i] = connectUser(t, nickName, config)
+		go connectAndDisconnect(t, nickName, config, chatServer)
 		i++
-	}
-
-	if chatServer.ConnectedUsersCount() != tryouts {
-		t.Fatalf("Expected user count to be %d after disconnecting users, got %d", tryouts, chatServer.ConnectedUsersCount())
-	}
-
-	i = 0
-	for i < tryouts {
-		disconnectUser(t, conns[i], chatServer)
-		i++
-	}
-
-	if chatServer.ConnectedUsersCount() != 0 {
-		t.Fatalf("Expected user count to be %d after disconnecting users, got %d", 0, chatServer.ConnectedUsersCount())
 	}
 }
 
@@ -104,4 +89,9 @@ func disconnectUser(t *testing.T, conn *gorilla.Conn, chatServer *chat.Server) {
 	if chatServer.IsUserConnected("User1") {
 		t.Fatal("User is still connected to server after quiting")
 	}
+}
+
+func connectAndDisconnect(t *testing.T, nickname string, config config.Config, chatServer *chat.Server) {
+	conn := connectUser(t, nickname, config)
+	disconnectUser(t, conn, chatServer)
 }
