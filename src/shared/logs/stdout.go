@@ -6,8 +6,6 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/pkg/errors"
-	"github.com/spring1843/chat-server/src/shared/errs"
 )
 
 const (
@@ -30,8 +28,7 @@ var (
 )
 
 func logErrDetails(err error) {
-	stack := errors.WithStack(err)
-	logPrint(debug, fmt.Sprintf("Error :%+v", stack))
+	logPrint(debug, fmt.Sprintf("Error: %s", err))
 }
 
 func logPrint(logType string, message string) {

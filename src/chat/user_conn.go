@@ -66,6 +66,5 @@ func (u *User) Disconnect() error {
 	// Wait 1 second before actually disconnecting
 	<-time.After(time.Second * 1)
 
-	u.endUser()
 	return u.conn.Close()
 }

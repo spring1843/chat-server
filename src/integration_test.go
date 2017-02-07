@@ -10,6 +10,7 @@ import (
 	gorilla "github.com/gorilla/websocket"
 	"github.com/spring1843/chat-server/src/chat"
 	"github.com/spring1843/chat-server/src/config"
+	"github.com/spring1843/chat-server/src/plugins"
 	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
@@ -80,7 +81,7 @@ func joinChannel(conn *gorilla.Conn, i int) {
 	if err != nil {
 		logs.Fatalf("user%d error, Error while reading connection. Error %s", i, err.Error())
 	}
-	expect := "05"
+	expect := fmt.Sprintf("%02d", plugins.UserOutPutTUserCommandOutput)
 	if !strings.Contains(string(message), expect) {
 		logs.Fatalf("user%d error, Could not join channel #r. Expected %q got %q", i, expect, message)
 	}
@@ -89,7 +90,7 @@ func joinChannel(conn *gorilla.Conn, i int) {
 	if err != nil {
 		logs.Fatalf("user%d error, Error while reading connection. Error %s", i, err.Error())
 	}
-	expect = "06"
+	expect = fmt.Sprintf("%02d", plugins.UserOutPutTypeFERunFunction)
 	if !strings.Contains(string(message), expect) {
 		logs.Fatalf("user%d error, Could not join channel #r. Expected %q got %q", i, expect, message)
 	}
@@ -98,7 +99,17 @@ func joinChannel(conn *gorilla.Conn, i int) {
 	if err != nil {
 		logs.Fatalf("user%d error, Error while reading connection. Error %s", i, err.Error())
 	}
-	expect = "00"
+
+	// Ignore user traffic messages the user will receive while in the channel.
+	inoreUserTraffic := "just joined channel"
+	for strings.Contains(string(message), inoreUserTraffic) {
+		_, message, err = conn.ReadMessage()
+		if err != nil {
+			logs.Fatalf("user%d error, Error while reading connection. Error %s", i, err.Error())
+		}
+	}
+
+	expect = fmt.Sprintf("%02d", plugins.UserOutPutTUserTraffic)
 	if !strings.Contains(string(message), expect) {
 		logs.Fatalf("user%d error, Could not join channel #r. Expected %q got %q", i, expect, message)
 	}

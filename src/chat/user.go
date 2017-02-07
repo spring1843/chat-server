@@ -37,12 +37,6 @@ func NewUser(nickName string) *User {
 	}
 }
 
-func (u *User) endUser(){
-	close(u.incoming)
-	close(u.outgoing)
-	u.lockChannel.Lock()
-}
-
 // GetNickName returns the nickname of this user
 func (u *User) GetNickName() string {
 	u.lockNickName.Lock()
