@@ -1,11 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/url"
 	"strings"
 	"testing"
+	"fmt"
+	"sync"
+	"time"
 
 	gorilla "github.com/gorilla/websocket"
 	"github.com/spring1843/chat-server/src/chat"
@@ -15,8 +17,11 @@ import (
 )
 
 var (
-	integrationTryouts = 100
-	doneWithAllUsers   chan bool
+	curUserCount = 0
+	userCount    = 2
+	counterLock  = new(sync.Mutex)
+
+	doneWithAllUsers chan bool
 )
 
 // Tests that the server can be started with config.json configs
@@ -28,14 +33,23 @@ func TestManyUsers(t *testing.T) {
 
 	bootstrap(config)
 
+	doneWithAllUsers = make(chan bool, 1)
+
 	i := 0
-	for i < integrationTryouts {
+	for i < userCount {
 		nickName := fmt.Sprintf("user%d", i)
 		go connectAndDisconnect(nickName, "/ws", config, chatServer, i)
 		i++
 	}
-	<-doneWithAllUsers
-	close(doneWithAllUsers)
+
+	select {
+	case <-time.After(time.Second * 5):
+		t.Fatalf("Didn't finish after 5 seconds")
+	case done := <-doneWithAllUsers:
+		if done {
+			t.Logf("Done!")
+		}
+	}
 }
 
 func connectUser(nickname string, wsPath string, config config.Config, i int) *gorilla.Conn {
@@ -120,7 +134,12 @@ func connectAndDisconnect(nickname string, wsPath string, config config.Config, 
 	conn := connectUser(nickname, wsPath, config, i)
 	joinChannel(conn, i)
 	disconnectUser(conn, chatServer, i)
-	if i == integrationTryouts {
+
+	counterLock.Lock()
+	defer counterLock.Unlock()
+
+	curUserCount++
+	if curUserCount == userCount {
 		doneWithAllUsers <- true
 	}
 }
