@@ -32,12 +32,12 @@ func (u *User) ReadFrom(chatServer *Server) {
 	for {
 		message := make([]byte, ReadConnectionLimitBytes)
 		if _, err := u.conn.Read(message); err != nil {
-			logs.ErrIfErrf(err, "Error reading from @%s.", u.GetNickName())
+			logs.ErrIfErrf(err, "Error reading from connection. @%s.", u.GetNickName())
 			continue
 		}
 
 		_, err := u.HandleNewInput(chatServer, sanitizeInput(message))
-		logs.ErrIfErrf(err, "Error reading input from user @%s.", u.GetNickName())
+		logs.ErrIfErrf(err, "Error handling input from user @%s.", u.GetNickName())
 	}
 }
 
@@ -60,7 +60,7 @@ func (u *User) WriteTo() {
 // Disconnect a user from this server
 func (u *User) Disconnect() error {
 	nickName := u.GetNickName()
-	logs.Infof("Disconnecting user @%s", nickName)
+	logs.Infof("Disconnecting @%s", nickName)
 
 	u.SetOutgoingf(plugins.UserOutPutTUserServerMessage, "Good Bye %f, come back again.", nickName)
 

@@ -4,6 +4,7 @@ import (
 	"net"
 
 	"github.com/gorilla/websocket"
+	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
 // ChatConnection is an middleman between the WebSocket connection and Chat Server
@@ -51,12 +52,11 @@ func (c *ChatConnection) Read(p []byte) (int, error) {
 	message = append(message, byte('\n'))
 
 	if len(p) < len(message) {
-		p = make([]byte, len(message))
+		p = make([]byte, len(message), len(message))
 	}
 
-	for _, bit := range message {
+	for i, bit := range message {
 		p[i] = bit
-		i++
 	}
 	return i, nil
 }
@@ -84,6 +84,7 @@ func listen(c *ChatConnection) {
 	for {
 		err := handleIncoming(c)
 		if err != nil {
+			logs.ErrIfErrf(err, "Error handling WebSocket incoming connection")
 			c.Close()
 			break
 		}

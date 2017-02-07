@@ -5,17 +5,24 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/spring1843/chat-server/src/chat"
+	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
-var chatServerInstance *chat.Server
+var (
+	chatServerInstance *chat.Server
+	upgrader           = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+	}
+)
 
 // Handler is a http handler function that implements WebSocket
 func Handler(w http.ResponseWriter, r *http.Request) {
-	var upgrader = new(websocket.Upgrader)
+	logs.Infof("Call to websocket /wp form %s", r.RemoteAddr)
 	chatConnection := NewChatConnection()
-
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
+		logs.ErrIfErrf(err, "Error upgrading websocket connection.")
 		return
 	}
 	chatConnection.Connection = conn

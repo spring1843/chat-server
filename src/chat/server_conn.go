@@ -11,7 +11,7 @@ func (s *Server) Listen() {
 	go func() {
 		for {
 			for connection := range s.conn {
-				logs.Infof("connection \t New connection from address=%s", connection.RemoteAddr().String())
+				logs.Infof("New connection from address=%s", connection.RemoteAddr().String())
 				go s.InterviewUser(connection)
 			}
 		}
