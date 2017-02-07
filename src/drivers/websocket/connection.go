@@ -4,6 +4,7 @@ import (
 	"net"
 
 	"github.com/gorilla/websocket"
+	"github.com/spring1843/chat-server/src/shared/errs"
 	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
@@ -15,26 +16,23 @@ type ChatConnection struct {
 
 // NewChatConnection returns a new ChatConnection
 func NewChatConnection() *ChatConnection {
-	newChatConnection := &ChatConnection{
+	return &ChatConnection{
 		Incoming: make(chan []byte),
 	}
-	return newChatConnection
 }
 
 // Write to a ChatConnection
 func (c *ChatConnection) Write(p []byte) (int, error) {
-	err := handleOutgoing(1, c, p)
-	if err != nil {
-		return -1, err
+	if err := handleOutgoing(1, c, p); err != nil {
+		return -1, errs.Wrap(err, "Error while trying to write to connection")
 	}
 	return len(p) - 1, nil
 }
 
 // Close a ChatConnection
 func (c *ChatConnection) Close() error {
-	err := c.Connection.Close()
-	if err != nil {
-		return err
+	if err := c.Connection.Close(); err != nil {
+		return errs.Wrap(err, "Error closing WebSocket connection")
 	}
 	return nil
 }
@@ -61,32 +59,24 @@ func (c *ChatConnection) Read(p []byte) (int, error) {
 	return i, nil
 }
 
-func handleIncoming(c *ChatConnection) error {
-	msgType, message, err := c.Connection.ReadMessage()
-	if err != nil {
-		return err
-	}
-	if msgType == 1 {
-		c.Incoming <- message
-	}
-	return nil
-}
-
 func handleOutgoing(msgType int, c *ChatConnection, message []byte) error {
 	err := c.Connection.WriteMessage(msgType, message)
 	if err != nil {
-		return err
+		return errs.Wrap(err, "Error handling Websocket Outgoging")
 	}
 	return nil
 }
 
 func listen(c *ChatConnection) {
 	for {
-		err := handleIncoming(c)
+		msgType, message, err := c.Connection.ReadMessage()
 		if err != nil {
-			logs.ErrIfErrf(err, "Error handling WebSocket incoming connection")
-			c.Close()
+			logs.ErrIfErrf(err, "Error reading from WebSocket connection")
 			break
 		}
+		if msgType == 1 {
+			c.Incoming <- message
+		}
 	}
+	logs.Infof("No longer listening to %s", c.RemoteAddr())
 }
