@@ -3,8 +3,8 @@ package chat
 import (
 	"github.com/spring1843/chat-server/src/plugins"
 	"github.com/spring1843/chat-server/src/plugins/command"
-	"github.com/spring1843/chat-server/src/shared/logs"
 	"github.com/spring1843/chat-server/src/shared/errs"
+	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
 // GetIncoming gets the incoming message from the user

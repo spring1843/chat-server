@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/emicklei/go-restful"
-	"github.com/emicklei/go-restful/swagger"
+	"github.com/emicklei/go-restful-swagger12"
 	"github.com/spring1843/chat-server/src/chat"
 )
 
