@@ -46,12 +46,8 @@ func connectUser(nickname string, wsPath string, config config.Config, i int) *g
 		logs.Fatalf("user%d error, Websocket couldn't dial %q error: %s", i, url.String(), err.Error())
 	}
 
-	_, message, err := conn.ReadMessage()
-	if err != nil {
-		logs.Fatalf("user%d error, Error while reading connection %s", i, err.Error())
-	}
-
-	if !strings.Contains(string(message), "Welcome") {
+	message := readAndIgnoreOtherUserJoinMessages(conn, i)
+	if !strings.Contains(message, "Welcome") {
 		logs.Fatalf("user%d error, Could not receive welcome message. In %s", i, message)
 	}
 
@@ -59,13 +55,9 @@ func connectUser(nickname string, wsPath string, config config.Config, i int) *g
 		logs.Fatalf("user%d error, Error writing to connection. Error %s", i, err)
 	}
 
-	_, message, err = conn.ReadMessage()
-	if err != nil {
-		logs.Fatalf("user%d error, Error while reading connection. Error %s", i, err.Error())
-	}
-
+	message = readAndIgnoreOtherUserJoinMessages(conn, i)
 	expect := "Welcome " + nickname
-	if !strings.Contains(string(message), expect) {
+	if !strings.Contains(message, expect) {
 		logs.Fatalf("user%d error, Could not set user %s, expected 'Thanks User1' got %s", i, nickname, expect)
 	}
 
@@ -117,10 +109,6 @@ func readAndIgnoreOtherUserJoinMessages(conn *gorilla.Conn, i int) string {
 func disconnectUser(conn *gorilla.Conn, chatServer *chat.Server, i int) {
 	if err := conn.WriteMessage(1, []byte(`/quit`)); err != nil {
 		logs.Fatalf("user%d error, Error writing to connection. Error %s", i, err)
-	}
-
-	if _, _, err := conn.ReadMessage(); err != nil {
-		logs.Fatalf("user%d error, Failed reading from WebSocket connection. Error %s", i, err)
 	}
 
 	if chatServer.IsUserConnected("User1") {
