@@ -63,7 +63,7 @@ func (u *User) handleCommandInput(chatServer *Server, input string) (bool, error
 	}
 
 	if err = userCommand.Execute(*commandParams); err != nil {
-		logs.ErrIfErrf(err, "error \t @%s command=%s error=%s", u.GetNickName(), input)
+		logs.ErrIfErrf(err, "error \t @%s command=%s error=%s", u.GetNickName(), input, err)
 		return false, errs.Wrapf(err, "Couldn't execute command %q.", input)
 	}
 
