@@ -13,8 +13,9 @@ import (
 
 func TestCanStartWebWithHTTP(t *testing.T) {
 	config := config.FromFile("./config.json")
+	config.WebAddress += "1"
+	srv := getTLSServer(getmux(), config.WebAddress)
 	go func() {
-		srv := getTLSServer(getmux(), config.WebAddress)
 		if err := srv.ListenAndServe(); err != nil {
 			logs.FatalIfErrf(err, "Couldn't start http on %s", config.WebAddress)
 		}
@@ -32,6 +33,7 @@ func TestCanStartWebWithHTTP(t *testing.T) {
 
 func TestCanStartWebWithHTTPS(t *testing.T) {
 	config := config.FromFile("./config.json")
+	config.WebAddress += "2"
 	go func() {
 		srv := getTLSServer(getmux(), config.WebAddress)
 		if err := srv.ListenAndServeTLS("tls.crt", "tls.key"); err != nil {
