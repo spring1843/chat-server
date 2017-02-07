@@ -3,10 +3,8 @@ package chat
 import (
 	"bytes"
 	"strings"
-	"time"
 
 	"github.com/spring1843/chat-server/src/drivers"
-	"github.com/spring1843/chat-server/src/plugins"
 	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
@@ -61,10 +59,5 @@ func (u *User) WriteTo() {
 func (u *User) Disconnect() error {
 	nickName := u.GetNickName()
 	logs.Infof("Disconnecting user @%s", nickName)
-	u.SetOutgoingf(plugins.UserOutPutTUserServerMessage, "Good Bye %f, come back again.", nickName)
-
-	// Wait 1 second before actually disconnecting
-	<-time.After(time.Second * 1)
-
 	return u.conn.Close()
 }
