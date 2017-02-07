@@ -59,15 +59,15 @@ func FatalIfErrf(err error, format string, a ...interface{}) {
 // WarnIfErrf warn logs if there's an error
 func WarnIfErrf(err error, format string, a ...interface{}) {
 	if err != nil {
-		logErrDetails(err)
 		Warnf(format, a...)
+		logErrDetails(err)
 	}
 }
 
 // ErrIfErrf error logs if there's an error
 func ErrIfErrf(err error, format string, a ...interface{}) {
 	if err != nil {
-		logErrDetails(err)
 		Errf(format, a...)
+		logErrDetails(err)
 	}
 }
