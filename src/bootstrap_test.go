@@ -5,8 +5,49 @@ import (
 	"os/exec"
 	"testing"
 
+	"net/http"
+
 	"github.com/spring1843/chat-server/src/config"
+	"github.com/spring1843/chat-server/src/shared/logs"
 )
+
+func TestCanStartWebWithHTTP(t *testing.T) {
+	config := config.FromFile("./config.json")
+	go func() {
+		srv := getTLSServer(getmux(), config.WebAddress)
+		if err := srv.ListenAndServe(); err != nil {
+			logs.FatalIfErrf(err, "Couldn't start http on %s", config.WebAddress)
+		}
+	}()
+
+	resp, err := http.Get("http://" + config.WebAddress + "/api/status")
+	if err != nil {
+		t.Fatalf("couldn't get api status endpoint after serving http. Error %s", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("Expected status %d, got %d", http.StatusOK, resp.StatusCode)
+	}
+}
+
+func TestCanStartWebWithHTTPS(t *testing.T) {
+	config := config.FromFile("./config.json")
+	go func() {
+		srv := getTLSServer(getmux(), config.WebAddress)
+		if err := srv.ListenAndServeTLS("tls.crt", "tls.key"); err != nil {
+			logs.FatalIfErrf(err, "Couldn't start http on %s", config.WebAddress)
+		}
+	}()
+
+	resp, err := http.Get("https://" + config.WebAddress + "/api/status")
+	if err != nil {
+		t.Fatalf("couldn't get api status endpoint after serving https. Error %s", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("Expected status %d, got %d", http.StatusOK, resp.StatusCode)
+	}
+}
 
 // TestCanRunDefaultConfig run bootstrap and expects it to be able to run with config.json values
 func TestCanRunDefaultConfig(t *testing.T) {
