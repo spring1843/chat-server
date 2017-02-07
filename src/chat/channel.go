@@ -75,7 +75,7 @@ func (c *Channel) Broadcast(chatServer *Server, message string) {
 		// User may no longer be connected to the chat server
 		if err != nil {
 			c.RemoveUser(nickName)
-			logs.ErrIfErrf(err, "User %s is in channel %s but not on connected to the server", user.GetNickName(), c.GetName())
+			logs.ErrIfErrf(err, "User %s is in channel %s but not on connected to the server", nickName, c.GetName())
 			continue
 		}
 		go user.SetOutgoing(plugins.UserOutPutTChannel, message)

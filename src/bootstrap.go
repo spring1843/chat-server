@@ -39,7 +39,6 @@ func startTelnet(config config.Config) error {
 	err := telnet.Start(chatServer, config)
 	if err != nil {
 		return err
-
 	}
 	logs.Info("Telnet server started")
 	return nil
@@ -47,14 +46,14 @@ func startTelnet(config config.Config) error {
 
 func startWeb(config config.Config) error {
 	go func() {
-		srv := getTLSServer(getmux(), config.WebAddress)
+		srv := getTLSServer(getMultiplexer(), config.WebAddress)
 		logs.Infof("Serving static files, Rest, WebSocket on http:/%s/", config.WebAddress)
 		logs.FatalIfErrf(srv.ListenAndServeTLS("tls.crt", "tls.key"), "Could not start Rest server.")
 	}()
 	return nil
 }
 
-func getmux() *http.ServeMux {
+func getMultiplexer() *http.ServeMux {
 	restHandler := rest.GetHandler(chatServer)
 	websocket.SetWebSocket(chatServer)
 	fs := http.FileServer(http.Dir(staticWebContentDir))
