@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+
 	"fmt"
 	"sync"
 	"time"
@@ -18,7 +19,7 @@ import (
 
 var (
 	curUserCount = 0
-	userCount    = 2
+	userCount    = 100
 	counterLock  = new(sync.Mutex)
 
 	doneWithAllUsers chan bool
@@ -43,7 +44,7 @@ func TestManyUsers(t *testing.T) {
 	}
 
 	select {
-	case <-time.After(time.Second * 5):
+	case <-time.After(time.Second * 15):
 		t.Fatalf("Didn't finish after 5 seconds")
 	case done := <-doneWithAllUsers:
 		if done {
