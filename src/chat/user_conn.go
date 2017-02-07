@@ -60,7 +60,7 @@ func (u *User) WriteTo() {
 // Disconnect a user from this server
 func (u *User) Disconnect() error {
 	nickName := u.GetNickName()
-	logs.Infof("disconnecting=@%s", nickName)
+	logs.Infof("Disconnecting user @%s", nickName)
 	u.SetOutgoingf(plugins.UserOutPutTUserServerMessage, "Good Bye %f, come back again.", nickName)
 
 	// Wait 1 second before actually disconnecting

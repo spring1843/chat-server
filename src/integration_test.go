@@ -77,25 +77,27 @@ func joinChannel(conn *gorilla.Conn, i int) {
 		logs.Fatalf("user%d error, Error writing to connection. Error %s", i, err)
 	}
 
-	_, message, err := conn.ReadMessage()
-	if err != nil {
-		logs.Fatalf("user%d error, Error while reading connection. Error %s", i, err.Error())
-	}
+	message := readAndIgnoreOtherUserJoinMessages(conn, i)
 	expect := fmt.Sprintf("%02d", plugins.UserOutPutTUserCommandOutput)
-	if !strings.Contains(string(message), expect) {
-		logs.Fatalf("user%d error, Could not join channel #r. Expected %q got %q", i, expect, message)
+	if !strings.Contains(message, expect) {
+		logs.Fatalf("user%d error, Could not join channel #r. Expected 'you are now in' (%q) got %q", i, expect, message)
 	}
 
-	_, message, err = conn.ReadMessage()
-	if err != nil {
-		logs.Fatalf("user%d error, Error while reading connection. Error %s", i, err.Error())
-	}
+	message = readAndIgnoreOtherUserJoinMessages(conn, i)
 	expect = fmt.Sprintf("%02d", plugins.UserOutPutTypeFERunFunction)
-	if !strings.Contains(string(message), expect) {
-		logs.Fatalf("user%d error, Could not join channel #r. Expected %q got %q", i, expect, message)
+	if !strings.Contains(message, expect) {
+		logs.Fatalf("user%d error, Could not join channel #r. Expected 'setChannel' (%q) got %q", i, expect, message)
 	}
 
-	_, message, err = conn.ReadMessage()
+	message = readAndIgnoreOtherUserJoinMessages(conn, i)
+	expect = fmt.Sprintf("%02d", plugins.UserOutPutTUserTraffic)
+	if !strings.Contains(message, expect) {
+		logs.Fatalf("user%d error, Could not join channel #r. Expected 'You are the first or there are other users' %q got %q", i, expect, message)
+	}
+}
+
+func readAndIgnoreOtherUserJoinMessages(conn *gorilla.Conn, i int) string {
+	_, message, err := conn.ReadMessage()
 	if err != nil {
 		logs.Fatalf("user%d error, Error while reading connection. Error %s", i, err.Error())
 	}
@@ -109,10 +111,7 @@ func joinChannel(conn *gorilla.Conn, i int) {
 		}
 	}
 
-	expect = fmt.Sprintf("%02d", plugins.UserOutPutTUserTraffic)
-	if !strings.Contains(string(message), expect) {
-		logs.Fatalf("user%d error, Could not join channel #r. Expected %q got %q", i, expect, message)
-	}
+	return string(message)
 }
 
 func disconnectUser(conn *gorilla.Conn, chatServer *chat.Server, i int) {
