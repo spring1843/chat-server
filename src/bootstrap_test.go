@@ -53,6 +53,22 @@ func TestCanStartWebWithHTTPS(t *testing.T) {
 	}
 }
 
+func TestEmptyDrivers(t *testing.T) {
+	config := new(config.Config)
+	bootstrap(*config)
+	if chatServer == nil {
+		t.Fatalf("Empty web and telnet addresses did not start the server.")
+	}
+}
+
+func TestErrorOnInvalidTelnet(t *testing.T) {
+	config := new(config.Config)
+	config.TelnetAddress = "-1"
+	if err := startTelnet(*config); err == nil {
+		t.Fatalf("Expected error on invalid telnet address")
+	}
+}
+
 // TestCanRunDefaultConfig run bootstrap and expects it to be able to run with config.json values
 func TestCanRunDefaultConfig(t *testing.T) {
 	if os.Getenv("BE_CRASHER") == "1" {
