@@ -53,7 +53,15 @@ func sanitizeInput(message []byte) string {
 // WriteTo to the user's connection and remembers the last message that was sent out
 func (u *User) WriteTo() {
 	for message := range u.outgoing {
-		u.conn.Write([]byte(message + "\n"))
+		n, err := u.conn.Write([]byte(message + "\n"))
+		if err != nil {
+			if err != nil {
+				logs.ErrIfErrf(err, "Failed writing to @%s's connection.", u.GetNickName())
+			}
+		}
+		if n == 0 {
+			logs.Errf("Zero length when writing to @%s's connection.", u.GetNickName())
+		}
 	}
 }
 
