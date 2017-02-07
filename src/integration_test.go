@@ -30,7 +30,7 @@ var (
 func TestManyUsers(t *testing.T) {
 	config := config.FromFile("./config.json")
 	config.WebAddress += "3"
-	config.TelnetAddress += "3"
+	config.TelnetAddress = ""
 
 	bootstrap(config)
 
