@@ -7,6 +7,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/pkg/errors"
+	"github.com/spring1843/chat-server/src/shared/errs"
 )
 
 const (
