@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/fatih/color"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -28,7 +29,8 @@ var (
 )
 
 func logErrDetails(err error) {
-	logPrint(debug, fmt.Sprintf("Error Details: %s", err))
+	stack := errors.WithStack(err)
+	logPrint(debug, fmt.Sprintf("Error :%+v", stack))
 }
 
 func logPrint(logType string, message string) {

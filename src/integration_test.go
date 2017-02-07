@@ -10,6 +10,7 @@ import (
 	gorilla "github.com/gorilla/websocket"
 	"github.com/spring1843/chat-server/src/chat"
 	"github.com/spring1843/chat-server/src/config"
+	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
 var (
@@ -33,6 +34,7 @@ func TestManyUsers(t *testing.T) {
 		i++
 	}
 	<-doneWithAllUsers
+	close(doneWithAllUsers)
 }
 
 func connectUser(nickname string, wsPath string, config config.Config, i int) *gorilla.Conn {
@@ -40,30 +42,30 @@ func connectUser(nickname string, wsPath string, config config.Config, i int) *g
 
 	conn, _, err := gorilla.DefaultDialer.Dial(url.String(), nil)
 	if err != nil {
-		log.Fatalf("user%d error, Websocket couldn't dial %q error: %s", i, url.String(), err.Error())
+		logs.Fatalf("user%d error, Websocket couldn't dial %q error: %s", i, url.String(), err.Error())
 	}
 
 	_, message, err := conn.ReadMessage()
 	if err != nil {
-		log.Fatalf("user%d error, Error while reading connection %s", i, err.Error())
+		logs.Fatalf("user%d error, Error while reading connection %s", i, err.Error())
 	}
 
 	if !strings.Contains(string(message), "Welcome") {
-		log.Fatalf("user%d error, Could not receive welcome message. In %s", i, message)
+		logs.Fatalf("user%d error, Could not receive welcome message. In %s", i, message)
 	}
 
 	if err := conn.WriteMessage(1, []byte(nickname)); err != nil {
-		log.Fatalf("user%d error, Error writing to connection. Error %s", i, err)
+		logs.Fatalf("user%d error, Error writing to connection. Error %s", i, err)
 	}
 
 	_, message, err = conn.ReadMessage()
 	if err != nil {
-		log.Fatalf("user%d error, Error while reading connection. Error %s", i, err.Error())
+		logs.Fatalf("user%d error, Error while reading connection. Error %s", i, err.Error())
 	}
 
 	expect := "Welcome " + nickname
 	if !strings.Contains(string(message), expect) {
-		log.Fatalf("user%d error, Could not set user %s, expected 'Thanks User1' got %s", i, nickname, expect)
+		logs.Fatalf("user%d error, Could not set user %s, expected 'Thanks User1' got %s", i, nickname, expect)
 	}
 
 	return conn
@@ -71,44 +73,44 @@ func connectUser(nickname string, wsPath string, config config.Config, i int) *g
 
 func joinChannel(conn *gorilla.Conn, i int) {
 	if err := conn.WriteMessage(1, []byte("/join #r")); err != nil {
-		log.Fatalf("user%d error, Error writing to connection. Error %s", i, err)
+		logs.Fatalf("user%d error, Error writing to connection. Error %s", i, err)
 	}
 
 	_, message, err := conn.ReadMessage()
 	if err != nil {
-		log.Fatalf("user%d error, Error while reading connection. Error %s", i, err.Error())
+		logs.Fatalf("user%d error, Error while reading connection. Error %s", i, err.Error())
 	}
 	expect := "05"
 	if !strings.Contains(string(message), expect) {
-		log.Fatalf("user%d error, Could not join channel #r. Expected %q got %q", i, expect, message)
+		logs.Fatalf("user%d error, Could not join channel #r. Expected %q got %q", i, expect, message)
 	}
 
 	_, message, err = conn.ReadMessage()
 	if err != nil {
-		log.Fatalf("user%d error, Error while reading connection. Error %s", i, err.Error())
+		logs.Fatalf("user%d error, Error while reading connection. Error %s", i, err.Error())
 	}
 	expect = "06"
 	if !strings.Contains(string(message), expect) {
-		log.Fatalf("user%d error, Could not join channel #r. Expected %q got %q", i, expect, message)
+		logs.Fatalf("user%d error, Could not join channel #r. Expected %q got %q", i, expect, message)
 	}
 
 	_, message, err = conn.ReadMessage()
 	if err != nil {
-		log.Fatalf("user%d error, Error while reading connection. Error %s", i, err.Error())
+		logs.Fatalf("user%d error, Error while reading connection. Error %s", i, err.Error())
 	}
 	expect = "00"
 	if !strings.Contains(string(message), expect) {
-		log.Fatalf("user%d error, Could not join channel #r. Expected %q got %q", i, expect, message)
+		logs.Fatalf("user%d error, Could not join channel #r. Expected %q got %q", i, expect, message)
 	}
 }
 
 func disconnectUser(conn *gorilla.Conn, chatServer *chat.Server, i int) {
 	if err := conn.WriteMessage(1, []byte(`/quit`)); err != nil {
-		log.Fatalf("user%d error, Error writing to connection. Error %s", i, err)
+		logs.Fatalf("user%d error, Error writing to connection. Error %s", i, err)
 	}
 
 	if _, _, err := conn.ReadMessage(); err != nil {
-		log.Fatalf("user%d error, Failed reading from WebSocket connection. Error %s", i, err)
+		logs.Fatalf("user%d error, Failed reading from WebSocket connection. Error %s", i, err)
 	}
 
 	if chatServer.IsUserConnected("User1") {
