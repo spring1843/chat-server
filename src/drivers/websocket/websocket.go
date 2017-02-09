@@ -26,8 +26,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	chatConnection.Connection = conn
-	go listen(chatConnection)
-	chatServerInstance.ReceiveConnection(chatConnection)
+	go chatServerInstance.ReceiveConnection(chatConnection)
+	chatConnection.readPump()
 }
 
 // SetWebSocket sets the chat server instance
