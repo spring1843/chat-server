@@ -27,6 +27,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 	chatConnection.Connection = conn
 	go chatServerInstance.ReceiveConnection(chatConnection)
+	go chatConnection.writePump()
 	chatConnection.readPump()
 }
 

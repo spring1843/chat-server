@@ -11,7 +11,14 @@ import (
 )
 
 const (
+	// Time allowed to write a message to the peer.
+	writeWait = 10 * time.Second
+
+	// Time allowed to read the next pong message from the peer.
 	pongWait = 60 * time.Second
+
+	// Send pings to peer with this period. Must be less than pongWait.
+	pingPeriod = (pongWait * 9) / 10
 
 	// Maximum message size allowed from peer.
 	maxMessageSize = 512
@@ -20,41 +27,43 @@ const (
 // ChatConnection is an middleman between the WebSocket connection and Chat Server
 type ChatConnection struct {
 	Connection *websocket.Conn
-	Incoming   chan []byte
+	incoming   chan []byte
+	outgoing   chan []byte
 }
 
 // NewChatConnection returns a new ChatConnection
 func NewChatConnection() *ChatConnection {
 	return &ChatConnection{
-		Incoming: make(chan []byte),
+		incoming: make(chan []byte),
+		outgoing: make(chan []byte),
 	}
 }
 
-// Read from a ChatConnection
-// P is a buffered, write only from the start and maintain the size
+// Read waits for user to enter a text, or reads the last entered incoming message
 func (c *ChatConnection) Read(p []byte) (int, error) {
 	i := 0
-	message := <-c.Incoming
+	message := <-c.incoming
 	message = append(message, byte('\n'))
 
 	if len(p) < len(message) {
-		p = make([]byte, len(message), len(message))
+		p = make([]byte, len(message))
 	}
 
-	for i, bit := range message {
+	for _, bit := range message {
 		p[i] = bit
+		i++
 	}
 	return i, nil
 }
 
 // Write to a ChatConnection
 func (c *ChatConnection) Write(p []byte) (int, error) {
-	w, err := c.Connection.NextWriter(websocket.TextMessage)
+	wtr, err := c.Connection.NextWriter(websocket.TextMessage)
 	if err != nil {
 		return 0, errs.Wrap(err, "Error getting nextwriter from WebSocket connection.")
 	}
-	defer w.Close()
-	return w.Write(p)
+	defer wtr.Close()
+	return wtr.Write(p)
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -77,9 +86,55 @@ func (c *ChatConnection) readPump() {
 			}
 			break
 		}
-		c.Incoming <- message
+		c.incoming <- message
 	}
 	logs.Infof("No longer listening to %s", c.RemoteAddr())
+}
+
+// writePump pumps messages from the hub to the websocket connection.
+//
+// A goroutine running writePump is started for each connection. The
+// application ensures that there is at most one writer to a connection by
+// executing all writes from this goroutine.
+func (c *ChatConnection) writePump() {
+	ticker := time.NewTicker(pingPeriod)
+	defer func() {
+		ticker.Stop()
+		c.Connection.Close()
+	}()
+	for {
+		select {
+		case message, ok := <-c.outgoing:
+			c.Connection.SetWriteDeadline(time.Now().Add(writeWait))
+			if !ok {
+				// The hub closed the channel.
+				c.Connection.WriteMessage(websocket.CloseMessage, []byte{})
+				return
+			}
+
+			w, err := c.Connection.NextWriter(websocket.TextMessage)
+			if err != nil {
+				return
+			}
+			w.Write(message)
+
+			// Add queued chat messages to the current websocket message.
+			n := len(c.outgoing)
+			for i := 0; i < n; i++ {
+				w.Write([]byte{'\n'})
+				w.Write(<-c.outgoing)
+			}
+
+			if err := w.Close(); err != nil {
+				return
+			}
+		case <-ticker.C:
+			c.Connection.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := c.Connection.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
+				return
+			}
+		}
+	}
 }
 
 // RemoteAddr returns the remote address of the connected user
