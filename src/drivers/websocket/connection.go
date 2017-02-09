@@ -23,10 +23,12 @@ func NewChatConnection() *ChatConnection {
 
 // Write to a ChatConnection
 func (c *ChatConnection) Write(p []byte) (int, error) {
-	if err := handleOutgoing(1, c, p); err != nil {
-		return -1, errs.Wrap(err, "Error while trying to write to connection")
+	w, err := c.Connection.NextWriter(websocket.TextMessage)
+	if err != nil {
+		return 0, errs.Wrap(err, "Error getting nextwriter from WebSocket connection.")
 	}
-	return len(p) - 1, nil
+	defer w.Close()
+	return w.Write(p)
 }
 
 // Close a ChatConnection
@@ -57,14 +59,6 @@ func (c *ChatConnection) Read(p []byte) (int, error) {
 		p[i] = bit
 	}
 	return i, nil
-}
-
-func handleOutgoing(msgType int, c *ChatConnection, message []byte) error {
-	err := c.Connection.WriteMessage(msgType, message)
-	if err != nil {
-		return errs.Wrap(err, "Error handling Websocket Outgoging")
-	}
-	return nil
 }
 
 func listen(c *ChatConnection) {
