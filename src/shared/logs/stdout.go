@@ -29,7 +29,18 @@ var (
 )
 
 func logErrDetails(err error) {
-	logPrint(debug, fmt.Sprintf("Error: %+v", errors.WithStack(err)))
+	type causer interface {
+		Cause() error
+	}
+	for err != nil {
+		cause, ok := err.(causer)
+		if !ok {
+			break
+		}
+		err = cause.Cause()
+		logPrint(debug, fmt.Sprintf("Caused By: %s", err))
+		logPrint(debug, fmt.Sprintf("Stack: %+v", errors.WithStack(err)))
+	}
 }
 
 func logPrint(logType string, message string) {

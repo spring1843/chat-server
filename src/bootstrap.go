@@ -29,7 +29,7 @@ func bootstrap(config config.Config) {
 	}
 
 	if config.WebAddress != "" {
-		logs.FatalIfErrf(startWeb(config), "Could not start web server.")
+		startWeb(config)
 	} else {
 		logs.Warnf("WebAddress is empty, not running Web Drivers")
 	}
@@ -44,13 +44,12 @@ func startTelnet(config config.Config) error {
 	return nil
 }
 
-func startWeb(config config.Config) error {
+func startWeb(config config.Config) {
 	go func() {
 		srv := getTLSServer(getMultiplexer(), config.WebAddress)
 		logs.Infof("Serving static files, Rest, WebSocket on http:/%s/", config.WebAddress)
 		logs.FatalIfErrf(srv.ListenAndServeTLS("tls.crt", "tls.key"), "Could not start Rest server.")
 	}()
-	return nil
 }
 
 func getMultiplexer() *http.ServeMux {

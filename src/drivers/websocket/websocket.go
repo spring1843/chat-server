@@ -29,6 +29,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	go chatServerInstance.ReceiveConnection(chatConnection)
 	go chatConnection.writePump()
 	chatConnection.readPump()
+	logs.Infof("End of call to websocket /wp form %s", r.RemoteAddr)
 }
 
 // SetWebSocket sets the chat server instance

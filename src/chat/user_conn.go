@@ -55,9 +55,9 @@ func (u *User) WriteTo() {
 	for message := range u.outgoing {
 		n, err := u.conn.Write([]byte(message + "\n"))
 		if err != nil {
-			if err != nil {
-				logs.ErrIfErrf(err, "Failed writing to @%s's connection.", u.GetNickName())
-			}
+			logs.ErrIfErrf(err, "Failed writing to @%s's connection.", u.GetNickName())
+			u.Disconnect()
+			break
 		}
 		if n == 0 {
 			logs.Errf("Zero length when writing to @%s's connection.", u.GetNickName())

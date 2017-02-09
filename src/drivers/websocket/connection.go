@@ -74,6 +74,9 @@ func (c *ChatConnection) Write(p []byte) (int, error) {
 func (c *ChatConnection) readPump() {
 	defer func() {
 		c.Connection.Close()
+		close(c.incoming)
+		close(c.outgoing)
+		logs.Infof("No longer reading Websocket pump for %s", c.Connection.RemoteAddr())
 	}()
 	c.Connection.SetReadLimit(maxMessageSize)
 	c.Connection.SetReadDeadline(time.Now().Add(pongWait))
@@ -88,7 +91,6 @@ func (c *ChatConnection) readPump() {
 		}
 		c.incoming <- message
 	}
-	logs.Infof("No longer listening to %s", c.RemoteAddr())
 }
 
 // writePump pumps messages from the hub to the websocket connection.
