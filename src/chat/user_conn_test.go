@@ -24,7 +24,10 @@ func TestCanReadWriteToFromUser(t *testing.T) {
 	user1 = chat.NewUser("bar")
 	go user1.SetIncoming(input)
 
-	incoming := user1.GetIncoming()
+	incoming, err := user1.GetIncoming()
+	if err != nil {
+		t.Fatalf("Failed getting incoming from user. Error %s", err)
+	}
 	if incoming != input {
 		t.Errorf("Message was not read from the user, got %s", incoming)
 	}

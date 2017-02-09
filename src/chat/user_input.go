@@ -1,15 +1,25 @@
 package chat
 
 import (
+	"time"
+
 	"github.com/spring1843/chat-server/src/plugins"
 	"github.com/spring1843/chat-server/src/plugins/command"
 	"github.com/spring1843/chat-server/src/shared/errs"
 	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
+var errIncomingTimeOut = errs.Newf("Read timeout after %s", "15s")
+
 // GetIncoming gets the incoming message from the user
-func (u *User) GetIncoming() string {
-	return <-u.incoming
+func (u *User) GetIncoming() (string, error) {
+	var incoming string
+	select {
+	case <-time.After(time.Second * 15):
+		return incoming, errIncomingTimeOut
+	case incoming = <-u.incoming:
+	}
+	return incoming, nil
 }
 
 // SetIncoming sets an incoming message from the user
