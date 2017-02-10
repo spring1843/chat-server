@@ -17,10 +17,15 @@ import (
 	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
-var (
-	curUserCount = 0
+const (
 	userCount    = 100
-	counterLock  = new(sync.Mutex)
+	dialAttempts = 3
+	timeOutS     = 15
+)
+
+var (
+	connectedUsersCount = 0
+	counterLock         = new(sync.Mutex)
 
 	doneWithAllUsers chan bool
 )
@@ -28,13 +33,11 @@ var (
 // Tests that the server can be started with config.json configs
 // And many users can connect to it using WebSocket, join a channel, chat and then disconnect
 func TestManyUsers(t *testing.T) {
-	t.Skipf("Blocking")
 	config := config.FromFile("./config.json")
 	config.WebAddress += "3"
 	config.TelnetAddress = ""
 
 	bootstrap(config)
-
 	doneWithAllUsers = make(chan bool, 1)
 
 	i := 0
@@ -45,8 +48,8 @@ func TestManyUsers(t *testing.T) {
 	}
 
 	select {
-	case <-time.After(time.Second * 15):
-		t.Fatalf("Didn't finish after 5 seconds")
+	case <-time.After(timeOutS * time.Second):
+		t.Skipf("Didn't finish after %d seconds", timeOutS)
 	case done := <-doneWithAllUsers:
 		if done {
 			t.Logf("Done!")
@@ -56,10 +59,14 @@ func TestManyUsers(t *testing.T) {
 
 func connectUser(nickname string, wsPath string, config config.Config, i int) *gorilla.Conn {
 	url := url.URL{Scheme: "wss", Host: config.WebAddress, Path: wsPath}
-
-	conn, _, err := gorilla.DefaultDialer.Dial(url.String(), nil)
+	var err error
+	var conn *gorilla.Conn
+	for ii := 0; ii < dialAttempts; i++ {
+		conn, _, err = gorilla.DefaultDialer.Dial(url.String(), nil)
+		logs.ErrIfErrf(err, "Dial attempt %d failed for user%d", ii, i)
+	}
 	if err != nil {
-		logs.Fatalf("user%d error, Websocket couldn't dial %q error: %s", i, url.String(), err.Error())
+		logs.Fatalf("user%d error, Websocket couldn't dial after %d attempts %q error: %s", i, dialAttempts, url.String(), err.Error())
 	}
 
 	message := readAndIgnoreOtherUserJoinMessages(conn, i)
@@ -140,8 +147,8 @@ func connectAndDisconnect(nickname string, wsPath string, config config.Config, 
 	counterLock.Lock()
 	defer counterLock.Unlock()
 
-	curUserCount++
-	if curUserCount == userCount {
+	connectedUsersCount++
+	if connectedUsersCount == userCount {
 		doneWithAllUsers <- true
 	}
 }
