@@ -38,8 +38,8 @@ var (
 // 	joins a channel
 // 	quits the server
 func TestManyUsers(t *testing.T) {
-	if os.Getenv("INTEGRATION") != "1" {
-		t.Skipf("INTEGRATION not set to 1, run make integration to run this test")
+	if os.Getenv("LONGTESTS") != "1" {
+		t.Skipf("LONGTESTS not set to 1, run make longtest to run this test")
 	}
 
 	config := config.FromFile("../config.json")

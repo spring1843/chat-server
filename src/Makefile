@@ -30,15 +30,15 @@ install:
 test: install
 	@go test $(GOFLAGS) ./...
 
-integration:
-	@INTEGRATION=1 go test ./integrationtest/...
+longtest:
+	@LONGTESTS=1 go test ./longtests/...
 
-mergecheck : beautify audit
+mergecheck : beautify audit longtest
 
 run: build
 	@./src -config config.json
 
-commit: mergecheck
+commit: beautify audit
 	@git add -p .
 
 virtuous:
