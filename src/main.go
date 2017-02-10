@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"time"
 
 	"github.com/spring1843/chat-server/src/config"
 	"github.com/spring1843/chat-server/src/shared/logs"
@@ -22,5 +23,6 @@ func main() {
 
 	// Never end
 	for true {
+		time.Sleep(24 * time.Hour)
 	}
 }
