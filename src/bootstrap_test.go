@@ -32,21 +32,6 @@ func TestCanStartWebWithHTTP(t *testing.T) {
 	}
 }
 
-func TestCanStartWebWithHTTPS(t *testing.T) {
-	config := config.FromFile("./config.json")
-	config.WebAddress += "2"
-	startWeb(config)
-
-	resp, err := http.Get("https://" + config.WebAddress + "/api/status")
-	if err != nil {
-		t.Fatalf("couldn't get api status endpoint after serving https. Error %s", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("Expected status %d, got %d", http.StatusOK, resp.StatusCode)
-	}
-}
-
 func TestEmptyDrivers(t *testing.T) {
 	config := new(config.Config)
 	bootstrap(*config)
