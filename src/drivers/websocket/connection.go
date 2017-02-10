@@ -58,12 +58,10 @@ func (c *ChatConnection) Read(p []byte) (int, error) {
 
 // Write to a ChatConnection
 func (c *ChatConnection) Write(p []byte) (int, error) {
-	wtr, err := c.Connection.NextWriter(websocket.TextMessage)
-	if err != nil {
-		return 0, errs.Wrap(err, "Error getting nextwriter from WebSocket connection.")
-	}
-	defer wtr.Close()
-	return wtr.Write(p)
+	// At max 1 go routine must be writing to this connection so we use a channel here
+	c.outgoing <- p
+	return len(p), nil
+
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -74,8 +72,6 @@ func (c *ChatConnection) Write(p []byte) (int, error) {
 func (c *ChatConnection) readPump() {
 	defer func() {
 		c.Connection.Close()
-		close(c.incoming)
-		close(c.outgoing)
 		logs.Infof("No longer reading Websocket pump for %s", c.Connection.RemoteAddr())
 	}()
 	c.Connection.SetReadLimit(maxMessageSize)
