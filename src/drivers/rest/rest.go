@@ -3,8 +3,8 @@ package rest
 import (
 	"net/http"
 
-	"github.com/emicklei/go-restful"
-	"github.com/emicklei/go-restful-swagger12"
+	"github.com/spring1843/chat-server/libs/go-restful"
+	"github.com/spring1843/chat-server/libs/go-restful-swagger12"
 	"github.com/spring1843/chat-server/src/chat"
 )
 

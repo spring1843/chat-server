@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	gorilla "github.com/gorilla/websocket"
+	gorilla "github.com/spring1843/chat-server/libs/websocket"
 	"github.com/spring1843/chat-server/src/chat"
 	"github.com/spring1843/chat-server/src/config"
 	"github.com/spring1843/chat-server/src/drivers/websocket"

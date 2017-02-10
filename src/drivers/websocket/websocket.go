@@ -3,7 +3,7 @@ package websocket
 import (
 	"net/http"
 
-	"github.com/gorilla/websocket"
+	"github.com/spring1843/chat-server/libs/websocket"
 	"github.com/spring1843/chat-server/src/chat"
 	"github.com/spring1843/chat-server/src/shared/logs"
 )

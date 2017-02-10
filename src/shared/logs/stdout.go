@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/fatih/color"
-	"github.com/pkg/errors"
+	"github.com/spring1843/chat-server/libs/color"
+	"github.com/spring1843/chat-server/libs/errors"
 )
 
 const (
