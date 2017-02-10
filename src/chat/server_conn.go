@@ -3,8 +3,8 @@ package chat
 import (
 	"github.com/spring1843/chat-server/src/drivers"
 	"github.com/spring1843/chat-server/src/plugins"
+	"github.com/spring1843/chat-server/src/shared/errs"
 	"github.com/spring1843/chat-server/src/shared/logs"
-	"github.com/spring1843/pomain/src/shared/errs"
 )
 
 // Listen Makes this server start listening to connections, when a user is connected he or she is welcomed
