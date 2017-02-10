@@ -70,7 +70,7 @@ func connectUser(nickname string, wsPath string, config config.Config, i int) *g
 	url := url.URL{Scheme: "wss", Host: config.WebAddress, Path: wsPath}
 	var err error
 	var conn *gorilla.Conn
-	for ii := 0; ii < dialAttempts; i++ {
+	for ii := 0; ii < dialAttempts; ii++ {
 		conn, _, err = gorilla.DefaultDialer.Dial(url.String(), nil)
 		logs.ErrIfErrf(err, "Dial attempt %d failed for user%d", ii, i)
 	}

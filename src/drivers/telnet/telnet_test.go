@@ -10,7 +10,10 @@ import (
 	"github.com/spring1843/chat-server/src/chat"
 	"github.com/spring1843/chat-server/src/config"
 	"github.com/spring1843/chat-server/src/drivers/telnet"
+	"github.com/spring1843/chat-server/src/shared/logs"
 )
+
+const dialAttempts = 3
 
 func TestCanStartTelnetAndConnectToIt(t *testing.T) {
 	config := config.Config{
@@ -25,11 +28,15 @@ func TestCanStartTelnetAndConnectToIt(t *testing.T) {
 		t.Errorf("Could not start telnet server. Error %s", err)
 	}
 
-	conn, err := net.Dial("tcp", config.TelnetAddress)
-	defer conn.Close()
+	var conn net.Conn
+	for i := 0; i < dialAttempts; i++ {
+		conn, err = net.Dial("tcp", config.TelnetAddress)
+		logs.ErrIfErrf(err, "Dial attempt %d failed", i)
+	}
 	if err != nil {
 		t.Errorf("Could not connect to the telnet server. Error %s", err)
 	}
+	defer conn.Close()
 
 	welcomeMessage, err := bufio.NewReader(conn).ReadString('\n')
 	if err != nil {
