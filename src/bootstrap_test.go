@@ -35,13 +35,7 @@ func TestCanStartWebWithHTTP(t *testing.T) {
 func TestCanStartWebWithHTTPS(t *testing.T) {
 	config := config.FromFile("./config.json")
 	config.WebAddress += "2"
-	srv := getTLSServer(getMultiplexer(), config.WebAddress)
-	go func() {
-		t.Logf("Starting https on %s", config.WebAddress)
-		if err := srv.ListenAndServeTLS("tls.crt", "tls.key"); err != nil {
-			logs.FatalIfErrf(err, "Couldn't start https on %s", config.WebAddress)
-		}
-	}()
+	startWeb(config)
 
 	resp, err := http.Get("https://" + config.WebAddress + "/api/status")
 	if err != nil {
