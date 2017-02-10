@@ -1,4 +1,4 @@
-package main
+package bootstrap
 
 import (
 	"net/http"
@@ -17,7 +17,8 @@ const staticWebContentDir = "../bin/web"
 
 var chatServer *chat.Server
 
-func bootstrap(config config.Config) {
+// NewBootstrap bootstraps chat server and starts all the drivers
+func NewBootstrap(config config.Config) {
 	chatServer = chat.NewServer()
 	chatServer.Listen()
 	logs.Info("Chat Server started")
@@ -35,6 +36,11 @@ func bootstrap(config config.Config) {
 	}
 }
 
+// GetChatServer returns thr running instance of chat server
+func GetChatServer() *chat.Server {
+	return chatServer
+}
+
 func startTelnet(config config.Config) error {
 	err := telnet.Start(chatServer, config)
 	if err != nil {
@@ -48,7 +54,7 @@ func startWeb(config config.Config) {
 	srv := getTLSServer(getMultiplexer(), config.WebAddress)
 	go func() {
 		logs.Infof("Serving static files, Rest, WebSocket on http:/%s/", config.WebAddress)
-		logs.FatalIfErrf(srv.ListenAndServeTLS("tls.crt", "tls.key"), "Could not start Rest server.")
+		logs.FatalIfErrf(srv.ListenAndServeTLS("tls.crt", "tls.key"), "Could not start Rest server. Error %s")
 	}()
 }
 

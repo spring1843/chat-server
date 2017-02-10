@@ -30,6 +30,9 @@ install:
 test: install
 	@go test $(GOFLAGS) ./...
 
+integration:
+	@INTEGRATION=1 go test ./integrationtest/...
+
 mergecheck : beautify audit
 
 run: build

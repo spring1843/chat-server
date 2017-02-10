@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/spring1843/chat-server/src/config"
+	"github.com/spring1843/chat-server/src/drivers/bootstrap"
 	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
@@ -19,7 +20,7 @@ func main() {
 	config := config.FromFile(configFile)
 
 	// Start all services e.g. Telnet, WebSocket, REST
-	bootstrap(config)
+	bootstrap.NewBootstrap(config)
 
 	// Never end
 	for true {

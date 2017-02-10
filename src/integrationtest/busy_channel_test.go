@@ -1,18 +1,19 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/url"
+	"os"
 	"strings"
-	"testing"
-
-	"fmt"
 	"sync"
+	"testing"
 	"time"
 
 	gorilla "github.com/gorilla/websocket"
 	"github.com/spring1843/chat-server/src/chat"
 	"github.com/spring1843/chat-server/src/config"
+	"github.com/spring1843/chat-server/src/drivers/bootstrap"
 	"github.com/spring1843/chat-server/src/plugins"
 	"github.com/spring1843/chat-server/src/shared/logs"
 )
@@ -20,7 +21,7 @@ import (
 const (
 	userCount    = 100
 	dialAttempts = 3
-	timeOutS     = 15
+	timeOutS     = 20
 )
 
 var (
@@ -30,26 +31,30 @@ var (
 	doneWithAllUsers chan bool
 )
 
-// Tests that the server can be started with config.json configs
-// And many users can connect to it using WebSocket, join a channel, chat and then disconnect
-func TestManyUsers(t *testing.T) {
-	config := config.FromFile("./config.json")
+// TestBusyChannel
+// Tries to connect many WebSocket users to a chat server, have them perform certain actions and then disconnect
+func TestBusyChannel(t *testing.T) {
+	if os.Getenv("INTEGRATION") != "1" {
+		t.Skipf("INTEGRATION not set to 1, run make integration to run this test")
+	}
+
+	config := config.FromFile("../config.json")
 	config.WebAddress += "3"
 	config.TelnetAddress = ""
 
-	bootstrap(config)
+	bootstrap.NewBootstrap(config)
 	doneWithAllUsers = make(chan bool, 1)
 
-	i := 0
-	for i < userCount {
+	for i := 0; i < userCount; i++ {
 		nickName := fmt.Sprintf("user%d", i)
-		go connectAndDisconnect(nickName, "/ws", config, chatServer, i)
-		i++
+
+		// Each user connects and disconnects concurrently
+		go connectAndDisconnect(nickName, "/ws", config, bootstrap.GetChatServer(), i)
 	}
 
 	select {
 	case <-time.After(timeOutS * time.Second):
-		t.Skipf("Didn't finish after %d seconds", timeOutS)
+		t.Fatalf("Timeout, didn't finish after %d seconds", timeOutS)
 	case done := <-doneWithAllUsers:
 		if done {
 			t.Logf("Done!")

@@ -1,4 +1,4 @@
-package main
+package bootstrap
 
 import (
 	"os"
@@ -11,8 +11,10 @@ import (
 	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
+const configFile = "../../config.json"
+
 func TestCanStartWebWithHTTP(t *testing.T) {
-	config := config.FromFile("./config.json")
+	config := config.FromFile(configFile)
 	config.WebAddress += "1"
 	srv := getTLSServer(getMultiplexer(), config.WebAddress)
 	go func() {
@@ -34,7 +36,7 @@ func TestCanStartWebWithHTTP(t *testing.T) {
 
 func TestEmptyDrivers(t *testing.T) {
 	config := new(config.Config)
-	bootstrap(*config)
+	NewBootstrap(*config)
 	if chatServer == nil {
 		t.Fatalf("Empty web and telnet addresses did not start the server.")
 	}
@@ -51,8 +53,8 @@ func TestErrorOnInvalidTelnet(t *testing.T) {
 // TestCanRunDefaultConfig run bootstrap and expects it to be able to run with config.json values
 func TestCanRunDefaultConfig(t *testing.T) {
 	if os.Getenv("BE_CRASHER") == "1" {
-		config := config.FromFile("./config.json")
-		bootstrap(config)
+		config := config.FromFile(configFile)
+		NewBootstrap(config)
 		return
 	}
 	cmd := exec.Command(os.Args[0], "-test.run=TestCanRunDefaultConfig")
@@ -69,12 +71,12 @@ func TestCanRunDefaultConfig(t *testing.T) {
 // TestCanCrashOnBadConfig run bootstrap and expects it to exit with status 1 (fatal error) when config values are not valid
 func TestCanCrashOnBadConfig(t *testing.T) {
 	if os.Getenv("BE_CRASHER") == "1" {
-		config := config.FromFile("./config.json")
+		config := config.FromFile(configFile)
 
 		// Make config invalid
 		config.TelnetAddress = "-1"
 
-		bootstrap(config)
+		NewBootstrap(config)
 		return
 	}
 	cmd := exec.Command(os.Args[0], "-test.run=TestCanCrashOnBadConfig")
