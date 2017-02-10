@@ -31,9 +31,13 @@ var (
 	doneWithAllUsers chan bool
 )
 
-// TestBusyChannel
-// Tries to connect many WebSocket users to a chat server, have them perform certain actions and then disconnect
-func TestBusyChannel(t *testing.T) {
+// TestManyUsers tests that many users can connect to a chat server using WebSocket connections
+// Each user:
+// 	tries to establish a WebSocket connection with a number of attempts
+// 	gets identified with a nickname
+// 	joins a channel
+// 	quits the server
+func TestManyUsers(t *testing.T) {
 	if os.Getenv("INTEGRATION") != "1" {
 		t.Skipf("INTEGRATION not set to 1, run make integration to run this test")
 	}
