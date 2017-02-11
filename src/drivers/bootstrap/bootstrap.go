@@ -1,9 +1,8 @@
 package bootstrap
 
 import (
-	"net/http"
-
 	"crypto/tls"
+	"net/http"
 
 	"github.com/spring1843/chat-server/src/chat"
 	"github.com/spring1843/chat-server/src/config"

@@ -37,6 +37,9 @@ test: install
 longtest:
 	@LONGTESTS=1 go test -race ./longtests/...
 
+nonetworktest:
+	@SKIP_NETWORK=1 go test -race ./...
+
 mergecheck : beautify audit longtest
 
 run: build
