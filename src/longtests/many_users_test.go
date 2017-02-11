@@ -13,9 +13,8 @@ import (
 )
 
 const (
-	userCount    = 100
-	dialAttempts = 3
-	timeOutS     = 20
+	userCount = 100
+	timeOutS  = 20
 )
 
 var (

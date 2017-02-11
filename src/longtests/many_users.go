@@ -13,6 +13,8 @@ import (
 	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
+const dialAttempts = 3
+
 func connectUser(nickname string, wsPath string, config config.Config, i int) *gorilla.Conn {
 	url := url.URL{Scheme: "wss", Host: config.WebAddress, Path: wsPath}
 	var err error
