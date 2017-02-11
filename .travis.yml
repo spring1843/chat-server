@@ -9,4 +9,4 @@ matrix:
 
 script:
   - make --file=src/Makefile getmakedeps
-  - make --file=src/Makefile commit
+  - cd ./src && make commit
