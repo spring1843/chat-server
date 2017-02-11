@@ -10,7 +10,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/emicklei/go-restful/log"
+	"github.com/spring1843/chat-server/libs/go-restful/log"
 )
 
 // RouteBuilder is a helper to construct Routes.

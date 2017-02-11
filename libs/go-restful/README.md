@@ -1,12 +1,12 @@
 go-restful
 ==========
 
-[![Build Status](https://drone.io/github.com/emicklei/go-restful/status.png)](https://drone.io/github.com/emicklei/go-restful/latest)
+[![Build Status](https://drone.io/github.com/spring1843/chat-server/libs/go-restful/status.png)](https://drone.io/github.com/spring1843/chat-server/libs/go-restful/latest)
 
 package for building REST-style Web Services using Google Go
 
-- [Documentation on godoc.org](http://godoc.org/github.com/emicklei/go-restful)
-- [Code examples](https://github.com/emicklei/go-restful/tree/master/examples)
+- [Documentation on godoc.org](http://godoc.org/github.com/spring1843/chat-server/libs/go-restful)
+- [Code examples](https://github.com/spring1843/chat-server/libs/go-restful/tree/master/examples)
 
 REST asks developers to use HTTP methods explicitly and in a way that's consistent with the protocol definition. This basic REST design principle establishes a one-to-one mapping between create, read, update, and delete (CRUD) operations and HTTP methods. According to this mapping:
 
@@ -39,7 +39,7 @@ func (u UserResource) findUser(request *restful.Request, response *restful.Respo
 }
 ```
 	
-[Full API of a UserResource](https://github.com/emicklei/go-restful/tree/master/examples/restful-user-resource.go) 
+[Full API of a UserResource](https://github.com/spring1843/chat-server/libs/go-restful/tree/master/examples/restful-user-resource.go)
 		
 ### Features
 
@@ -66,7 +66,7 @@ func (u UserResource) findUser(request *restful.Request, response *restful.Respo
 
 - [Example posted on blog](http://ernestmicklei.com/2012/11/go-restful-first-working-example/)
 - [Design explained on blog](http://ernestmicklei.com/2012/11/go-restful-api-design/)
-- [sourcegraph](https://sourcegraph.com/github.com/emicklei/go-restful)
+- [sourcegraph](https://sourcegraph.com/github.com/spring1843/chat-server/libs/go-restful)
 - [showcase: Mora - MongoDB REST Api server](https://github.com/emicklei/mora)
 
 (c) 2012 - 2017, http://ernestmicklei.com. MIT License. Contributions are welcome.

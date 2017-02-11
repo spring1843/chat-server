@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/emicklei/go-restful/log"
+	"github.com/spring1843/chat-server/libs/go-restful/log"
 )
 
 // Copyright 2013 Ernest Micklei. All rights reserved.

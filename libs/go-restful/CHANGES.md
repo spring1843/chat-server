@@ -3,7 +3,7 @@ Change history of go-restful
 2017-01-30
  
 	[IMPORTANT] For swagger users, change your import statement to:	
-	swagger "github.com/emicklei/go-restful-swagger12"
+	swagger "github.com/spring1843/chat-server/libs/go-restful-swagger12"
 
 - moved swagger 1.2 code to go-restful-swagger12
 - created TAG 2.0.0
@@ -211,7 +211,7 @@ Important API changes:
 
 [2012-11-14 .. 2013-05-18>
  
-- See https://github.com/emicklei/go-restful/commits
+- See https://github.com/spring1843/chat-server/libs/go-restful/commits
 
 2012-11-14
 

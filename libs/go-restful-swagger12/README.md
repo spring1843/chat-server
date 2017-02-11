@@ -1,7 +1,7 @@
 # go-restful-swagger12
 
 [![Build Status](https://travis-ci.org/emicklei/go-restful-swagger12.png)](https://travis-ci.org/emicklei/go-restful-swagger12)
-[![GoDoc](https://godoc.org/github.com/emicklei/go-restful-swagger12?status.svg)](https://godoc.org/github.com/emicklei/go-restful-swagger12)
+[![GoDoc](https://godoc.org/github.com/spring1843/chat-server/libs/go-restful-swagger12?status.svg)](https://godoc.org/github.com/spring1843/chat-server/libs/go-restful-swagger12)
 
 How to use Swagger UI with go-restful
 =

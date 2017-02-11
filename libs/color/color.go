@@ -8,8 +8,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/mattn/go-colorable"
-	"github.com/mattn/go-isatty"
+	"github.com/spring1843/chat-server/libs/go-isatty"
+	"github.com/spring1843/chat-server/libs/go-colorable"
+
 )
 
 var (

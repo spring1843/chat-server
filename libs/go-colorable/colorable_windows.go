@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/mattn/go-isatty"
+	"github.com/spring1843/chat-server/libs/go-isatty"
 )
 
 const (

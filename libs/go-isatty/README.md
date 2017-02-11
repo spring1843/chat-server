@@ -11,7 +11,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/mattn/go-isatty"
+	"github.com/spring1843/chat-server/libs/go-isatty"
 	"os"
 )
 
