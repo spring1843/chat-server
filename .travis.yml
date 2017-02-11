@@ -8,7 +8,7 @@ matrix:
     - go: tip
 
 script:
-  - make --file=dir/dir2/dir3/makefile commit
+  - make --file=src/Makefile commit
   - diff -u <(echo -n) <(gofmt -d .)
   - go vet ./src/...
   - go test -v -race ./src/...
