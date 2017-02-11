@@ -1,4 +1,4 @@
-# Chat Server
+# errors [![Travis-CI](https://travis-ci.org/spring1843/chat-server.svg?branch=master)](https://travis-ci.org/spring1843/chat-server/)
 
 Chat Server is basic IRC like server written in Go with drivers for Telnet, WebSocket, and HTTP REST.
 
