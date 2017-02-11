@@ -1,10 +1,17 @@
 language: go
-go:
- - 1.7
-env:
-  - "PATH=/home/travis/gopath/bin:$PATH"
-before_install:
-  - go get -u github.com/golang/lint/golint
-  - go get -u golang.org/x/tools/cmd/goimports
+sudo: false
+
+matrix:
+  include:
+    - go: 1.4
+    - go: 1.5
+    - go: 1.6
+    - go: 1.7
+    - go: tip
+  allow_failures:
+    - go: tip
+
 script:
- - cd ./src && make mergecheck
+  - diff -u <(echo -n) <(gofmt -d .)
+  - go vet $(go list ./... | grep -v /vendor/)
+  - go test -v -race ./...
