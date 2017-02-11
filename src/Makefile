@@ -27,6 +27,10 @@ audit: vet race lint
 install:
 	@go get $(GOFLAGS) ./...
 
+getmakedeps:
+	@go get -u golang.org/x/tools/cmd/goimports
+	@go get -u github.com/golang/lint/golint
+
 test: install
 	@go test $(GOFLAGS) ./...
 
