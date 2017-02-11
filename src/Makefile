@@ -37,7 +37,10 @@ test: install
 longtest:
 	@LONGTESTS=1 go test -race ./longtests/...
 
-mergecheck : beautify audit longtest
+no_net_race:
+	@SKIP_NETWORK=1 go test -race ./...
+
+travis : beautify vet no_net_race lint
 
 run: build
 	@./src -config config.json

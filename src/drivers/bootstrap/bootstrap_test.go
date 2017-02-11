@@ -1,9 +1,9 @@
 package bootstrap
 
 import (
-	"testing"
-
 	"net/http"
+	"os"
+	"testing"
 
 	"github.com/spring1843/chat-server/src/config"
 	"github.com/spring1843/chat-server/src/shared/logs"
@@ -12,7 +12,9 @@ import (
 const configFile = "../../config.json"
 
 func TestCanStartWebWithHTTP(t *testing.T) {
-	t.Skipf("Doesnt start on build server.")
+	if os.Getenv("SKIP_NETWORK") == "1" {
+		t.Skipf("Skipping test SKIP_NETWORK set to %q", os.Getenv("SKIPNETWORK"))
+	}
 	config := config.FromFile(configFile)
 	config.WebAddress += "1"
 	srv := getTLSServer(getMultiplexer(), config.WebAddress)

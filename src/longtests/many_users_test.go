@@ -34,6 +34,9 @@ func TestManyUsers(t *testing.T) {
 	if os.Getenv("LONGTESTS") != "1" {
 		t.Skipf("LONGTESTS not set to 1, run make longtest to run this test")
 	}
+	if os.Getenv("SKIP_NETWORK") == "1" {
+		t.Skipf("Skipping test SKIP_NETWORK set to %q", os.Getenv("SKIPNETWORK"))
+	}
 
 	config := config.FromFile("../config.json")
 	config.WebAddress += "3"

@@ -3,6 +3,7 @@ package websocket_test
 import (
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"testing"
 
@@ -13,8 +14,9 @@ import (
 )
 
 func TestCantStartAndConnect(t *testing.T) {
-	t.Skipf("Doesnt start on build server.")
-
+	if os.Getenv("SKIP_NETWORK") == "1" {
+		t.Skipf("Skipping test SKIP_NETWORK set to %q", os.Getenv("SKIPNETWORK"))
+	}
 	config := config.Config{
 		WebAddress: "127.0.0.1:4003",
 	}
