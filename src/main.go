@@ -9,13 +9,20 @@ import (
 	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
+const usageDoc = `Chat Server
+Usage:
+        chat-server -config config.json
+Flags:
+        -config S r equired .json config file, look at config.json for default settings
+`
+
 func main() {
 	var configFile string
 	flag.StringVar(&configFile, "config", "", "path to .json config file")
 	flag.Parse()
 
 	if configFile == "" {
-		logs.Fatalf("-config flag is required")
+		logs.Fatalf(usageDoc)
 	}
 	config := config.FromFile(configFile)
 
