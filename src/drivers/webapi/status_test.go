@@ -1,4 +1,4 @@
-package rest_test
+package webapi_test
 
 import (
 	"io/ioutil"
@@ -8,7 +8,7 @@ import (
 
 	"github.com/spring1843/chat-server/src/chat"
 	"github.com/spring1843/chat-server/src/config"
-	"github.com/spring1843/chat-server/src/drivers/rest"
+	"github.com/spring1843/chat-server/src/drivers/webapi"
 )
 
 func TestCanStartAndGetStatus(t *testing.T) {
@@ -19,7 +19,7 @@ func TestCanStartAndGetStatus(t *testing.T) {
 	chatServer := chat.NewServer()
 	chatServer.Listen()
 
-	restHandler := rest.GetHandler(chatServer)
+	restHandler := webapi.GetHandler(chatServer)
 
 	server := &http.Server{Addr: config.WebAddress, Handler: restHandler}
 	go server.ListenAndServe()

@@ -1,4 +1,4 @@
-package rest
+package webapi
 
 import (
 	"bufio"
@@ -33,33 +33,33 @@ type (
 		Message string `json:"message"`
 	}
 	messageResp struct {
-		Response
+		rest.Response
 		Success bool `json:"success"`
 	}
 	searchLogResp struct {
-		Response
+		rest.Response
 		Occurrences []string `json:"occurrences"`
 	}
 )
 
 var (
 	maxQueryResults   = 100
-	errMessageNoUsers = ResponseError{
+	errMessageNoUsers = rest.ResponseError{
 		Severity:             5,
 		HumanFriendlyMessage: `No users are connected to this server`,
 		ShortMessage:         `no-connected-users`,
 	}
-	errInvalidPattern = ResponseError{
+	errInvalidPattern = rest.ResponseError{
 		Severity:             10,
 		HumanFriendlyMessage: `Regex pattern entered is not RE2 compliant`,
 		ShortMessage:         `invalid-regex-pattern`,
 	}
-	errCouldNotReadLogFile = ResponseError{
+	errCouldNotReadLogFile = rest.ResponseError{
 		Severity:             10,
 		HumanFriendlyMessage: `Could not read the log file`,
 		ShortMessage:         `could-not-read-log`,
 	}
-	errTooManyResults = ResponseError{
+	errTooManyResults = rest.ResponseError{
 		Severity:             10,
 		HumanFriendlyMessage: `Too many results, returning only the first ` + string(maxQueryResults),
 		ShortMessage:         `could-not-read-log`,
@@ -69,7 +69,7 @@ var (
 func (r *messageEndpoint) broadCastMessage(request *restful.Request, response *restful.Response) {
 	messageResponse := new(messageResp)
 	messageRequest := new(messageReq)
-	ParseRequestBody(request, messageRequest)
+	rest.ParseRequestBody(request, messageRequest)
 
 	if r.ChatServer.ConnectedUsersCount() == 0 {
 		messageResponse.AddError(errMessageNoUsers)

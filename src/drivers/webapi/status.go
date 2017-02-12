@@ -1,4 +1,4 @@
-package rest
+package webapi
 
 import (
 	"github.com/spring1843/chat-server/libs/go-restful"
@@ -17,7 +17,7 @@ func registerStatusPath(container rest.Container) {
 
 type (
 	statusResp struct {
-		Response
+		rest.Response
 		Data struct {
 			Health string `json:"health"`
 		}
