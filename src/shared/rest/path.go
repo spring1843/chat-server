@@ -3,11 +3,6 @@ package rest
 import "github.com/spring1843/chat-server/libs/go-restful"
 
 type (
-	// Container interfaces *restful.Container
-	Container interface {
-		Add(service *restful.WebService) *restful.Container
-		RegisteredWebServices() []*restful.WebService
-	}
 	// EndpointHandlerParams is a value passed to every function that is supposed to handle RESTful calls
 	EndpointHandlerParams struct {
 		Req  *restful.Request
@@ -16,10 +11,6 @@ type (
 	// EndpointFunction is a function that intakes EndpointHandlerParams to respond to a RESTful call
 	EndpointFunction func(*EndpointHandlerParams)
 )
-
-func NewHTTPHandler() *restful.Container {
-	return restful.NewContainer()
-}
 
 // NewPath returns a new API Path lie /api/something
 func NewPath(root, doc string) *restful.WebService {

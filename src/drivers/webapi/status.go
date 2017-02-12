@@ -15,7 +15,7 @@ func registerStatusPath(container rest.Container) {
 
 type (
 	statusResp struct {
-		rest.Response
+		rest.Resp
 		Data struct {
 			Health string `json:"health"`
 		}

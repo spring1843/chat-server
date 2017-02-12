@@ -34,33 +34,33 @@ type (
 		Message string `json:"message"`
 	}
 	messageResp struct {
-		rest.Response
+		rest.Resp
 		Success bool `json:"success"`
 	}
 	searchLogResp struct {
-		rest.Response
+		rest.Resp
 		Occurrences []string `json:"occurrences"`
 	}
 )
 
 var (
 	maxQueryResults   = 100
-	errMessageNoUsers = rest.ResponseError{
+	errMessageNoUsers = rest.RespError{
 		Severity:             5,
 		HumanFriendlyMessage: `No users are connected to this server`,
 		ShortMessage:         `no-connected-users`,
 	}
-	errInvalidPattern = rest.ResponseError{
+	errInvalidPattern = rest.RespError{
 		Severity:             10,
 		HumanFriendlyMessage: `Regex pattern entered is not RE2 compliant`,
 		ShortMessage:         `invalid-regex-pattern`,
 	}
-	errCouldNotReadLogFile = rest.ResponseError{
+	errCouldNotReadLogFile = rest.RespError{
 		Severity:             10,
 		HumanFriendlyMessage: `Could not read the log file`,
 		ShortMessage:         `could-not-read-log`,
 	}
-	errTooManyResults = rest.ResponseError{
+	errTooManyResults = rest.RespError{
 		Severity:             10,
 		HumanFriendlyMessage: `Too many results, returning only the first ` + string(maxQueryResults),
 		ShortMessage:         `could-not-read-log`,

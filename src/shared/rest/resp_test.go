@@ -18,8 +18,8 @@ type MockedReaderCloser struct {
 func (MockedReaderCloser) Close() error { return nil }
 
 func TestCanDecorateResponseWithError(t *testing.T) {
-	resp := new(rest.Response)
-	restError := rest.ResponseError{
+	resp := new(rest.Resp)
+	restError := rest.RespError{
 		Severity:             1,
 		HumanFriendlyMessage: `test error`,
 		ShortMessage:         `test-error`,
