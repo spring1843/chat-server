@@ -74,6 +74,9 @@ build_windows:
 
 build_bin: build_linux build_osx build_windows
 
+get_go_deps:
+	@go get -t -v ./...
+
 deps:
 	@go list -json | jq ".Deps" | grep -E -o "github.com+/[^\/]+/[^\/]+" | sed 's|[\",[:space:]]||g' | sort -u
 
