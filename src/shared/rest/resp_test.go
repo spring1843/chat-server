@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/spring1843/chat-server/libs/go-restful"
-	"github.com/spring1843/chat-server/src/drivers/rest"
+	"github.com/spring1843/chat-server/src/shared/rest"
 )
 
 type MockedReaderCloser struct {
@@ -18,9 +18,9 @@ type MockedReaderCloser struct {
 func (MockedReaderCloser) Close() error { return nil }
 
 func TestCanDecorateResponseWithError(t *testing.T) {
-	resp := new(rest.Response)
-	restError := rest.ResponseError{
-		Severity:             1,
+	resp := new(rest.Resp)
+	restError := rest.RespError{
+		Severity:             rest.Error,
 		HumanFriendlyMessage: `test error`,
 		ShortMessage:         `test-error`,
 	}

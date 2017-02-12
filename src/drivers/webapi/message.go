@@ -1,4 +1,4 @@
-package rest
+package webapi
 
 import (
 	"bufio"
@@ -6,29 +6,27 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/spring1843/chat-server/libs/go-restful"
 	"github.com/spring1843/chat-server/src/shared/logs"
+	"github.com/spring1843/chat-server/src/shared/rest"
 )
 
 // Register the message REST endpoints
-func (r messageEndpoint) Register(container *restful.Container) {
-	ws := new(restful.WebService)
-	ws.Path("/api/message").
-		Doc("Interact with chat server").
-		Consumes(restful.MIME_JSON).
-		Produces(restful.MIME_JSON)
+func registerMessagePath(container rest.Container) {
+	apiPath := rest.NewPath("/api/message", "Interact with chat server")
+	defer container.Add(apiPath)
 
-	ws.Route(ws.POST("").To(r.broadCastMessage).
+	apiPath.Route(apiPath.POST("").To(rest.UnsecuredHandler(broadCastMessage)).
 		Doc("Broadcasts a public announcement to all users connected to the server").
+		Operation("broadCastMessage").
 		Reads(messageReq{}).
 		Writes(messageResp{}))
 
-	ws.Route(ws.GET("").To(r.searchLogForMessages).
+	apiPath.Route(apiPath.GET("").To(rest.UnsecuredHandler(searchLogForMessages)).
 		Doc("Searches private and public messages Returns only up to " + string(maxQueryResults) + " messages").
-		Param(ws.QueryParameter("pattern", `Optional RE2 Regex pattern to query messages. Examples: '.*' for all logs`).DataType("string")).
+		Operation("searchLogForMessages").
+		Param(apiPath.QueryParameter("pattern", `Optional RE2 Regex pattern to query messages. Examples: '.*' for all logs`).DataType("string")).
 		Writes(searchLogResp{}))
 
-	container.Add(ws)
 }
 
 type (
@@ -36,60 +34,60 @@ type (
 		Message string `json:"message"`
 	}
 	messageResp struct {
-		Response
+		rest.Resp
 		Success bool `json:"success"`
 	}
 	searchLogResp struct {
-		Response
+		rest.Resp
 		Occurrences []string `json:"occurrences"`
 	}
 )
 
 var (
 	maxQueryResults   = 100
-	errMessageNoUsers = ResponseError{
-		Severity:             5,
+	errMessageNoUsers = rest.RespError{
+		Severity:             rest.Informational,
 		HumanFriendlyMessage: `No users are connected to this server`,
 		ShortMessage:         `no-connected-users`,
 	}
-	errInvalidPattern = ResponseError{
-		Severity:             10,
+	errInvalidPattern = rest.RespError{
+		Severity:             rest.Error,
 		HumanFriendlyMessage: `Regex pattern entered is not RE2 compliant`,
 		ShortMessage:         `invalid-regex-pattern`,
 	}
-	errCouldNotReadLogFile = ResponseError{
-		Severity:             10,
+	errCouldNotReadLogFile = rest.RespError{
+		Severity:             rest.Critical,
 		HumanFriendlyMessage: `Could not read the log file`,
 		ShortMessage:         `could-not-read-log`,
 	}
-	errTooManyResults = ResponseError{
-		Severity:             10,
+	errTooManyResults = rest.RespError{
+		Severity:             rest.Notice,
 		HumanFriendlyMessage: `Too many results, returning only the first ` + string(maxQueryResults),
 		ShortMessage:         `could-not-read-log`,
 	}
 )
 
-func (r *messageEndpoint) broadCastMessage(request *restful.Request, response *restful.Response) {
+func broadCastMessage(params *rest.EndpointHandlerParams) {
 	messageResponse := new(messageResp)
 	messageRequest := new(messageReq)
-	ParseRequestBody(request, messageRequest)
+	rest.ParseRequestBody(params.Req, messageRequest)
 
-	if r.ChatServer.ConnectedUsersCount() == 0 {
+	if chatServerInstance.ConnectedUsersCount() == 0 {
 		messageResponse.AddError(errMessageNoUsers)
 	}
 
-	logs.Infof("message \t RESTful public annoucnement=%s", messageRequest.Message)
+	logs.Infof("message \t RESTful public announcement=%s", messageRequest.Message)
 
-	r.ChatServer.Broadcast("Public Server Announcement: " + messageRequest.Message)
+	chatServerInstance.Broadcast("Public Server Announcement: " + messageRequest.Message)
 
-	messageResponse.DecorateResponse(request)
+	messageResponse.DecorateResponse(params.Req)
 	messageResponse.Success = true
-	response.WriteEntity(messageResponse)
+	params.Resp.WriteEntity(messageResponse)
 }
 
-func (r *messageEndpoint) searchLogForMessages(request *restful.Request, response *restful.Response) {
+func searchLogForMessages(params *rest.EndpointHandlerParams) {
 	messageResponse := new(searchLogResp)
-	pattern := request.QueryParameter(`pattern`)
+	pattern := params.Req.QueryParameter(`pattern`)
 
 	// if no pattern specified default to all
 	if pattern == `` {
@@ -100,7 +98,7 @@ func (r *messageEndpoint) searchLogForMessages(request *restful.Request, respons
 	if err != nil {
 		errInvalidPattern.HumanFriendlyMessage = "Invalid REGEX pattern, pattern is not RE2 compliant:" + pattern
 		messageResponse.AddError(errInvalidPattern)
-		response.WriteEntity(messageResponse)
+		params.Resp.WriteEntity(messageResponse)
 		return
 	}
 
@@ -133,6 +131,6 @@ func (r *messageEndpoint) searchLogForMessages(request *restful.Request, respons
 	}
 
 	messageResponse.Occurrences = occurrences
-	messageResponse.DecorateResponse(request)
-	response.WriteEntity(messageResponse)
+	messageResponse.DecorateResponse(params.Req)
+	params.Resp.WriteEntity(messageResponse)
 }

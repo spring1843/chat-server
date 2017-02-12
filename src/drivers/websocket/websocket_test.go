@@ -11,7 +11,10 @@ import (
 	"github.com/spring1843/chat-server/src/chat"
 	"github.com/spring1843/chat-server/src/config"
 	"github.com/spring1843/chat-server/src/drivers/websocket"
+	"github.com/spring1843/chat-server/src/shared/logs"
 )
+
+const dialAttempts = 3
 
 func TestCantStartAndConnect(t *testing.T) {
 	if os.Getenv("SKIP_NETWORK") == "1" {
@@ -34,9 +37,16 @@ func TestCantStartAndConnect(t *testing.T) {
 	}()
 	u := url.URL{Scheme: "ws", Host: config.WebAddress, Path: "/ws1"}
 
-	conn, _, err := gorilla.DefaultDialer.Dial(u.String(), nil)
+	var err error
+	var conn *gorilla.Conn
+	for i := 0; i < dialAttempts; i++ {
+		conn, _, err = gorilla.DefaultDialer.Dial(u.String(), nil)
+		if err != nil {
+			logs.ErrIfErrf(err, "Dial attempt %d failed", i)
+		}
+	}
 	if err != nil {
-		t.Fatalf("Websocket Dial error: %s", err.Error())
+		t.Fatalf("Websocket dial attempt failed after %d times. error: %s", dialAttempts, err.Error())
 	}
 
 	_, message, err := conn.ReadMessage()

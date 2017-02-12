@@ -6,8 +6,8 @@ import (
 
 	"github.com/spring1843/chat-server/src/chat"
 	"github.com/spring1843/chat-server/src/config"
-	"github.com/spring1843/chat-server/src/drivers/rest"
 	"github.com/spring1843/chat-server/src/drivers/telnet"
+	"github.com/spring1843/chat-server/src/drivers/webapi"
 	"github.com/spring1843/chat-server/src/drivers/websocket"
 	"github.com/spring1843/chat-server/src/shared/logs"
 )
@@ -58,7 +58,7 @@ func startWeb(config config.Config) {
 }
 
 func getMultiplexer() *http.ServeMux {
-	restHandler := rest.GetHandler(chatServer)
+	restHandler := webapi.NewHandler(chatServer)
 	websocket.SetWebSocket(chatServer)
 	fs := http.FileServer(http.Dir(staticWebContentDir))
 
