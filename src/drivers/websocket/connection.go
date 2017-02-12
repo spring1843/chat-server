@@ -5,7 +5,7 @@ import (
 
 	"time"
 
-	"github.com/spring1843/chat-server/libs/websocket"
+	"github.com/gorilla/websocket"
 	"github.com/spring1843/chat-server/src/shared/errs"
 	"github.com/spring1843/chat-server/src/shared/logs"
 )
