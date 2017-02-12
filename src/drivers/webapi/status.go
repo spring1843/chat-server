@@ -7,7 +7,7 @@ func registerStatusPath(container rest.Container) {
 	apiPath := rest.NewPath("/api/status", "Returns the status")
 	defer container.Add(apiPath)
 
-	apiPath.Route(apiPath.GET("").To(rest.UnsecuredHandle(getStatus)).
+	apiPath.Route(apiPath.GET("").To(rest.UnsecuredHandler(getStatus)).
 		Operation("getStatus").
 		Writes(statusResp{}))
 

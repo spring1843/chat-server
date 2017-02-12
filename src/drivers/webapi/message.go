@@ -15,13 +15,13 @@ func (r messageEndpoint) Register(container rest.Container) {
 	apiPath := rest.NewPath("/api/message", "Interact with chat server")
 	defer container.Add(apiPath)
 
-	apiPath.Route(apiPath.POST("").To(rest.UnsecuredHandle(r.broadCastMessage)).
+	apiPath.Route(apiPath.POST("").To(rest.UnsecuredHandler(r.broadCastMessage)).
 		Doc("Broadcasts a public announcement to all users connected to the server").
 		Operation("broadCastMessage").
 		Reads(messageReq{}).
 		Writes(messageResp{}))
 
-	apiPath.Route(apiPath.GET("").To(rest.UnsecuredHandle(r.searchLogForMessages)).
+	apiPath.Route(apiPath.GET("").To(rest.UnsecuredHandler(r.searchLogForMessages)).
 		Doc("Searches private and public messages Returns only up to " + string(maxQueryResults) + " messages").
 		Operation("searchLogForMessages").
 		Param(apiPath.QueryParameter("pattern", `Optional RE2 Regex pattern to query messages. Examples: '.*' for all logs`).DataType("string")).

@@ -28,8 +28,8 @@ func NewPath(root, doc string) *restful.WebService {
 	return ws
 }
 
-// UnsecuredHandle is a handler for an open to the world endpoint
-func UnsecuredHandle(handler EndpointFunction) restful.RouteFunction {
+// UnsecuredHandler is a handler for an open to the world endpoint
+func UnsecuredHandler(handler EndpointFunction) restful.RouteFunction {
 	return func(req *restful.Request, resp *restful.Response) {
 		handler(
 			&EndpointHandlerParams{
