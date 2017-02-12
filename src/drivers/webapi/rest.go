@@ -3,7 +3,6 @@ package webapi
 import (
 	"net/http"
 
-	"github.com/spring1843/chat-server/libs/go-restful"
 	"github.com/spring1843/chat-server/libs/go-restful-swagger12"
 	"github.com/spring1843/chat-server/src/chat"
 	"github.com/spring1843/chat-server/src/shared/rest"
@@ -35,7 +34,7 @@ func configureSwagger(wsContainer rest.Container) swagger.Config {
 
 // GetHandler returns a handler that includes all API endpoins
 func GetHandler(chatServer *chat.Server) http.Handler {
-	handler := restful.NewContainer()
+	handler := rest.NewHTTPHandler()
 	registerAllEndpoints(chatServer, handler)
 	swagger.RegisterSwaggerService(configureSwagger(handler), handler)
 	return handler

@@ -17,6 +17,10 @@ type (
 	EndpointFunction func(*EndpointHandlerParams)
 )
 
+func NewHTTPHandler() *restful.Container {
+	return restful.NewContainer()
+}
+
 // NewPath returns a new API Path lie /api/something
 func NewPath(root, doc string) *restful.WebService {
 	ws := new(restful.WebService)
