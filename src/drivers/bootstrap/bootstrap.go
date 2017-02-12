@@ -58,7 +58,7 @@ func startWeb(config config.Config) {
 }
 
 func getMultiplexer() *http.ServeMux {
-	restHandler := webapi.GetHandler(chatServer)
+	restHandler := webapi.NewHandler(chatServer)
 	websocket.SetWebSocket(chatServer)
 	fs := http.FileServer(http.Dir(staticWebContentDir))
 

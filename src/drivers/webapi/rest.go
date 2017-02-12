@@ -7,26 +7,24 @@ import (
 	"github.com/spring1843/chat-server/src/shared/rest"
 )
 
-// messageEndpoint an instance of the chat.Server
-type messageEndpoint struct {
-	ChatServer *chat.Server
-}
+var (
+	// LogFilePath path to API log file
+	LogFilePath string
 
-// LogFilePath path to API log file
-var LogFilePath string
+	chatServerInstance *chat.Server
+)
 
-func registerAllEndpoints(chatServer *chat.Server, container rest.Container) {
-	messageResource := new(messageEndpoint)
-	messageResource.ChatServer = chatServer
-	messageResource.Register(container)
-
+func registerPaths(container rest.Container) {
+	registerMessagePath(container)
 	registerStatusPath(container)
 }
 
-// GetHandler returns a handler that includes all API endpoins
-func GetHandler(chatServer *chat.Server) http.Handler {
+// NewHandler returns a HTTP handler that includes all RESTfyk API endpoints exposed
+func NewHandler(chatServer *chat.Server) http.Handler {
+	chatServerInstance = chatServer
+
 	handler := rest.NewHTTPHandler()
-	registerAllEndpoints(chatServer, handler)
+	registerPaths(handler)
 	rest.ConfigureSwagger("/api/docs.json", handler)
 	return handler
 }

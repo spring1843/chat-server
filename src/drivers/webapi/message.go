@@ -11,17 +11,17 @@ import (
 )
 
 // Register the message REST endpoints
-func (r messageEndpoint) Register(container rest.Container) {
+func registerMessagePath(container rest.Container) {
 	apiPath := rest.NewPath("/api/message", "Interact with chat server")
 	defer container.Add(apiPath)
 
-	apiPath.Route(apiPath.POST("").To(rest.UnsecuredHandler(r.broadCastMessage)).
+	apiPath.Route(apiPath.POST("").To(rest.UnsecuredHandler(broadCastMessage)).
 		Doc("Broadcasts a public announcement to all users connected to the server").
 		Operation("broadCastMessage").
 		Reads(messageReq{}).
 		Writes(messageResp{}))
 
-	apiPath.Route(apiPath.GET("").To(rest.UnsecuredHandler(r.searchLogForMessages)).
+	apiPath.Route(apiPath.GET("").To(rest.UnsecuredHandler(searchLogForMessages)).
 		Doc("Searches private and public messages Returns only up to " + string(maxQueryResults) + " messages").
 		Operation("searchLogForMessages").
 		Param(apiPath.QueryParameter("pattern", `Optional RE2 Regex pattern to query messages. Examples: '.*' for all logs`).DataType("string")).
@@ -67,25 +67,25 @@ var (
 	}
 )
 
-func (r *messageEndpoint) broadCastMessage(params *rest.EndpointHandlerParams) {
+func broadCastMessage(params *rest.EndpointHandlerParams) {
 	messageResponse := new(messageResp)
 	messageRequest := new(messageReq)
 	rest.ParseRequestBody(params.Req, messageRequest)
 
-	if r.ChatServer.ConnectedUsersCount() == 0 {
+	if chatServerInstance.ConnectedUsersCount() == 0 {
 		messageResponse.AddError(errMessageNoUsers)
 	}
 
 	logs.Infof("message \t RESTful public announcement=%s", messageRequest.Message)
 
-	r.ChatServer.Broadcast("Public Server Announcement: " + messageRequest.Message)
+	chatServerInstance.Broadcast("Public Server Announcement: " + messageRequest.Message)
 
 	messageResponse.DecorateResponse(params.Req)
 	messageResponse.Success = true
 	params.Resp.WriteEntity(messageResponse)
 }
 
-func (r *messageEndpoint) searchLogForMessages(params *rest.EndpointHandlerParams) {
+func searchLogForMessages(params *rest.EndpointHandlerParams) {
 	messageResponse := new(searchLogResp)
 	pattern := params.Req.QueryParameter(`pattern`)
 
