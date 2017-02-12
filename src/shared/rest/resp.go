@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"io"
 
-	"github.com/spring1843/chat-server/libs/go-restful"
+	restful "github.com/emicklei/go-restful"
 )
 
 type (

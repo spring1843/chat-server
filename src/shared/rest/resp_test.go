@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/spring1843/chat-server/libs/go-restful"
+	restful "github.com/emicklei/go-restful"
 	"github.com/spring1843/chat-server/src/shared/rest"
 )
 

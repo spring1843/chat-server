@@ -1,8 +1,8 @@
 package rest
 
 import (
-	"github.com/spring1843/chat-server/libs/go-restful"
-	"github.com/spring1843/chat-server/libs/go-restful-swagger12"
+	restful "github.com/emicklei/go-restful"
+	swagger "github.com/emicklei/go-restful-swagger12"
 )
 
 // ConfigureSwagger configures the swagger documentation for all endpoints in the container

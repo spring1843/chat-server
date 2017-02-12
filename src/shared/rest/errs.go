@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/spring1843/chat-server/libs/go-restful"
+	restful "github.com/emicklei/go-restful"
 )
 
 // Syslog model error severity levels https://en.wikipedia.org/wiki/Syslog#Severity_level

@@ -1,6 +1,6 @@
 package rest
 
-import "github.com/spring1843/chat-server/libs/go-restful"
+import restful "github.com/emicklei/go-restful"
 
 // Container interfaces *restful.Container, a web service container
 type Container interface {
