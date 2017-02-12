@@ -20,7 +20,7 @@ func (MockedReaderCloser) Close() error { return nil }
 func TestCanDecorateResponseWithError(t *testing.T) {
 	resp := new(rest.Resp)
 	restError := rest.RespError{
-		Severity:             1,
+		Severity:             rest.Error,
 		HumanFriendlyMessage: `test error`,
 		ShortMessage:         `test-error`,
 	}

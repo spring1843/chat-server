@@ -46,22 +46,22 @@ type (
 var (
 	maxQueryResults   = 100
 	errMessageNoUsers = rest.RespError{
-		Severity:             5,
+		Severity:             rest.Informational,
 		HumanFriendlyMessage: `No users are connected to this server`,
 		ShortMessage:         `no-connected-users`,
 	}
 	errInvalidPattern = rest.RespError{
-		Severity:             10,
+		Severity:             rest.Error,
 		HumanFriendlyMessage: `Regex pattern entered is not RE2 compliant`,
 		ShortMessage:         `invalid-regex-pattern`,
 	}
 	errCouldNotReadLogFile = rest.RespError{
-		Severity:             10,
+		Severity:             rest.Critical,
 		HumanFriendlyMessage: `Could not read the log file`,
 		ShortMessage:         `could-not-read-log`,
 	}
 	errTooManyResults = rest.RespError{
-		Severity:             10,
+		Severity:             rest.Notice,
 		HumanFriendlyMessage: `Too many results, returning only the first ` + string(maxQueryResults),
 		ShortMessage:         `could-not-read-log`,
 	}

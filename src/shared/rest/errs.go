@@ -8,9 +8,33 @@ import (
 	"github.com/spring1843/chat-server/libs/go-restful"
 )
 
+// Syslog model error severity levels https://en.wikipedia.org/wiki/Syslog#Severity_level
+const (
+	// Alert should be corrected immediately e.g. Loss of the primary ISP connection.
+	Alert = "alert"
+
+	// Critical conditions e.g. A failure in the system's primary application.
+	Critical = "crit"
+
+	// Error conditions e.g. An application has exceeded its file storage limit and attempts to write are failing.
+	Error = "err"
+
+	// Warning may indicate that an error will occur if action is not taken. e.g. A non-root file system has only 2GB remaining.
+	Warning = "warn"
+
+	// Notice events that are unusual, but not error conditions. e.g. Ski Haus Delta reports temperature < low_notice(50)
+	Notice = "notice"
+
+	// Informational normal operational messages that require no action. e.g. An application has started, paused or ended successfully.
+	Informational = "info"
+
+	// Debug information useful to developers for debugging the application.
+	Debug = "debug"
+)
+
 // RespError is an error that is part of the API response
 type RespError struct {
-	Severity             int    `json:"severity"`
+	Severity             string `json:"severity"`
 	HumanFriendlyMessage string `json:"human_friendly_message"`
 	ShortMessage         string `json:"short_message"`
 	Details              string `json:"details"`
