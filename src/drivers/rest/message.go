@@ -8,27 +8,24 @@ import (
 
 	"github.com/spring1843/chat-server/libs/go-restful"
 	"github.com/spring1843/chat-server/src/shared/logs"
+	"github.com/spring1843/chat-server/src/shared/rest"
 )
 
 // Register the message REST endpoints
 func (r messageEndpoint) Register(container *restful.Container) {
-	ws := new(restful.WebService)
-	ws.Path("/api/message").
-		Doc("Interact with chat server").
-		Consumes(restful.MIME_JSON).
-		Produces(restful.MIME_JSON)
+	apiPath := rest.NewPath("/api/message", "Interact with chat server")
 
-	ws.Route(ws.POST("").To(r.broadCastMessage).
+	apiPath.Route(apiPath.POST("").To(r.broadCastMessage).
 		Doc("Broadcasts a public announcement to all users connected to the server").
 		Reads(messageReq{}).
 		Writes(messageResp{}))
 
-	ws.Route(ws.GET("").To(r.searchLogForMessages).
+	apiPath.Route(apiPath.GET("").To(r.searchLogForMessages).
 		Doc("Searches private and public messages Returns only up to " + string(maxQueryResults) + " messages").
-		Param(ws.QueryParameter("pattern", `Optional RE2 Regex pattern to query messages. Examples: '.*' for all logs`).DataType("string")).
+		Param(apiPath.QueryParameter("pattern", `Optional RE2 Regex pattern to query messages. Examples: '.*' for all logs`).DataType("string")).
 		Writes(searchLogResp{}))
 
-	container.Add(ws)
+	container.Add(apiPath)
 }
 
 type (
@@ -78,7 +75,7 @@ func (r *messageEndpoint) broadCastMessage(request *restful.Request, response *r
 		messageResponse.AddError(errMessageNoUsers)
 	}
 
-	logs.Infof("message \t RESTful public annoucnement=%s", messageRequest.Message)
+	logs.Infof("message \t RESTful public announcement=%s", messageRequest.Message)
 
 	r.ChatServer.Broadcast("Public Server Announcement: " + messageRequest.Message)
 
