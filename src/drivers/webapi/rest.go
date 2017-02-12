@@ -6,6 +6,7 @@ import (
 	"github.com/spring1843/chat-server/libs/go-restful"
 	"github.com/spring1843/chat-server/libs/go-restful-swagger12"
 	"github.com/spring1843/chat-server/src/chat"
+	"github.com/spring1843/chat-server/src/shared/rest"
 )
 
 // messageEndpoint an instance of the chat.Server
@@ -16,7 +17,7 @@ type messageEndpoint struct {
 // LogFilePath path to API log file
 var LogFilePath string
 
-func registerAllEndpoints(chatServer *chat.Server, container *restful.Container) {
+func registerAllEndpoints(chatServer *chat.Server, container rest.Container) {
 	messageResource := new(messageEndpoint)
 	messageResource.ChatServer = chatServer
 	messageResource.Register(container)
@@ -24,7 +25,7 @@ func registerAllEndpoints(chatServer *chat.Server, container *restful.Container)
 	registerStatusPath(container)
 }
 
-func configureSwagger(wsContainer *restful.Container) swagger.Config {
+func configureSwagger(wsContainer rest.Container) swagger.Config {
 	return swagger.Config{
 		WebServices:    wsContainer.RegisteredWebServices(),
 		WebServicesUrl: ``,

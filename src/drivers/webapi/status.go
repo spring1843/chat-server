@@ -1,18 +1,16 @@
 package webapi
 
-import (
-	"github.com/spring1843/chat-server/libs/go-restful"
-	"github.com/spring1843/chat-server/src/shared/rest"
-)
+import "github.com/spring1843/chat-server/src/shared/rest"
 
 // Register the status endpoint
 func registerStatusPath(container rest.Container) {
 	apiPath := rest.NewPath("/api/status", "Returns the status")
+	defer container.Add(apiPath)
 
-	apiPath.Route(apiPath.GET("").To(Status).
+	apiPath.Route(apiPath.GET("").To(rest.UnsecuredHandle(getStatus)).
+		Operation("getStatus").
 		Writes(statusResp{}))
 
-	container.Add(apiPath)
 }
 
 type (
@@ -25,9 +23,9 @@ type (
 )
 
 // Status shows the status of the chat server to the users
-func Status(request *restful.Request, response *restful.Response) {
+func getStatus(params *rest.EndpointHandlerParams) {
 	resp := new(statusResp)
 	resp.Data.Health = `ok`
-	resp.DecorateResponse(request)
-	response.WriteEntity(resp)
+	resp.DecorateResponse(params.Req)
+	params.Resp.WriteEntity(resp)
 }
