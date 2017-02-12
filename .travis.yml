@@ -8,5 +8,5 @@ matrix:
     - go: tip
 
 script:
-  - make --file=src/Makefile getmakedeps
+  - make --file=src/Makefile get_make_deps
   - cd ./src && make travis
