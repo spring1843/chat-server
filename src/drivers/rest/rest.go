@@ -21,8 +21,7 @@ func registerAllEndpoints(chatServer *chat.Server, container *restful.Container)
 	messageResource.ChatServer = chatServer
 	messageResource.Register(container)
 
-	statusResource := new(statusEndpoint)
-	statusResource.Register(container)
+	registerStatusPath(container)
 }
 
 func configureSwagger(wsContainer *restful.Container) swagger.Config {

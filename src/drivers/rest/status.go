@@ -2,25 +2,21 @@ package rest
 
 import (
 	"github.com/spring1843/chat-server/libs/go-restful"
+	"github.com/spring1843/chat-server/src/shared/rest"
 )
 
 // Register the status endpoint
-func (g statusEndpoint) Register(container *restful.Container) {
-	ws := new(restful.WebService)
-	ws.Path("/api/status").
-		Doc("Returns the status").
-		Consumes(restful.MIME_JSON).
-		Produces(restful.MIME_JSON)
+func registerStatusPath(container rest.Container) {
+	apiPath := rest.NewPath("/api/status", "Returns the status")
 
-	ws.Route(ws.GET("").To(Status).
+	apiPath.Route(apiPath.GET("").To(Status).
 		Writes(statusResp{}))
 
-	container.Add(ws)
+	container.Add(apiPath)
 }
 
 type (
-	statusEndpoint struct{}
-	statusResp     struct {
+	statusResp struct {
 		Response
 		Data struct {
 			Health string `json:"health"`
