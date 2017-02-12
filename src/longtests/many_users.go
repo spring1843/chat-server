@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strings"
 
-	gorilla "github.com/spring1843/chat-server/libs/websocket"
+	"github.com/gorilla/websocket"
 	"github.com/spring1843/chat-server/src/chat"
 	"github.com/spring1843/chat-server/src/config"
 	"github.com/spring1843/chat-server/src/plugins"
@@ -15,12 +15,12 @@ import (
 
 const dialAttempts = 3
 
-func connectUser(nickname string, wsPath string, config config.Config, i int) *gorilla.Conn {
+func connectUser(nickname string, wsPath string, config config.Config, i int) *websocket.Conn {
 	url := url.URL{Scheme: "wss", Host: config.WebAddress, Path: wsPath}
 	var err error
-	var conn *gorilla.Conn
+	var conn *websocket.Conn
 	for ii := 0; ii < dialAttempts; ii++ {
-		conn, _, err = gorilla.DefaultDialer.Dial(url.String(), nil)
+		conn, _, err = websocket.DefaultDialer.Dial(url.String(), nil)
 		logs.ErrIfErrf(err, "Dial attempt %d failed for user%d", ii, i)
 	}
 	if err != nil {
@@ -45,7 +45,7 @@ func connectUser(nickname string, wsPath string, config config.Config, i int) *g
 	return conn
 }
 
-func joinChannel(conn *gorilla.Conn, i int) {
+func joinChannel(conn *websocket.Conn, i int) {
 	if err := conn.WriteMessage(1, []byte("/join #r")); err != nil {
 		logs.Fatalf("user%d error, Error writing to connection. Error %s", i, err)
 	}
@@ -69,7 +69,7 @@ func joinChannel(conn *gorilla.Conn, i int) {
 	}
 }
 
-func readAndIgnoreOtherUserJoinMessages(conn *gorilla.Conn, i int) string {
+func readAndIgnoreOtherUserJoinMessages(conn *websocket.Conn, i int) string {
 	_, message, err := conn.ReadMessage()
 	if err != nil {
 		logs.Fatalf("user%d error, Error while reading connection. Error %s", i, err.Error())
@@ -87,7 +87,7 @@ func readAndIgnoreOtherUserJoinMessages(conn *gorilla.Conn, i int) string {
 	return string(message)
 }
 
-func disconnectUser(conn *gorilla.Conn, chatServer *chat.Server, i int) {
+func disconnectUser(conn *websocket.Conn, chatServer *chat.Server, i int) {
 	if err := conn.WriteMessage(1, []byte(`/quit`)); err != nil {
 		logs.Fatalf("user%d error, Error writing to connection. Error %s", i, err)
 	}

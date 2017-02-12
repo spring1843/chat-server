@@ -1,6 +1,6 @@
 package errs
 
-import "github.com/spring1843/chat-server/libs/errors"
+import "github.com/pkg/errors"
 
 // New returns an error with the supplied message.
 func New(message string) error {
