@@ -68,8 +68,10 @@ func getMultiplexer(config config.Config) *http.ServeMux {
 
 func serveStaticWeb(mux *http.ServeMux, config config.Config) {
 	if config.StaticWeb == "" {
+		logs.Infof("Not serving static web files")
 		return
 	}
+	logs.Infof("Serving static web files from %s", config.StaticWeb)
 	fs := http.FileServer(http.Dir(config.StaticWeb))
 	mux.Handle("/", fs)
 }
