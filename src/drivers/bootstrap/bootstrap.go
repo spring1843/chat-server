@@ -12,8 +12,6 @@ import (
 	"github.com/spring1843/chat-server/src/shared/logs"
 )
 
-const staticWebContentDir = "../bin/web"
-
 var chatServer *chat.Server
 
 // NewBootstrap bootstraps chat server and starts all the drivers
@@ -50,23 +48,30 @@ func startTelnet(config config.Config) error {
 }
 
 func startWeb(config config.Config) {
-	srv := getTLSServer(getMultiplexer(), config.WebAddress)
+	srv := getTLSServer(getMultiplexer(config), config.WebAddress)
 	go func() {
 		logs.Infof("Serving static files, Rest, WebSocket on http:/%s/", config.WebAddress)
 		logs.FatalIfErrf(srv.ListenAndServeTLS("tls.crt", "tls.key"), "Could not start Rest server. Error %s")
 	}()
 }
 
-func getMultiplexer() *http.ServeMux {
+func getMultiplexer(config config.Config) *http.ServeMux {
 	restHandler := webapi.NewHandler(chatServer)
 	websocket.SetWebSocket(chatServer)
-	fs := http.FileServer(http.Dir(staticWebContentDir))
 
 	mux := http.NewServeMux()
 	mux.Handle("/api/", restHandler)
 	mux.HandleFunc("/ws", websocket.Handler)
-	mux.Handle("/", fs)
+	serveStaticWeb(mux, config)
 	return mux
+}
+
+func serveStaticWeb(mux *http.ServeMux, config config.Config) {
+	if config.StaticWeb == "" {
+		return
+	}
+	fs := http.FileServer(http.Dir(config.StaticWeb))
+	mux.Handle("/", fs)
 }
 
 func getTLSConfig() *tls.Config {
