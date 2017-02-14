@@ -3,6 +3,7 @@ package bootstrap
 import (
 	"crypto/tls"
 	"net/http"
+	"os"
 
 	"github.com/spring1843/chat-server/src/chat"
 	"github.com/spring1843/chat-server/src/config"
@@ -69,6 +70,11 @@ func getMultiplexer(config config.Config) *http.ServeMux {
 func serveStaticWeb(mux *http.ServeMux, config config.Config) {
 	if config.StaticWeb == "" {
 		logs.Infof("Not serving static web files")
+		return
+	}
+	_, err := os.Stat(config.StaticWeb)
+	if os.IsNotExist(err) {
+		logs.Errf("Directory for StaticWeb defined in config does not exist. %s", config.StaticWeb)
 		return
 	}
 	logs.Infof("Serving static web files from %s", config.StaticWeb)
