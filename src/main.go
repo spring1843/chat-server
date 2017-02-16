@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/spring1843/chat-server/src/config"
@@ -25,11 +27,25 @@ func main() {
 		logs.Fatalf(usageDoc)
 	}
 	config := config.FromFile(configFile)
+	setCWD(config)
 
 	// Start all services e.g. Telnet, WebSocket, REST
 	bootstrap.NewBootstrap(config)
 
 	// Never end
+	neverDie()
+}
+
+func setCWD(config config.Config) {
+	if config.CWD == "" {
+		var err error
+		if config.CWD, err = filepath.Abs(filepath.Dir(os.Args[0])); err != nil {
+			logs.FatalIfErrf(err, "Error finding out CWD, current working directory")
+		}
+	}
+}
+
+func neverDie() {
 	for true {
 		time.Sleep(24 * time.Hour)
 	}

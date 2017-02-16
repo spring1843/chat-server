@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/spring1843/chat-server/src/chat"
 	"github.com/spring1843/chat-server/src/config"
@@ -80,13 +81,19 @@ func serveStaticWeb(mux *http.ServeMux, config config.Config) {
 		logs.Infof("Not serving static web files")
 		return
 	}
-	_, err := os.Stat(config.StaticWeb)
+
+	absolutePath, err := filepath.Abs(config.CWD + config.StaticWeb)
+	if err != nil {
+		logs.Errf("Error finding absolutepath of %q + %q", config.CWD, config.StaticWeb)
+	}
+
+	_, err = os.Stat(absolutePath)
 	if os.IsNotExist(err) {
-		logs.Errf("Directory for StaticWeb defined in config does not exist. %s", config.StaticWeb)
+		logs.Errf("Directory for StaticWeb defined in config does not exist. %s", absolutePath)
 		return
 	}
-	logs.Infof("Serving static web files from %s", config.StaticWeb)
-	fs := http.FileServer(http.Dir(config.StaticWeb))
+	logs.Infof("Serving static web files from %s", absolutePath)
+	fs := http.FileServer(http.Dir(absolutePath))
 	mux.Handle("/", fs)
 }
 

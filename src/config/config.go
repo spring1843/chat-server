@@ -12,6 +12,7 @@ type Config struct {
 	WebAddress    string `json:"web_address"`
 	StaticWeb     string `json:"static_web"`
 	HTTPS         bool   `json:"https"`
+	CWD           string `json:"cwd"`
 }
 
 // FromFile parses Config from a .json file
