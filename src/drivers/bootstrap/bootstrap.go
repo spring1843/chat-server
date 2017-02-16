@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/spring1843/chat-server/src/chat"
 	"github.com/spring1843/chat-server/src/config"
@@ -51,8 +52,36 @@ func startTelnet(config config.Config) error {
 func startWeb(config config.Config) {
 	srv := getTLSServer(getMultiplexer(config), config.WebAddress)
 	go func() {
-		logs.Infof("Serving static files, Rest, WebSocket on http:/%s/", config.WebAddress)
-		logs.FatalIfErrf(srv.ListenAndServeTLS("tls.crt", "tls.key"), "Could not start Rest server. Error %s")
+		var err error
+
+		switch config.HTTPS {
+		case false:
+			logs.Infof("HTTPS disabled in config")
+			logs.Infof("Serving static files, Rest, WebSocket on http:/%s/", config.WebAddress)
+			err = srv.ListenAndServe()
+		default:
+			absolutePathCert, err := filepath.Abs(filepath.Join(config.CWD, config.TLSCert))
+			if err != nil {
+				logs.Fatalf("Error finding absolute path of TLS cert %s%s", config.CWD, config.TLSCert)
+			}
+			if _, err = os.Stat(absolutePathCert); os.IsNotExist(err) {
+				logs.Fatalf("TLS cert file path defined in config does not exist. CWD %s Absolute Path %s", config.CWD, absolutePathCert)
+				return
+			}
+
+			absolutePathKey, err := filepath.Abs(filepath.Join(config.CWD, config.TLSKey))
+			if err != nil {
+				logs.Fatalf("Error finding absolute path of TLS Key %s%s", config.CWD, config.TLSKey)
+			}
+			_, err = os.Stat(absolutePathKey)
+			if os.IsNotExist(err) {
+				logs.Fatalf("TLS key file path defined in config does not exist. CWD %s Absolute Path %s", config.CWD, absolutePathKey)
+				return
+			}
+			logs.Infof("Serving static files, Rest, WebSocket on https:/%s/", config.WebAddress)
+			err = srv.ListenAndServeTLS("tls.crt", "tls.key")
+		}
+		logs.FatalIfErrf(err, "Could not start Rest server. Error %s", err)
 	}()
 }
 
@@ -72,13 +101,19 @@ func serveStaticWeb(mux *http.ServeMux, config config.Config) {
 		logs.Infof("Not serving static web files")
 		return
 	}
-	_, err := os.Stat(config.StaticWeb)
+
+	absolutePath, err := filepath.Abs(filepath.Join(config.CWD, config.StaticWeb))
+	if err != nil {
+		logs.Errf("Error finding absolute path of %q + %q", config.CWD, config.StaticWeb)
+	}
+
+	_, err = os.Stat(absolutePath)
 	if os.IsNotExist(err) {
-		logs.Errf("Directory for StaticWeb defined in config does not exist. %s", config.StaticWeb)
+		logs.Errf("Directory for StaticWeb defined in config does not exist. CWD %s Absolute Path %s", config.CWD, absolutePath)
 		return
 	}
-	logs.Infof("Serving static web files from %s", config.StaticWeb)
-	fs := http.FileServer(http.Dir(config.StaticWeb))
+	logs.Infof("Serving static web files from %s", absolutePath)
+	fs := http.FileServer(http.Dir(absolutePath))
 	mux.Handle("/", fs)
 }
 

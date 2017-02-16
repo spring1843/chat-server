@@ -1,0 +1,66 @@
+html {
+    overflow: hidden;
+}
+
+body {
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    background: gray;
+}
+
+video {
+    max-height: 100%;
+    height: 120px;
+    float:left;
+    margin-right:0.5em;
+}
+
+#localVideo {
+    position:absolute;
+    max-height: 100%;
+    height: 120px;
+    right:0em;
+    top:0em;
+    margin-right:0em;
+}
+
+#cams {
+    margin: 0;
+    position: absolute;
+    top: 0.5em;
+    left: 0.5em;
+    right: 0.5em;
+    overflow:scroll;
+}
+
+#videoContainer {
+    width: 200px;
+    height: 150px;
+    float:left;
+}
+
+#log {
+    background: white;
+    margin: 0;
+    padding: 0.5em 0.5em 0.5em 0.5em;
+    position: absolute;
+    top: 8.5em;
+    left: 0.5em;
+    right: 0.5em;
+    bottom: 3em;
+    overflow: auto;
+}
+
+#userInput {
+    padding: 0 0.5em 0 0.5em;
+    margin: 0;
+    position: absolute;
+    bottom: 0em;
+    left: 0.0em;
+    right:0.0em;
+    width:100%;
+    height:3em;
+}

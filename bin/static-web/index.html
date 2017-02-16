@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>chat-server</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="https://simplewebrtc.com/latest-v2.js"></script>
+    <link rel="stylesheet" href="css/main.css" />
+</head>
+
+<body>
+    <div id="cams">
+        <video id="localVideo"></video>
+        <div id="remotes"></div>
+    </div>
+    <div id="log"></div>
+
+    <form id="userInputForm">
+        <input type="text" placeholder="Type message or command in here and press Enter or Return. Use /help for all available commands." id="userInput" size="64" />
+    </form>
+
+    <script src="/js/webcosket.js"></script>
+    <script src="/js/webrtc.js"></script>
+</body>
+
+</html>
