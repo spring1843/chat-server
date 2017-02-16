@@ -53,13 +53,33 @@ func startWeb(config config.Config) {
 	srv := getTLSServer(getMultiplexer(config), config.WebAddress)
 	go func() {
 		var err error
-		if config.HTTPS {
-			logs.Infof("Serving static files, Rest, WebSocket on https:/%s/", config.WebAddress)
-			err = srv.ListenAndServeTLS("tls.crt", "tls.key")
-		} else {
+
+		switch config.HTTPS {
+		case false:
 			logs.Infof("HTTPS disabled in config")
 			logs.Infof("Serving static files, Rest, WebSocket on http:/%s/", config.WebAddress)
 			err = srv.ListenAndServe()
+		default:
+			absolutePathCert, err := filepath.Abs(filepath.Join(config.CWD, config.TLSCert))
+			if err != nil {
+				logs.Fatalf("Error finding absolute path of TLS cert %s%s", config.CWD, config.TLSCert)
+			}
+			if _, err = os.Stat(absolutePathCert); os.IsNotExist(err) {
+				logs.Fatalf("TLS cert file path defined in config does not exist. CWD %s Absolute Path %s", config.CWD, absolutePathCert)
+				return
+			}
+
+			absolutePathKey, err := filepath.Abs(filepath.Join(config.CWD, config.TLSKey))
+			if err != nil {
+				logs.Fatalf("Error finding absolute path of TLS Key %s%s", config.CWD, config.TLSKey)
+			}
+			_, err = os.Stat(absolutePathKey)
+			if os.IsNotExist(err) {
+				logs.Fatalf("TLS key file path defined in config does not exist. CWD %s Absolute Path %s", config.CWD, absolutePathKey)
+				return
+			}
+			logs.Infof("Serving static files, Rest, WebSocket on https:/%s/", config.WebAddress)
+			err = srv.ListenAndServeTLS("tls.crt", "tls.key")
 		}
 		logs.FatalIfErrf(err, "Could not start Rest server. Error %s", err)
 	}()
@@ -82,9 +102,9 @@ func serveStaticWeb(mux *http.ServeMux, config config.Config) {
 		return
 	}
 
-	absolutePath, err := filepath.Abs(config.CWD + config.StaticWeb)
+	absolutePath, err := filepath.Abs(filepath.Join(config.CWD, config.StaticWeb))
 	if err != nil {
-		logs.Errf("Error finding absolutepath of %q + %q", config.CWD, config.StaticWeb)
+		logs.Errf("Error finding absolute path of %q + %q", config.CWD, config.StaticWeb)
 	}
 
 	_, err = os.Stat(absolutePath)
