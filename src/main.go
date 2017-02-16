@@ -2,10 +2,12 @@ package main
 
 import (
 	"flag"
-	"os"
-	"path/filepath"
 	"time"
 
+	"os"
+	"path/filepath"
+
+	"github.com/kardianos/osext"
 	"github.com/spring1843/chat-server/src/config"
 	"github.com/spring1843/chat-server/src/drivers/bootstrap"
 	"github.com/spring1843/chat-server/src/shared/logs"
@@ -27,7 +29,8 @@ func main() {
 		logs.Fatalf(usageDoc)
 	}
 	config := config.FromFile(configFile)
-	setCWD(config)
+	config = setCWD(config)
+	checkStaticDirExists(config)
 
 	// Start all services e.g. Telnet, WebSocket, REST
 	bootstrap.NewBootstrap(config)
@@ -36,13 +39,27 @@ func main() {
 	neverDie()
 }
 
-func setCWD(config config.Config) {
+func checkStaticDirExists(config config.Config) {
+	absolutePath, err := filepath.Abs(filepath.Join(config.CWD, config.StaticWeb))
+	if err != nil {
+		logs.Fatalf("Error finding absolutepath of %q + %q", config.CWD, config.StaticWeb)
+	}
+	_, err = os.Stat(absolutePath)
+	if os.IsNotExist(err) {
+		logs.Fatalf("Directory for StaticWeb defined in config does not exist. CWD %s Absolute Path %s", config.CWD, absolutePath)
+		return
+	}
+}
+
+func setCWD(config config.Config) config.Config {
 	if config.CWD == "" {
 		var err error
-		if config.CWD, err = filepath.Abs(filepath.Dir(os.Args[0])); err != nil {
+		if config.CWD, err = osext.ExecutableFolder(); err != nil {
 			logs.FatalIfErrf(err, "Error finding out CWD, current working directory")
 		}
+		config.CWD += "/"
 	}
+	return config
 }
 
 func neverDie() {

@@ -89,7 +89,7 @@ func serveStaticWeb(mux *http.ServeMux, config config.Config) {
 
 	_, err = os.Stat(absolutePath)
 	if os.IsNotExist(err) {
-		logs.Errf("Directory for StaticWeb defined in config does not exist. %s", absolutePath)
+		logs.Errf("Directory for StaticWeb defined in config does not exist. CWD %s Absolute Path %s", config.CWD, absolutePath)
 		return
 	}
 	logs.Infof("Serving static web files from %s", absolutePath)

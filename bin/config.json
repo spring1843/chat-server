@@ -1,6 +1,6 @@
 {
   "telnet_address" : "",
-  "web_address" : ":80",
-  "static_web" : "./static-web",
+  "web_address" : "0.0.0.0:80",
+  "static_web" : "static-web",
   "https":false
 }
