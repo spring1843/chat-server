@@ -51,8 +51,16 @@ func startTelnet(config config.Config) error {
 func startWeb(config config.Config) {
 	srv := getTLSServer(getMultiplexer(config), config.WebAddress)
 	go func() {
-		logs.Infof("Serving static files, Rest, WebSocket on http:/%s/", config.WebAddress)
-		logs.FatalIfErrf(srv.ListenAndServeTLS("tls.crt", "tls.key"), "Could not start Rest server. Error %s")
+		var err error
+		if config.HTTPS {
+			logs.Infof("Serving static files, Rest, WebSocket on https:/%s/", config.WebAddress)
+			err = srv.ListenAndServeTLS("tls.crt", "tls.key")
+		} else {
+			logs.Infof("HTTPS disabled in config")
+			logs.Infof("Serving static files, Rest, WebSocket on http:/%s/", config.WebAddress)
+			err = srv.ListenAndServe()
+		}
+		logs.FatalIfErrf(err, "Could not start Rest server. Error %s", err)
 	}()
 }
 

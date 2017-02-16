@@ -11,6 +11,7 @@ type Config struct {
 	TelnetAddress string `json:"telnet_address"`
 	WebAddress    string `json:"web_address"`
 	StaticWeb     string `json:"static_web"`
+	HTTPS         bool   `json:"https"`
 }
 
 // FromFile parses Config from a .json file

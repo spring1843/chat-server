@@ -1,17 +1,18 @@
 FROM ubuntu:wily
+#Get Ubuntu
 
-RUN apt-get update -y && apt-get install --no-install-recommends -y -q curl build-essential ca-certificates git mercurial bzr
-RUN mkdir /goroot && curl https://storage.googleapis.com/golang/go1.5.linux-amd64.tar.gz | tar xvzf - -C /goroot --strip-components=1
+# Add linux binary
+ADD ./chat-server.linux.amd64 /tmp/chat-server.linux.amd64
 
-RUN mkdir /gopath
+# Add config.json
+ADD ./config.json /tmp/config.json
 
-ENV GOROOT /goroot
-ENV GOPATH /gopath
-ENV PATH $PATH:$GOROOT/bin:$GOPATH/bin
+# add static web files
+ADD ./static-web /tmp/static-web
 
-RUN mkdir -p  $GOPATH/src/github.com/spring1843/chat-server
-WORKDIR  $GOPATH/src/github.com/spring1843/chat-server
-ADD . $GOPATH/src/github.com/spring1843/chat-server
+# Add certificats
+ADD ./tls.crt /tmp/tls.crt
+ADD ./tls.key /tmp/tls.key
 
-EXPOSE 4000 4001 4004
-CMD ["/gopath/src/github.com/spring1843/chat-server/src/srceb_run.sh"]
+EXPOSE 80
+ENTRYPOINT ["/tmp/chat-server.linux.amd64", "-config", "/tmp/config.json"]

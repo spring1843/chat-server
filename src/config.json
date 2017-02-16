@@ -1,5 +1,6 @@
 {
   "telnet_address" : "chatserver.local:4000",
   "web_address" : "chatserver.local:4001",
-  "static_web" : "../static-web"
+  "static_web" : "../static-web",
+  "https":true
 }
