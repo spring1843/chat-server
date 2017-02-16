@@ -51,6 +51,7 @@ func checkStaticDirExists(config config.Config) {
 	}
 }
 
+// TODO change to os.Executable() when upgrading to Go 1.8
 func setCWD(config config.Config) config.Config {
 	if config.CWD == "" {
 		var err error
