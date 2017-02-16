@@ -8,7 +8,13 @@ $(function() {
 
     var log = $("#log");
     var hostAndPort = location.hostname+(location.port ? ':'+location.port: '');
-    var webSocketAddr = "wss://" + hostAndPort + "/ws";
+
+    var protocol = "wss:"
+    if (location.protocol != 'https:'){
+      protocol = "ws:"
+    }
+
+    var webSocketAddr = protocol + "//" + hostAndPort + "/ws";
 
     var validCommands = ["06"]; // UserOutPutTypeFERunFunction
     var timeStampLentgh = 13
