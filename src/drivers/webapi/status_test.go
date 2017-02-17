@@ -19,7 +19,7 @@ func TestCanStartAndGetStatus(t *testing.T) {
 	chatServer := chat.NewServer()
 	chatServer.Listen()
 
-	restHandler := webapi.NewHandler(chatServer)
+	restHandler := webapi.NewHandler(chatServer, "")
 
 	server := &http.Server{Addr: config.WebAddress, Handler: restHandler}
 	go server.ListenAndServe()

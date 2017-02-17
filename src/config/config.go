@@ -11,6 +11,7 @@ type Config struct {
 	TelnetAddress string `json:"telnet_address"`
 	WebAddress    string `json:"web_address"`
 	StaticWeb     string `json:"static_web"`
+	APIDocPath    string `json:"api_doc_path"`
 	HTTPS         bool   `json:"https"`
 	CWD           string `json:"cwd"`
 	TLSKey        string `json:"tls_key"`

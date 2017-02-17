@@ -86,7 +86,10 @@ func startWeb(config config.Config) {
 }
 
 func getMultiplexer(config config.Config) *http.ServeMux {
-	restHandler := webapi.NewHandler(chatServer)
+	if config.APIDocPath == "" {
+		logs.Infof("Not serving API Docs JSON endpoit because APIDocPath is empty in config")
+	}
+	restHandler := webapi.NewHandler(chatServer, config.APIDocPath)
 	websocket.SetWebSocket(chatServer)
 
 	mux := http.NewServeMux()

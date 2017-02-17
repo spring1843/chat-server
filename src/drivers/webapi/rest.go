@@ -20,11 +20,13 @@ func registerPaths(container rest.Container) {
 }
 
 // NewHandler returns a HTTP handler that includes all RESTfyk API endpoints exposed
-func NewHandler(chatServer *chat.Server) http.Handler {
+func NewHandler(chatServer *chat.Server, apiDocPath string) http.Handler {
 	chatServerInstance = chatServer
 
 	handler := rest.NewHTTPHandler()
 	registerPaths(handler)
-	rest.ConfigureSwagger("/api/docs.json", handler)
+	if apiDocPath != "" {
+		rest.ConfigureSwagger(apiDocPath, handler)
+	}
 	return handler
 }

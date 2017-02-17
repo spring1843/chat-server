@@ -2,6 +2,7 @@
   "telnet_address": "chatserver.local:4000",
   "web_address": "chatserver.local:4001",
   "static_web": "../bin/static-web",
+  "api_doc_path": "/api/docs.json",
   "tls_key": "tls.key",
   "tls_cert": "tls.crt",
   "https": true
