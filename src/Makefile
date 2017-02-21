@@ -63,17 +63,6 @@ certs:
 serve: build install
 	@chat-server -c config.json
 
-build_linux:
-	@env GOOS=linux GOARCH=amd64 go build -o ../bin/chat-server.linux.amd64 github.com/spring1843/chat-server/src/
-
-build_osx:
-	@env GOOS=darwin GOARCH=amd64 go build -o ../bin/chat-server.osx.amd64 github.com/spring1843/chat-server/src/
-
-build_windows:
-	@env GOOS=windows GOARCH=amd64 go build -o ../bin/chat-server.linux.amd64.exe github.com/spring1843/chat-server/src/
-
-build_bin: build_linux build_osx build_windows
-
 get_go_deps:
 	@go get -t -v ./...
 
