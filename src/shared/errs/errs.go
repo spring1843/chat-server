@@ -32,7 +32,7 @@ func Cause(err error) error {
 	return errors.Cause(err)
 }
 
-// Cause returns the underlying cause of the error, if possible.
+// Stack returns a the stack trace of the error up to this function. Message includes error as a string
 func Stack(err error) string {
 	trace := fmt.Sprintf("%+v", errors.WithStack(err))
 	trace = strings.Replace(trace, "\n", "\n\t", -1)
