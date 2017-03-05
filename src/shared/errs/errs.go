@@ -1,6 +1,11 @@
 package errs
 
-import "github.com/pkg/errors"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/pkg/errors"
+)
 
 // New returns an error with the supplied message.
 func New(message string) error {
@@ -25,4 +30,11 @@ func Wrapf(err error, format string, args ...interface{}) error {
 // Cause returns the underlying cause of the error, if possible.
 func Cause(err error) error {
 	return errors.Cause(err)
+}
+
+// Cause returns the underlying cause of the error, if possible.
+func Stack(err error) string {
+	trace := fmt.Sprintf("%+v", errors.WithStack(err))
+	trace = strings.Replace(trace, "\n", "\n\t", -1)
+	return trace
 }
