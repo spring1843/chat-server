@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/kardianos/osext"
 	"github.com/spring1843/chat-server/src/config"
 	"github.com/spring1843/chat-server/src/drivers/bootstrap"
 	"github.com/spring1843/chat-server/src/shared/logs"
@@ -51,14 +50,13 @@ func checkStaticDirExists(config config.Config) {
 	}
 }
 
-// TODO change to os.Executable() when upgrading to Go 1.8
 func setCWD(config config.Config) config.Config {
 	if config.CWD == "" {
-		var err error
-		if config.CWD, err = osext.ExecutableFolder(); err != nil {
+		executable, err := os.Executable()
+		if err != nil {
 			logs.FatalIfErrf(err, "Error finding out CWD, current working directory")
 		}
-		config.CWD += "/"
+		config.CWD += filepath.Dir(executable)
 	}
 	return config
 }

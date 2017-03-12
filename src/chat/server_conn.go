@@ -59,6 +59,8 @@ func (s *Server) authenticateUser(user *User, conn drivers.Connection) error {
 
 func (s *Server) connectUser(user *User, conn drivers.Connection) {
 	s.AddUser(user)
-	logs.Infof("connection address %s is now nicknamed %q", conn.RemoteAddr().String(), user.GetNickName())
+	nickName := user.GetNickName()
+	logs.Infof("connection address %s is now nicknamed %q", conn.RemoteAddr().String(), nickName)
+	conn.SetUserNickname(nickName)
 	user.SetOutgoingf(plugins.UserOutPutTUserServerMessage, "Welcome %s! Enter /join #channel or /help to get all commands", user.GetNickName())
 }

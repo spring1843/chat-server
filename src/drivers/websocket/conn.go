@@ -2,7 +2,7 @@ package websocket
 
 import (
 	"net"
-
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -26,16 +26,19 @@ const (
 
 // ChatConnection is an middleman between the WebSocket connection and Chat Server
 type ChatConnection struct {
-	Connection *websocket.Conn
-	incoming   chan []byte
-	outgoing   chan []byte
+	Connection   *websocket.Conn
+	incoming     chan []byte
+	outgoing     chan []byte
+	nickName     string
+	nickNameLock *sync.Mutex
 }
 
 // NewChatConnection returns a new ChatConnection
 func NewChatConnection() *ChatConnection {
 	return &ChatConnection{
-		incoming: make(chan []byte),
-		outgoing: make(chan []byte),
+		incoming:     make(chan []byte),
+		outgoing:     make(chan []byte),
+		nickNameLock: new(sync.Mutex),
 	}
 }
 
@@ -64,6 +67,33 @@ func (c *ChatConnection) Write(p []byte) (int, error) {
 
 }
 
+// RemoteAddr returns the remote address of the connected user
+func (c *ChatConnection) RemoteAddr() net.Addr {
+	return c.Connection.RemoteAddr()
+}
+
+// SetUserNickname sets the nickname given to this connection after authentication
+func (c *ChatConnection) SetUserNickname(nickName string) {
+	c.nickNameLock.Lock()
+	defer c.nickNameLock.Unlock()
+	c.nickName = nickName
+}
+
+// GetUserNickName gets the nickname given to this connection after authentication
+func (c *ChatConnection) GetUserNickName() string {
+	c.nickNameLock.Lock()
+	defer c.nickNameLock.Unlock()
+	return c.nickName
+}
+
+// Close a ChatConnection
+func (c *ChatConnection) Close() error {
+	if err := c.Connection.Close(); err != nil {
+		return errs.Wrap(err, "Error closing WebSocket connection")
+	}
+	return nil
+}
+
 // readPump pumps messages from the websocket connection to the hub.
 //
 // The application runs readPump in a per-connection goroutine. The application
@@ -72,7 +102,10 @@ func (c *ChatConnection) Write(p []byte) (int, error) {
 func (c *ChatConnection) readPump() {
 	defer func() {
 		c.Connection.Close()
-		logs.Infof("No longer reading Websocket pump for %s", c.Connection.RemoteAddr())
+		nickName := c.GetUserNickName()
+		logs.Infof("No longer reading Websocket pump for @%s %s", nickName, c.Connection.RemoteAddr())
+		logs.ErrIfErrf(chatServerInstance.RemoveUser(nickName), "Failed removing @%s from chat server after Websocket connection ended.", nickName)
+		logs.Infof("@%s removed from chat server", nickName)
 	}()
 	c.Connection.SetReadLimit(maxMessageSize)
 	c.Connection.SetReadDeadline(time.Now().Add(pongWait))
@@ -133,17 +166,4 @@ func (c *ChatConnection) writePump() {
 			}
 		}
 	}
-}
-
-// RemoteAddr returns the remote address of the connected user
-func (c *ChatConnection) RemoteAddr() net.Addr {
-	return c.Connection.RemoteAddr()
-}
-
-// Close a ChatConnection
-func (c *ChatConnection) Close() error {
-	if err := c.Connection.Close(); err != nil {
-		return errs.Wrap(err, "Error closing WebSocket connection")
-	}
-	return nil
 }
