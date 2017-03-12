@@ -52,12 +52,11 @@ func checkStaticDirExists(config config.Config) {
 
 func setCWD(config config.Config) config.Config {
 	if config.CWD == "" {
-		var err error
-		if config.CWD, err = os.Executable(); err != nil {
+		executable, err := os.Executable()
+		if err != nil {
 			logs.FatalIfErrf(err, "Error finding out CWD, current working directory")
 		}
-
-		config.CWD += "/"
+		config.CWD += filepath.Dir(executable)
 	}
 	return config
 }
