@@ -17,7 +17,7 @@ $(function() {
     var webSocketAddr = protocol + "//" + hostAndPort + "/ws";
 
     var validCommands = ["06"]; // UserOutPutTypeFERunFunction
-    var timeStampLentgh = 13
+    var timeStampLength = 13
 
     function appendLog(msg) {
         var d = log[0]
@@ -34,10 +34,10 @@ $(function() {
 
     for (var i = 0; i < validCommands.length ; i++) {
         var commandLength = validCommands[i].length;
-        if (msg.length < commandLength + timeStampLentgh ){
+        if (msg.length < commandLength + timeStampLength ){
             continue;
         }
-        var part = msg.substr(timeStampLentgh,commandLength);
+        var part = msg.substr(timeStampLength-commandLength,commandLength);
         if (part == validCommands[i]) {
              isCommand = true;
              command = validCommands[i];
@@ -64,7 +64,7 @@ $(function() {
             conn.onmessage = function(evt) {
                 var dataString = evt.data;
                 runIfCommand(dataString);
-                appendLog($("<div/>").text(dataString.substr(timeStampLentgh, dataString.length - timeStampLentgh)))
+                appendLog($("<div/>").text(dataString.substr(timeStampLength, dataString.length - timeStampLength)))
             }
     }
 

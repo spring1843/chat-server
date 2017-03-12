@@ -26,7 +26,7 @@ func Start(chatServer *chat.Server, config config.Config) error {
 			if err != nil {
 				logs.Infof("Error accepting connection %s", err.Error())
 			}
-			chatServer.ReceiveConnection(connection)
+			chatServer.ReceiveConnection(&chatConnection{conn: connection})
 		}
 	}(chatServer)
 

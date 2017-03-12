@@ -15,6 +15,7 @@ type (
 		data      []byte
 		lock      *sync.Mutex
 		EnableLog bool
+		nickName  string
 	}
 	// MockedNetwork is needed to implement the connection interface
 	MockedNetwork struct{}
@@ -76,6 +77,11 @@ func (conn *MockedConnection) Read(p []byte) (int, error) {
 
 	conn.log("End - Reading data from connection\n")
 	return len(data), nil
+}
+
+// SetUserNickname sets the nickname given to this connection after authentication
+func (conn *MockedConnection) SetUserNickname(nickName string) {
+	conn.nickName = nickName
 }
 
 // ReadString convenient method for reading
