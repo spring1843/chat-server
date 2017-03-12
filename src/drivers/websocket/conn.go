@@ -29,6 +29,7 @@ type ChatConnection struct {
 	Connection *websocket.Conn
 	incoming   chan []byte
 	outgoing   chan []byte
+	nickName   chan string
 }
 
 // NewChatConnection returns a new ChatConnection
@@ -36,6 +37,7 @@ func NewChatConnection() *ChatConnection {
 	return &ChatConnection{
 		incoming: make(chan []byte),
 		outgoing: make(chan []byte),
+		nickName: make(chan string),
 	}
 }
 
@@ -62,6 +64,24 @@ func (c *ChatConnection) Write(p []byte) (int, error) {
 	c.outgoing <- p
 	return len(p), nil
 
+}
+
+// RemoteAddr returns the remote address of the connected user
+func (c *ChatConnection) RemoteAddr() net.Addr {
+	return c.Connection.RemoteAddr()
+}
+
+// SetUserNickname sets the nickname given to this connection after authentication
+func (c *ChatConnection) SetUserNickname(nickName string) {
+	c.nickName <- nickName
+}
+
+// Close a ChatConnection
+func (c *ChatConnection) Close() error {
+	if err := c.Connection.Close(); err != nil {
+		return errs.Wrap(err, "Error closing WebSocket connection")
+	}
+	return nil
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -133,17 +153,4 @@ func (c *ChatConnection) writePump() {
 			}
 		}
 	}
-}
-
-// RemoteAddr returns the remote address of the connected user
-func (c *ChatConnection) RemoteAddr() net.Addr {
-	return c.Connection.RemoteAddr()
-}
-
-// Close a ChatConnection
-func (c *ChatConnection) Close() error {
-	if err := c.Connection.Close(); err != nil {
-		return errs.Wrap(err, "Error closing WebSocket connection")
-	}
-	return nil
 }
