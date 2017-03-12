@@ -16,8 +16,8 @@ add_static_files: remove_old_package
 	@cd ./bin && zip -vr ./latest_package.zip  ./static-web && cd ..
 
 add_to_zip_package: add_static_files
-	@zip -vj ./bin/latest_package.zip Dockerfile ./bin/Dockerrun.aws.json ./bin/chat-server.linux.amd64 ./bin/config.json
+	@zip -vj ./bin/latest_package.zip ./bin/Dockerfile ./bin/Dockerrun.aws.json ./bin/chat-server.linux.amd64 ./bin/config.json
 
-build_all_targets: build_linux build_osx build_windows
+build_all_targets: build_linux
 
 build: build_all_targets add_to_zip_package

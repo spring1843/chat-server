@@ -1,7 +1,4 @@
 {
   "AWSEBDockerrunVersion": "1",
   "Logging": "/tmp/docker-chat-server",
-  "Image": {
-    "Update": "false"
-  }
 }
