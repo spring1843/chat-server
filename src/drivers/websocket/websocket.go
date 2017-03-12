@@ -13,8 +13,14 @@ var (
 	upgrader           = websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
+		CheckOrigin:     checkOrigin,
 	}
 )
+
+// TODO validate CORS headers here
+func checkOrigin(r *http.Request) bool {
+	return true
+}
 
 // Handler is a http handler function that implements WebSocket
 func Handler(w http.ResponseWriter, r *http.Request) {
