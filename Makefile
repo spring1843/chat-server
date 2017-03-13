@@ -12,10 +12,7 @@ build_windows:
 remove_old_package:
 	@rm -f ./bin/latest_package.zip
 
-add_static_files: remove_old_package
-	@cd ./bin && zip -vr ./latest_package.zip  ./static-web && cd ..
-
-add_to_zip_package: add_static_files
+add_to_zip_package: remove_old_package
 	@zip -vj ./bin/latest_package.zip ./bin/Dockerfile ./bin/Dockerrun.aws.json ./bin/chat-server.linux.amd64 ./bin/config.json
 
 build_all_targets: build_linux
